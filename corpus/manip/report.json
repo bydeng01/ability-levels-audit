@@ -1,0 +1,10 @@
+{
+  "n_pairs": 60,
+  "n_correct": 60,
+  "n_reversed": 0,
+  "n_tied": 0,
+  "agreement_rate": 1.0,
+  "reversed_stimuli": [],
+  "tied_stimuli": [],
+  "note": "blind, order-randomised; validates that R_H leaves more of the next reasoning step to the student than R_L. Not a selection step."
+}

@@ -1,0 +1,26 @@
+# FROZEN learner-profile texts — the manipulated factor of the study.
+#
+# Constraints (build prompt, Phase 4):
+#   - matched for length and specificity, differing ONLY in stated ability;
+#   - neither may hint at the dialogue (no mixture/percent/algebra-task specifics
+#     beyond naming the course subject, identical in both);
+#   - neither may instruct the judge how to weigh the profile.
+#
+# The two texts are sentence-by-sentence parallel: (1) course stage, (2) placement
+# percentile, (3) self-assessment, (4) previous teacher's description. Word counts
+# are matched exactly (novice 59 / advanced 59; verified by tests/test_instrument.py).
+# Frozen before any judge call; never tuned afterward.
+
+novice: >-
+  This student is in the first weeks of an introductory algebra course. On the
+  course placement test they scored in the 12th percentile. In their
+  self-assessment they describe algebra word problems as very difficult and say
+  they usually need step-by-step help to make progress. Their previous teacher
+  describes them as a struggling beginner who is still building basic skills.
+
+advanced: >-
+  This student is in the final weeks of an accelerated algebra course. On the
+  course placement test they scored in the 93rd percentile. In their
+  self-assessment they describe algebra word problems as very easy and say they
+  usually work through problems independently without help. Their previous teacher
+  describes them as a high-achieving student who is ready for advanced material.

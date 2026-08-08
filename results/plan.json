@@ -1,0 +1,21 @@
+{
+  "design": "60 stimuli x 3 arms x 2 poles x 3 reps",
+  "n_stimuli": 60,
+  "n_units": 360,
+  "reps": 3,
+  "n_calls_planned": 1080,
+  "judge_model": "claude-opus-4-8",
+  "est_cost_usd": 10.6,
+  "worst_case_cost_usd": 35.42,
+  "contract_sha256": "41ec4f6696d773202a94729b575061ed6164b929d49fc551a20df9b69b584eb8",
+  "frozen_inputs": {
+    "stimuli_sha256": "b0e9948e85b2c4318b01fb574170ef8ee7f5228dd9b5ce2d30f77ae28ce18795",
+    "labels_sha256": "fda2bc3d6f25e60433e211a1c792d7a56b7d7d102338921d182d9059b22707d4",
+    "profiles_yaml_sha256": "e0dea8f6b459b98a33b4042fd5e27e1ffd4ddac87572cd5fa57147e24b24fb61",
+    "models_yaml_sha256": "3f3e3c8060f7ae1bdf3246b7ec29f8ef0ae189e994ea05e4fec13a13e0fcb296",
+    "judge_pedagogy_py_sha256": "a79766c86a44a7075f2c1579343f09802282ec99bbbff97b52c42edba5a0c9fe",
+    "profile_judge_py_sha256": "87869e7dbb7add4912f6d800a4c04ae6505a8c307b4d73dd96daf4d8fd772c0c",
+    "rubric_md_sha256": "901f2fb274c7b93d5cc1a57c4629d8c78c327d861100a2ee8cac51de10fb7362"
+  },
+  "note": "the ~814-token system prompt is below claude-opus-4-8's 1024-token prompt-cache minimum, so no cache discount is assumed"
+}

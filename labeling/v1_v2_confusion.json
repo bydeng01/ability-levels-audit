@@ -1,0 +1,19 @@
+{
+  "v1_to_v2_competence": {
+    "v1=weak,v2=weak": 20,
+    "v1=strong,v2=weak": 45,
+    "v1=strong,v2=strong": 31
+  },
+  "raw_agreement": 51,
+  "n": 96,
+  "cohens_kappa": 0.223,
+  "evidence_strength_agreement": 62,
+  "v1_distribution": {
+    "weak": 20,
+    "strong": 76
+  },
+  "v2_distribution": {
+    "weak": 65,
+    "strong": 31
+  }
+}

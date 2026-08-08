@@ -1,0 +1,30 @@
+{
+  "judged_turns": 2219,
+  "tracker_joined": 990,
+  "tracker_distribution": {
+    "stuck=True,progressed=False": 39,
+    "stuck=False,progressed=True": 844,
+    "stuck=True,progressed=True": 100,
+    "stuck=False,progressed=False": 7
+  },
+  "per_policy": {
+    "conv_no_final_answer": 190,
+    "conv_socratic": 223,
+    "ped_no_cascade": 239,
+    "ped_no_gate": 191,
+    "ped_no_tracker": 197,
+    "conv": 511,
+    "ped": 668
+  },
+  "leaks_per_policy": {
+    "conv_no_final_answer": 32,
+    "conv_socratic": 4,
+    "ped_no_cascade": 8,
+    "ped_no_gate": 14,
+    "ped_no_tracker": 5,
+    "conv": 199,
+    "ped": 45
+  },
+  "reassembly_assertion": "byte-identical to analysis.judge.dialogue_for_turn for every judged turn",
+  "check_pass": true
+}
