@@ -210,6 +210,16 @@ profile when evidence is ambiguous (it is a prior); the failure mode is profile
 influence that persists undiminished under strong evidence. We do NOT pre-register
 "evidence should always beat the label."
 
+> **Scope limit, recorded at freeze (see Amendment A1).** The frozen 60 span only
+> two evidence levels — `moderate` (37) and `strong` (23); the pool's 8 `ambiguous`
+> items were all excluded as a side-effect of the confidence-ordered selection rule.
+> §6.4 is therefore a two-level contrast, and it cannot speak to the ambiguous end,
+> which is precisely where leaning on a profile would be most defensible. The
+> selection rule was **not** re-tuned to recover them: it was frozen before any label
+> existed, the gain would be ~4 items per stratum, and re-cutting a frozen rule after
+> seeing the covariate is the behaviour the freeze exists to prevent. Reported as a
+> limitation.
+
 **6.5 Statistics:** paired throughout; stimulus as the unit; BCa bootstrap (10,000
 resamples, seed 13) resampling stimuli within stratum; exact Wilcoxon where n ≤ 25
 per SciPy defaults, otherwise the normal approximation. No multiplicity correction on
@@ -226,6 +236,16 @@ x-axis: demonstrated competence (weak → strong); y-axis: preference for high
 scaffolding (Δ); two lines (stated novice, stated advanced) with CIs; the D-arm
 control shown as a reference. Parallel, closely-spaced lines = behaviour-driven
 judge; wide separation = profile anchoring.
+
+## 7b. Amendments after the `prereg-frozen` tag
+
+Recorded here rather than silently edited. No judge call had been made at the time of
+either entry, and neither is data-dependent.
+
+**A1 (2026-08-08) — evidence-strength coverage of the frozen set.** Composition audit
+of the frozen 60 found `moderate` 37 / `strong` 23 / `ambiguous` 0. §6.4's three-level
+framing was written before the materials existed; the text above now states the actual
+two-level scope. The design was not changed to chase the missing level.
 
 ## 8. Budget
 

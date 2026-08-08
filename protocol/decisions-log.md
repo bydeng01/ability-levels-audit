@@ -261,3 +261,23 @@ now exercise the real frozen stimuli rather than skipping.
 **Dry run.** `--manifest-only`: 360 units, 1,080 calls, est **$10.60**, worst case
 $35.42 under the $40 cap. Contract hash
 `41ec4f6696d773202a94729b575061ed6164b929d49fc551a20df9b69b584eb8`.
+
+## 2026-08-08 — Post-freeze composition audit (Amendment A1)
+
+Auditing the frozen 60 found the evidence-strength covariate spans only two levels:
+moderate 37 / strong 23 / **ambiguous 0**. The pool's 8 ambiguous items were all
+excluded as a side-effect of the pre-specified confidence-ordered selection rule
+(ambiguous evidence correlates with lower labeller confidence). This costs the §6.4
+moderation analysis its most theoretically interesting end — ambiguous evidence is
+exactly where leaning on a stated profile is defensible as a prior.
+
+Deliberately NOT fixed by re-tuning the selection rule: the rule was frozen before any
+label existed, recovering the 8 items would add ~4 per stratum (a negligibly powered
+cell), and re-cutting a frozen rule after inspecting the covariate is the behaviour
+the freeze discipline exists to prevent. Recorded as Amendment A1 in the
+pre-registration; §6.4 is restated as a two-level contrast and listed as a limitation
+in the abstract.
+
+Other composition facts for the paper: tutor families split exactly 30 conv / 30 ped;
+bases gpt 26 / gemini 22 / sonnet 12; problems 8–12 each across all six; prompt purity
+verified over all 360 assembled prompts; user prompts 1,160–5,156 chars (median 2,048).
