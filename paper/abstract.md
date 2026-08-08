@@ -34,17 +34,28 @@ manipulation touches only the evaluator.
 
 **Corpus.** 60 dialogue contexts drawn from the 2,219 judged tutor turns of a
 frozen tutoring-policy study (7 tutor policies × 3 tutor bases; algebra mixture
-problems; a calibrated-weak Llama-3.1-8B student). Each context ends with a
-student turn and carries two candidate tutor replies to that same context: a
-high-scaffolding `R_H` and a low-scaffolding `R_L`
-([[n_corpus_pairs]] drawn from real corpus turns, [[n_authored]] authored,
-length-matched).
+problems; a calibrated-weak Llama-3.1-8B student). Contexts are split evenly
+across tutor families (30 conv / 30 ped) and span all six training problems.
+Each context ends with a student turn, presents a live next reasoning step, and
+carries two candidate tutor replies to that same context: a high-scaffolding
+`R_H` and a low-scaffolding `R_L`. One pole is the session's real next tutor
+turn; the counterpart is another corpus turn that fits, or an authored reply
+matched for length and register (R_H: 55 corpus / 5 authored; R_L: 33 / 27).
+**28 stimuli use no authored text at all** and support a pre-registered
+authoring-robustness re-estimate of the primary endpoint.
 
-**Labels.** Demonstrated competence (30 weak / 30 strong — [[actual split]])
-comes from three independent blind annotation passes over the contexts alone
-(majority vote; rubric and per-rep records released), not from the tutor's own
-state tracker, which shares a model family with the judge and is used only as a
-sampling prior.
+**Manipulation check.** Blind, order-randomised raters identified the
+higher-scaffolding member of all **60/60** pairs (0 reversed, 0 tied), so Δ
+measures the intended contrast.
+
+**Labels.** Demonstrated competence (30 weak / 30 strong) comes from three
+independent blind annotation passes over the contexts alone (126-candidate pool;
+majority vote; 0 items below 2/3 agreement; 115/126 unanimous; pairwise rep
+agreement ≈95%), not from the tutor's own state tracker, which shares a model
+family with the judge and is used only as a sampling prior. The labelling rubric
+was revised once before any judge call, to measure *current-state* competence;
+the revision was strictly monotone (45 items strong→weak, **0** weak→strong) and
+both label sets are released.
 
 **Judge.** The source study's frozen pedagogy judge (Claude Opus 4.8, rubric
 verbatim: contingent scaffolding, productive struggle, assistance calibration,
@@ -71,7 +82,15 @@ whether the label moves ratings even with the response held fixed.
 blind-labelled behavioural evidence strengthens (Spearman ρ = [[rho]],
 p = [[p]]). A rational evaluator may lean on a prior when evidence is ambiguous;
 the failure mode is influence that persists undiminished under strong evidence
-— which we [[do/do not]] observe.
+— which we [[do/do not]] observe. This contrast spans two evidence levels
+(moderate, strong); the frozen set contains no ambiguous-evidence items, so the
+end of the scale where profile use is most defensible is not tested here.
+
+**Authoring robustness.** Re-estimated on the 28 stimuli containing no authored
+text, the primary endpoint is [[PAG_weak all-corpus mean, CI]]. Authored text
+cannot in any case manufacture the result: identical `R_H`/`R_L` texts are judged
+in all three arms, so a stimulus-level artifact cancels exactly in a
+difference-of-differences.
 
 **Figure 1.** [[fig1.pdf — two lines (stated novice / stated advanced) over
 demonstrated competence, D-arm reference; parallel lines = behaviour-driven,
@@ -90,9 +109,12 @@ metadata, bounded by the single domain and judge family.]]
 **Limitations.** One judge family (the blind competence labels are also
 Claude-family, disclosed; the tutor-pipeline circularity is removed but
 family-correlation with the judge remains); one algebra domain; profiles are
-synthetic course-record texts; scaffolding preference is rubric-scored rather
-than forced-choice (a forced-choice robustness check is a labelled exploratory
-follow-up).
+synthetic course-record texts; the evidence-strength moderation spans only
+moderate and strong, so the ambiguous end — where profile use is most defensible
+— is untested; roughly half of `R_L` responses are authored (inert for the
+primary endpoint by construction, and checked on the authoring-free subset);
+scaffolding preference is rubric-scored rather than forced-choice (a
+forced-choice robustness check is a labelled exploratory follow-up).
 
 **Relation to companion work.** The corpus, judge, and rubric come from a
 companion study of tutoring policies [cite]; its headline findings are not
