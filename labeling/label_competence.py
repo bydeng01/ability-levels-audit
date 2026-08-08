@@ -120,7 +120,18 @@ def cmd_prepare(args):
     cands = _candidates()
     (LAB / "batches").mkdir(exist_ok=True)
     (LAB / "reps").mkdir(exist_ok=True)
-    (LAB / "RUBRIC.md").write_text(LABEL_RUBRIC)
+    # The rubric is frozen (decisions-log 2026-08-08: "No further instrument
+    # iteration"). Re-running prepare must never silently rewrite it
+    # (AUDIT-2026-08-08 N-series): emit it only if absent, and refuse if the file on
+    # disk differs from the module's text.
+    rubric_path = LAB / "RUBRIC.md"
+    if not rubric_path.exists():
+        rubric_path.write_text(LABEL_RUBRIC)
+    elif rubric_path.read_text() != LABEL_RUBRIC:
+        raise SystemExit(
+            f"FROZEN RUBRIC MISMATCH: {rubric_path} differs from LABEL_RUBRIC in "
+            "label_competence.py. The labelling instrument is frozen; refusing to "
+            "overwrite it. Reconcile deliberately if a revision is genuinely intended.")
     for rep in range(1, N_REPS + 1):
         order = list(cands)
         random.Random(SEED + rep).shuffle(order)
@@ -163,6 +174,14 @@ def cmd_aggregate(args):
         votes = [reps[i][cid] for i in range(N_REPS)]
         comp_counts = Counter(v["competence"] for v in votes)
         top, n_top = comp_counts.most_common(1)[0]
+        # NOTE (AUDIT-2026-08-08 B4): with N_REPS == 3 and a BINARY competence label,
+        # n_top is 2 or 3 by pigeonhole, so `agreement_ok` is structurally always True
+        # and `n_dropped` is structurally always 0. The field is retained because the
+        # released labels.jsonl carries it, but it is NOT a reliability statistic and
+        # must not be reported as one ("0 items dropped for <2/3 agreement" is a
+        # tautology, not a finding). The reliability evidence is the unanimity rate and
+        # the pairwise inter-rep agreement printed below. A gate that can actually fail
+        # would need either an "unclear" option in COMP_VALS or an even rep count.
         agreement_ok = n_top >= 2
         if not agreement_ok:
             n_dropped += 1
@@ -187,9 +206,19 @@ def cmd_aggregate(args):
     comp = Counter(r["competence"] for r in kept)
     ev = Counter(r["evidence_strength"] for r in kept)
     unan = sum(1 for r in kept if r["unanimous"])
-    print(f"labels: {len(out)} candidates, {n_dropped} dropped (<2/3 agreement)")
+    print(f"labels: {len(out)} candidates, {n_dropped} dropped "
+          f"(<2/3 agreement — NOTE: structurally always 0, see cmd_aggregate; "
+          f"not a reliability statistic)")
     print(f"  competence: {dict(comp)}  (unanimous: {unan}/{len(kept)})")
     print(f"  evidence_strength: {dict(ev)}")
+    # Real reliability evidence: pairwise agreement between the independent reps.
+    for i in range(N_REPS):
+        for j in range(i + 1, N_REPS):
+            same = sum(1 for c in cands
+                       if reps[i][c["candidate_id"]]["competence"]
+                       == reps[j][c["candidate_id"]]["competence"])
+            print(f"  inter-rep competence agreement rep{i + 1}/rep{j + 1}: "
+                  f"{same}/{len(cands)} ({same / len(cands):.1%})")
     prior = {c["candidate_id"]: c["prior_stratum"] for c in cands}
     match = sum(1 for r in kept if r["competence"] == prior[r["candidate_id"]])
     print(f"  agreement with sampling prior: {match}/{len(kept)} "

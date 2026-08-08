@@ -15,9 +15,10 @@ Arms:
   P_adv  advanced profile + dialogue + response
 
 Units are (stimulus_id, arm, pole) with pole in {high, low} (the R_H / R_L
-candidate response). Design: 60 stimuli x 3 arms x 2 poles x 3 reps = 1,080 calls.
-Cache key: (stimulus_id, arm, pole, rep). Call order is a seeded shuffle of the
-full schedule (arm order randomised, per the pre-registration).
+candidate response). The number of stimuli is read from the frozen artifact; each
+has 3 arms x 2 poles x 3 reps. Cache key: (stimulus_id, arm, pole, rep). Call order
+is a seeded shuffle of the full schedule (arm order randomised, per the
+pre-registration).
 
 The prompt NEVER contains: the condition/arm label, the competence label, the
 source policy name, the tutor base, node names, run ids, or the canonical answer
@@ -26,7 +27,9 @@ source policy name, the tutor base, node names, run ids, or the canonical answer
 from __future__ import annotations
 
 import hashlib
+import importlib.metadata
 import json
+import platform
 import random
 import sys
 from pathlib import Path
@@ -53,7 +56,8 @@ PROFILE_BLOCK_TEMPLATE = (
 
 def load_profiles() -> dict:
     p = yaml.safe_load((ROOT / "profiles/profiles.yaml").read_text())
-    assert set(p) == {"novice", "advanced"}
+    if not isinstance(p, dict) or set(p) != {"novice", "advanced"}:
+        raise SystemExit("profiles/profiles.yaml must contain exactly novice and advanced")
     return p
 
 
@@ -97,10 +101,31 @@ def schedule(stimuli: list[dict]) -> list[dict]:
 
 
 def contract_sha256(judge_spec: dict) -> str:
-    """Hash of everything that shapes a request: model + params + every frozen text.
-    The preflight freezes this; the paid run refuses to start if it changed."""
+    """Hash request values, executed request code, and the transport runtime.
+
+    Hashing constants alone did not bind `dialogue_for`, `schedule`, or the live
+    transport. A preflight is now valid only for these exact source files and runtime
+    versions; the paid runner compares the contract again before scoring.
+    """
     profiles = load_profiles()
-    stimuli_sha = (ROOT / "corpus/stimuli.sha256").read_text().split()[0]
+    # Hash the ARTIFACT, not its sidecar (AUDIT-2026-08-08 B2). The sidecar is still
+    # cross-checked by run_study.sha_artifact; reading it here instead of hashing
+    # stimuli.jsonl left every post-freeze edit of the stimuli invisible to the
+    # contract, the cache stamp and run_meta.json.
+    stimuli_sha = hashlib.sha256((ROOT / "corpus/stimuli.jsonl").read_bytes()).hexdigest()
+    code_paths = (
+        "judging/profile_judge.py",
+        "judging/run_study.py",
+        "vendor/analysis/judge_pedagogy.py",
+    )
+    code_sha256 = {
+        path: hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
+        for path in code_paths
+    }
+    try:
+        anthropic_version = importlib.metadata.version("anthropic")
+    except importlib.metadata.PackageNotFoundError:
+        anthropic_version = "not-installed"
     blob = json.dumps({
         "model": judge_spec["model"],
         "provider": judge_spec.get("provider"),
@@ -113,6 +138,9 @@ def contract_sha256(judge_spec: dict) -> str:
         "stimuli_sha256": stimuli_sha,
         "arms": ARMS, "poles": POLES, "reps": REPS,
         "schedule_seed": SCHEDULE_SEED,
+        "request_code_sha256": code_sha256,
+        "runtime": {"python": platform.python_version(),
+                    "anthropic": anthropic_version},
     }, sort_keys=True)
     return hashlib.sha256(blob.encode()).hexdigest()
 
@@ -138,8 +166,10 @@ def assert_prompt_pure(user: str, arm: str, profiles: dict) -> None:
     profile = profile_for_arm(arm, profiles)
     if profile is not None:
         block = PROFILE_BLOCK_TEMPLATE.format(profile=profile)
-        assert user.startswith(block), "profile arm does not start with its block"
+        if not user.startswith(block):
+            raise SystemExit("profile arm does not start with its frozen block")
         body = user[len(block):]
     low = body.lower()
     for tok in FORBIDDEN_METADATA_TOKENS:
-        assert tok.lower() not in low, f"metadata token {tok!r} leaked into the prompt"
+        if tok.lower() in low:
+            raise SystemExit(f"metadata token {tok!r} leaked into the prompt")

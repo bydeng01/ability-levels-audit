@@ -1,8 +1,7 @@
 {
-  "rule": "Deterministic selection of 30 weak + 30 strong from the labelled candidates.\n\n    Rule (pre-specified before any label existed; see decisions-log 2026-08-08):\n    eligible = candidates whose 3 blind reps reached >= 2/3 agreement on competence\n    AND whose context presents a live next reasoning step (`is_eligible`; added\n    2026-08-08 before any judge call, applied identically to both strata).\n    Within each labelled stratum, order by (unanimity desc, mean confidence desc,\n    candidate_id asc) and take greedily under coverage caps: <= 7 per problem,\n    <= 2 per (run, problem) [already enforced at candidate stage], relaxing the\n    problem cap to 9 then 12 only if 30 cannot otherwise be reached. If a stratum\n    has < 30 eligible members, take all and report the imbalance.",
+  "rule": "Deterministic selection of up to 30 weak + 30 strong labelled candidates.\n\n    Rule (pre-specified before any label existed; see decisions-log 2026-08-08):\n    eligible = candidates whose 3 blind reps reached >= 2/3 agreement on competence\n    AND whose context presents a live next reasoning step (`is_eligible`; added\n    2026-08-08 before any judge call, applied identically to both strata).\n    Within each labelled stratum, order by (unanimity desc, mean confidence desc,\n    candidate_id asc) and take greedily under coverage caps: <= 7 per problem,\n    <= 2 per (run, problem) [already enforced at candidate stage], relaxing the\n    problem cap to 9 then 12 only if 30 cannot otherwise be reached. If a stratum\n    has < 30 eligible members, take all and report the imbalance. The explicit\n    pre-data material exclusions above are applied before this unchanged ordering.",
   "selected": {
     "weak": [
-      "C001",
       "C002",
       "C004",
       "C005",
@@ -14,10 +13,10 @@
       "C025",
       "C026",
       "C028",
-      "C030",
       "C031",
       "C033",
       "C039",
+      "C043",
       "C055",
       "C057",
       "C065",
@@ -27,6 +26,7 @@
       "C077",
       "C080",
       "C086",
+      "C088",
       "C089",
       "C094",
       "C105",
@@ -34,9 +34,6 @@
       "C010"
     ],
     "strong": [
-      "C052",
-      "C073",
-      "C103",
       "C111",
       "C115",
       "C116",
@@ -44,7 +41,6 @@
       "C119",
       "C121",
       "C050",
-      "C078",
       "C091",
       "C007",
       "C011",
@@ -58,21 +54,23 @@
       "C081",
       "C085",
       "C087",
-      "C106",
-      "C110",
       "C126",
       "C051",
       "C092",
-      "C109"
+      "C109",
+      "C021"
     ]
   },
   "n_eligible": {
-    "weak": 80,
-    "strong": 32
+    "weak": 75,
+    "strong": 25
+  },
+  "pre_data_exclusions": {
+    "C018": "unrepaired current error and response-pair contingency confound"
   },
   "n_dropped_no_agreement": 0,
   "n_dropped_no_live_step": {
-    "strong": 10,
-    "weak": 4
+    "weak": 9,
+    "strong": 16
   }
 }

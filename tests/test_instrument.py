@@ -1,12 +1,14 @@
 """Prompt purity + arm equivalence + profile matching (Phase 7)."""
 import json
 import re
+from types import SimpleNamespace
 from pathlib import Path
 
 import pytest
 
 from analysis import judge_pedagogy as JP
 from judging import profile_judge as PJ
+import judging.run_study as RS
 from judging.run_study import PREFLIGHT_STIMULUS
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -117,3 +119,33 @@ def test_dialogue_reassembly_matches_render_contract():
             assert J.render_dialogue(labeled) == d
             assert labeled[-1][0] == "Tutor"
             assert labeled[-1][1] == s[f"r_{pole}"].strip()
+
+
+def test_live_transport_disables_sdk_retries_and_sends_only_frozen_fields(monkeypatch):
+    import anthropic
+    captured = {"calls": 0}
+
+    class FakeMessages:
+        def create(self, **kwargs):
+            captured["calls"] += 1
+            captured["request"] = kwargs
+            return SimpleNamespace(
+                id="msg_offline_test", model="claude-opus-4-8",
+                stop_reason="end_turn",
+                content=[SimpleNamespace(type="text", text='{"overall": 3}')],
+                usage=SimpleNamespace(input_tokens=10, output_tokens=5))
+
+    class FakeAnthropic:
+        def __init__(self, **kwargs):
+            captured["client"] = kwargs
+            self.messages = FakeMessages()
+
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "offline-placeholder")
+    monkeypatch.setattr(anthropic, "Anthropic", FakeAnthropic)
+    caller = RS.LiveCaller(RS.judge_spec()["cfg"])
+    result = caller.call("system", "user", seed=123)
+
+    assert captured["client"]["max_retries"] == 0
+    assert captured["calls"] == 1
+    assert set(captured["request"]) == {"model", "system", "messages", "max_tokens"}
+    assert result["response_id"] == "msg_offline_test"

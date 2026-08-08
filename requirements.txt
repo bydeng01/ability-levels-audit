@@ -1,20 +1,18 @@
-# Core
-anthropic>=0.40
-openai>=1.40          # OpenAI-compatible providers (Groq / Cerebras / OpenRouter)
-pyyaml>=6.0
+# Exact pre-run environment. The primary signed-rank test is implemented explicitly
+# in analysis/analyze.py, but SciPy's BCa bootstrap and Spearman implementation remain
+# executable parts of the registered analysis. Do not loosen these pins for the
+# reportable run; the preflight contract also records Python and Anthropic SDK versions.
 
-# Analysis (Step 5+)
-numpy>=1.24
-scipy>=1.10
-pandas>=2.0
-statsmodels>=0.14.5 # Week-3 J2 mixed-effects models (§10). 0.14.5+ required for
-                    # scipy>=1.15 (earlier statsmodels imports the removed scipy._lib._util._lazywhere)
-matplotlib>=3.8     # Figure 2 (analysis/figures/fig2_dissociation.py); 3.8+ for
-                    # deterministic PDF/SVG metadata and Pillow TIFF-LZW export
+# Core — the judge transport (vendor/agents/model_client.py) and config loading.
+anthropic==0.96.0
+openai==2.32.0        # only the OpenAI-compatible branch of the vendored client;
+                      # this study's judge role is Anthropic and never takes it.
+pyyaml==6.0.3
 
-# Checks. Both were imported by tracked code without being declared here, so a clone that
-# followed the README could not run either one.
-sympy>=1.12         # tools/verify_problems.py re-solves domain/algebra/problems.yaml
-                    # symbolically, independently of the answers recorded in the file
-pytest>=8.0         # analysis/figures/test_fig2_dissociation.py is the one pytest-style
-                    # test in the tree; everything under tools/ is a standalone script
+# Analysis (PREREGISTRATION §6).
+numpy==1.26.4
+scipy==1.17.1
+matplotlib==3.10.8    # analysis/figures/fig1.py (the abstract's one figure)
+
+# Tests.
+pytest==9.0.3

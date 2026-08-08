@@ -1,9 +1,9 @@
 """Spend ledger + circuit breaker guarantees (Phase 7)."""
 import json
-
 import pytest
 
-from judging.run_study import Breaker, SpendLedger, BREAKER_WARMUP
+from judging.run_study import (Breaker, SpendLedger, BREAKER_WARMUP,
+                               WORST_CASE_IN_TOKENS, worst_case_call_usd)
 
 
 def test_cap_trips_before_the_next_request(tmp_path):
@@ -28,6 +28,24 @@ def test_ledger_is_cumulative_across_invocations(tmp_path):
     led2.settle(0.3, 0.3)
     with pytest.raises(SystemExit, match="SPEND CAP"):
         led2.charge(0.5, "c")
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf"), 0.0, -1.0])
+def test_nonfinite_or_nonpositive_cap_is_refused(tmp_path, bad):
+    with pytest.raises(SystemExit, match="finite positive"):
+        SpendLedger(tmp_path / "ledger.json", cap_usd=bad, backend="live")
+
+
+def test_live_cap_cannot_exceed_study_ceiling_or_rise_on_resume(tmp_path):
+    with pytest.raises(SystemExit, match="immutable study ceiling"):
+        SpendLedger(tmp_path / "too-high.json", cap_usd=40.01, backend="live")
+
+    p = tmp_path / "ledger.json"
+    led = SpendLedger(p, cap_usd=20.0, backend="live")
+    led.charge(1.0, "first")
+    led.settle(1.0, 0.5)
+    with pytest.raises(SystemExit, match="cannot be raised"):
+        SpendLedger(p, cap_usd=20.01, backend="live")
 
 
 def test_crash_leaves_precharge_committed(tmp_path):
@@ -61,9 +79,38 @@ def test_inconsistent_totals_fail_closed(tmp_path):
     p = tmp_path / "ledger.json"
     p.write_text(json.dumps({
         "settled_usd_total": 99.0,
+        "caps_usd_by_backend": {"live": 1.0},
         "invocations": [{"backend": "live", "settled_usd": 0.1, "committed_usd": 0.0}]}))
     with pytest.raises(SystemExit, match="internally inconsistent"):
         SpendLedger(p, cap_usd=1.0, backend="live")
+
+
+@pytest.mark.parametrize("field", ["settled_usd", "committed_usd"])
+def test_nonfinite_persisted_amounts_fail_closed(tmp_path, field):
+    p = tmp_path / "ledger.json"
+    row = {"backend": "live", "settled_usd": 0.0, "committed_usd": 0.0}
+    row[field] = float("nan")
+    p.write_text(json.dumps({
+        "settled_usd_total": 0.0, "caps_usd_by_backend": {"live": 1.0},
+        "invocations": [row]}))
+    with pytest.raises(SystemExit, match="SPEND LEDGER CORRUPT"):
+        SpendLedger(p, cap_usd=1.0, backend="live")
+
+
+def test_invalid_settlement_fails_closed(tmp_path):
+    led = SpendLedger(tmp_path / "ledger.json", cap_usd=1.0, backend="live")
+    led.charge(0.4, "a")
+    with pytest.raises(SystemExit, match="SPEND SETTLEMENT"):
+        led.settle(0.4, float("nan"))
+    with pytest.raises(SystemExit, match="SPEND SETTLEMENT"):
+        led.settle(0.4, 0.41)
+
+
+def test_request_text_must_fit_the_precharged_input_bound():
+    spec = {"max_tokens": 512}
+    assert worst_case_call_usd(spec, "system", "user") > 0
+    with pytest.raises(SystemExit, match="REQUEST EXCEEDS SPEND RESERVATION"):
+        worst_case_call_usd(spec, "", "x" * WORST_CASE_IN_TOKENS)
 
 
 def test_missing_ledger_beside_live_wire_evidence_refuses(tmp_path, monkeypatch):

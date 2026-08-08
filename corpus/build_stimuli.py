@@ -35,6 +35,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import random
 import re
 import shutil
@@ -51,7 +52,26 @@ from protocol.leakage import turn_leaks  # noqa: E402  vendored, frozen
 
 SEED = 20260808
 CORPUS = ROOT / "corpus"
-DEFAULT_SRC_LOGS = Path("/Users/boyuandeng/Documents/GitHub/conv-vs-ped-tutor/logs")
+# Source-corpus logs ($SRC/logs). Only `census`, `candidates`, `topup` and `freeze`
+# need them; `verify` reads the vendored copies under corpus/logs/ and is the one
+# reproduction path that works on any clone. Overridable via $SRC_LOGS or --src-logs
+# so the default absolute path is not a hard dependency on one machine
+# (AUDIT-2026-08-08 N9).
+DEFAULT_SRC_LOGS = Path(
+    os.environ.get("SRC_LOGS")
+    or "/Users/boyuandeng/Documents/GitHub/conv-vs-ped-tutor/logs")
+
+# Frozen construction recipes and pre-data material exclusions. Candidate IDs are
+# referenced by three completed blind-label passes, pairing reviews, and the
+# manipulation check, so a reconstruction must never reassign them to newly sampled
+# turns. C018 was removed after the independent pre-flight audit, before any paid
+# judge score existed: its unrepaired algebra error conflicts with its strong label,
+# and its two candidate responses also differ in error-contingency, not only in how
+# much reasoning they leave to the student (PREREGISTRATION Amendment A4).
+TOPUP_RECIPE = CORPUS / "candidates_topup.jsonl"
+PRE_DATA_EXCLUSIONS = {
+    "C018": "unrepaired current error and response-pair contingency confound",
+}
 
 # Expected corpus shape. Judged-turn total and the three sampling-relevant tracker
 # cells match the build prompt exactly. The build prompt reported 991 joinable with
@@ -220,18 +240,67 @@ def _fmt_answer(x) -> str:
     return str(int(f)) if f.is_integer() else f"{f:g}"
 
 
+def answer_forms(problem) -> list[str]:
+    """Every numeric spelling of the canonical answer that counts as stating it.
+
+    Uses the SAME list `protocol.leakage` checks (`leakage.numeric_form`, e.g.
+    ['12', '12.0', '12.00']) plus the plain formatting, so this module and the
+    leakage guard cannot disagree about what "the answer" looks like
+    (AUDIT-2026-08-08 B1: the earlier single-token form missed '12.0'/'12.00').
+    """
+    forms = set(str(x) for x in ((problem.leakage or {}).get("numeric_form") or []))
+    forms.add(_fmt_answer(problem.canonical_answer))
+    return sorted(forms)
+
+
+def _states_answer_in(text: str, problem) -> bool:
+    # The lookbehind excludes a preceding '-' as well as digits/'.', so an
+    # unrepaired sign error ("x = -21" against answer 21) is NOT read as stating
+    # the answer — it is a live next step (AUDIT-2026-08-08 B1; recovered C061, C068).
+    for ans in answer_forms(problem):
+        if re.search(r"(?<![\d.\-])" + re.escape(ans) + r"(?!\d)(?!\.\d)", text):
+            return True
+    return False
+
+
 def states_answer(rec: dict, problems_by_id: dict) -> bool:
     """The student's latest turn already states the canonical answer."""
-    ans = _fmt_answer(problems_by_id[rec["problem_id"]].canonical_answer)
-    pat = r"(?<![\d.])" + re.escape(ans) + r"(?!\d)(?!\.\d)"
-    return re.search(pat, rec["last_student"]) is not None
+    return _states_answer_in(rec["last_student"], problems_by_id[rec["problem_id"]])
+
+
+def problem_already_resolved(rec: dict, problems_by_id: dict) -> bool:
+    """The named problem's answer appears ANYWHERE in the context.
+
+    AUDIT-2026-08-08 B1. Scoping the answer check to the latest student turn let
+    through contexts in which the tutor stated the answer earlier and the dialogue
+    then moved on to a *different* problem (a pasted one, an invented practice one,
+    or another topic entirely). Those items keep a `problem_id` that no longer
+    describes their live content, which silently disables both this filter and the
+    R_H answer-leak guard in `assemble`/`tests/test_stimuli.py`, and they carry no
+    live scaffolding step for the named problem. Checked over the whole context.
+    """
+    return _states_answer_in(rec["context"], problems_by_id[rec["problem_id"]])
 
 
 def is_eligible(rec: dict, problems_by_id: dict) -> bool:
-    """Eligible == the context presents a live next reasoning step (see CLOSING_RE)."""
+    """Eligible == the context presents a live next reasoning step ON THE NAMED PROBLEM.
+
+    Three independent disqualifiers:
+      1. the latest student turn is a closing sign-off (CLOSING_RE);
+      2. the latest student turn already states the canonical answer;
+      3. the named problem is already resolved earlier in the context, so the
+         dialogue has drifted past it (`problem_already_resolved`).
+
+    (1) previously carried an undisclosed `and "?" not in last` escape hatch that
+    exempted any wrap-up phrased as a question; it is removed here — the criterion
+    now matches the prose in PREREGISTRATION §3 exactly. It changes no candidate's
+    eligibility on the frozen pool.
+    """
     last = rec["last_student"]
-    closing_signoff = bool(CLOSING_RE.search(last)) and "?" not in last
-    return not (closing_signoff or states_answer(rec, problems_by_id))
+    closing_signoff = bool(CLOSING_RE.search(last))
+    return not (closing_signoff
+                or states_answer(rec, problems_by_id)
+                or problem_already_resolved(rec, problems_by_id))
 
 
 def parse_context(context: str) -> list[tuple[str, str]]:
@@ -378,56 +447,61 @@ def cmd_candidates(args):
 
 
 def cmd_topup(args):
-    """Append strong-prior candidates so the pre-specified 30/30 target is reachable
-    after the eligibility filter (decisions-log 2026-08-08).
+    """Replay the frozen 30-item top-up recipe without reassigning candidate IDs.
 
-    Deterministic and disjoint from the existing pool; the labelling rubric is
-    UNCHANGED (v2) and the new items go through the same 3-rep blind pass. Only the
-    strong stratum is topped up: after the eligibility filter the weak stratum has 63
-    labelled members against a target of 30, while the strong stratum has 26.
+    `candidates_topup.jsonl` is the pre-label sampling result. Recomputing that sample
+    after eligibility code changed assigned C103/C106/C110/C124 to different source
+    turns while the completed labels still joined by candidate ID. The recipe is now
+    an immutable construction input: every source-derived field is checked against
+    `response_pools.jsonl`, then its exact rows are appended to the 96-item pool.
     """
-    rng = random.Random(SEED + 7)
     pools = [json.loads(l) for l in open(CORPUS / "response_pools.jsonl")]
     existing = [json.loads(l) for l in open(CORPUS / "candidates.jsonl")]
     seen = {(c["run"], c["problem_id"], c["turn_index"]) for c in existing}
-    problems = M.problem_index(str(ROOT / "vendor/domain/algebra/problems.yaml"))
+    if not TOPUP_RECIPE.exists():
+        raise SystemExit(
+            "missing frozen corpus/candidates_topup.jsonl; refusing to regenerate "
+            "candidate identities after labels exist")
+    new = [json.loads(l) for l in open(TOPUP_RECIPE) if l.strip()]
+    if len(new) != args.n:
+        raise SystemExit(
+            f"frozen top-up has {len(new)} rows, but -n requested {args.n}; "
+            "the labelled recipe cannot be resized")
+    existing_ids = {c["candidate_id"] for c in existing}
+    overlap = sorted(existing_ids & {c["candidate_id"] for c in new})
+    if overlap:
+        raise SystemExit(
+            f"top-up IDs already exist ({overlap[:3]}); start from "
+            "corpus/candidates.pre-topup.jsonl")
 
-    def tight_strong(r):
-        last = r["last_student"]
-        return (strong_prior(r) and is_eligible(r, problems)
-                and ("=" in last or re.search(r"\d+\s*[-+*/×]\s*\d+", last)))
-
-    avail = [r for r in pools
-             if (r["run"], r["problem_id"], r["turn_index"]) not in seen
-             and tight_strong(r)]
-    avail.sort(key=lambda r: (r["run"], r["problem_id"], r["turn_index"]))
-    g = defaultdict(list)
-    for r in avail:
-        g[(r["base"], r["problem_id"])].append(r)
-    picked = _rr_take(g, want=args.n)
-
-    new = [{**r, "prior_stratum": "strong", "struggle_score": struggle_score(r)}
-           for r in picked]
-    rng.shuffle(new)
-    start = 1 + max(int(c["candidate_id"][1:]) for c in existing)
-    for i, c in enumerate(new):
-        c["candidate_id"] = f"C{start + i:03d}"
+    pool_by_key = {(r["run"], r["problem_id"], r["turn_index"]): r for r in pools}
+    for row in new:
+        key = (row["run"], row["problem_id"], row["turn_index"])
+        if key in seen:
+            raise SystemExit(f"frozen top-up is not disjoint from the base pool: {key}")
+        source = pool_by_key.get(key)
+        if source is None:
+            raise SystemExit(f"frozen top-up source turn is missing: {key}")
+        expected = {**source, "prior_stratum": "strong",
+                    "struggle_score": struggle_score(source),
+                    "candidate_id": row["candidate_id"]}
+        if row != expected:
+            raise SystemExit(
+                f"frozen top-up row {row['candidate_id']} no longer matches its "
+                f"source turn {key}")
 
     with open(CORPUS / "candidates.jsonl", "a") as f:
         for c in new:
             f.write(json.dumps(c) + "\n")
     _write_sha(CORPUS / "candidates.jsonl")
-    with open(CORPUS / "candidates_topup.jsonl", "w") as f:
-        for c in new:
-            f.write(json.dumps(c) + "\n")
-    print(f"top-up: appended {len(new)} strong-prior candidates "
-          f"({new[0]['candidate_id']}..{new[-1]['candidate_id']}) from "
-          f"{len(avail)} eligible unsampled turns; pool now {len(existing) + len(new)}")
+    print(f"top-up: replayed {len(new)} frozen candidates "
+          f"({new[0]['candidate_id']}..{new[-1]['candidate_id']}); "
+          f"pool now {len(existing) + len(new)}")
 
 
 # ---------------------------------------------------------------- selection (post-labels)
 def cmd_select(args):
-    """Deterministic selection of 30 weak + 30 strong from the labelled candidates.
+    """Deterministic selection of up to 30 weak + 30 strong labelled candidates.
 
     Rule (pre-specified before any label existed; see decisions-log 2026-08-08):
     eligible = candidates whose 3 blind reps reached >= 2/3 agreement on competence
@@ -437,7 +511,8 @@ def cmd_select(args):
     candidate_id asc) and take greedily under coverage caps: <= 7 per problem,
     <= 2 per (run, problem) [already enforced at candidate stage], relaxing the
     problem cap to 9 then 12 only if 30 cannot otherwise be reached. If a stratum
-    has < 30 eligible members, take all and report the imbalance.
+    has < 30 eligible members, take all and report the imbalance. The explicit
+    pre-data material exclusions above are applied before this unchanged ordering.
     """
     cands = {c["candidate_id"]: c
              for c in (json.loads(l) for l in open(CORPUS / "candidates.jsonl"))}
@@ -446,6 +521,8 @@ def cmd_select(args):
     by_stratum = defaultdict(list)
     n_ineligible = Counter()
     for lab in labels:
+        if lab["candidate_id"] in PRE_DATA_EXCLUSIONS:
+            continue
         if not lab["agreement_ok"]:
             continue
         if not is_eligible(cands[lab["candidate_id"]], problems):
@@ -479,6 +556,7 @@ def cmd_select(args):
 
     out = {"rule": cmd_select.__doc__.strip(), "selected": selected,
            "n_eligible": {k: len(v) for k, v in by_stratum.items()},
+           "pre_data_exclusions": PRE_DATA_EXCLUSIONS,
            "n_dropped_no_agreement": sum(1 for l in labels if not l["agreement_ok"]),
            "n_dropped_no_live_step": dict(n_ineligible)}
     (CORPUS / "selection.json").write_text(json.dumps(out, indent=2))
@@ -716,6 +794,23 @@ def cmd_assemble(args):
         rows.append({"candidate_id": cid, "r_high": rh, "r_low": rl,
                      "real_turn_pole": d["real_turn_pole"],
                      "review_note": d.get("note", "")})
+
+    # No donor turn may serve two stimuli. AUDIT-2026-08-08 N6: the same corpus turn
+    # was transplanted into more than one stimulus, so those stimuli shared half their
+    # text and were not independent observations — but the bootstrap in §6.5 resamples
+    # stimuli as if they were. Checked on the text, so it catches a repeat reached via
+    # different refs as well.
+    seen: dict[str, tuple[str, str]] = {}
+    for r in rows:
+        for pole in ("r_high", "r_low"):
+            txt = r[pole]["text"].strip()
+            if txt in seen:
+                other_cid, other_pole = seen[txt]
+                problems_found.append(
+                    f"{r['candidate_id']}:{pole} duplicates {other_cid}:{other_pole} "
+                    f"(same donor text in two stimuli)")
+            else:
+                seen[txt] = (r["candidate_id"], pole)
 
     with open(CORPUS / "pairing_draft.jsonl", "w") as f:
         for r in rows:

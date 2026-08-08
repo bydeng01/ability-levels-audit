@@ -281,3 +281,205 @@ in the abstract.
 Other composition facts for the paper: tutor families split exactly 30 conv / 30 ped;
 bases gpt 26 / gemini 22 / sonnet 12; problems 8–12 each across all six; prompt purity
 verified over all 360 assembled prompts; user prompts 1,160–5,156 chars (median 2,048).
+
+## 2026-08-08 — Independent pre-flight audit, and the fixes it forced (pre-judging)
+
+Before releasing the operator sequence, the repository was put through an independent
+adversarial pre-flight audit (`protocol/AUDIT-2026-08-08.md`), which returned **NO-GO**
+on four blocking findings. All four are fixed below. **Zero judge calls existed at any
+point in this entry**, so every change is legitimately pre-data; the labelling
+instrument and the deterministic selection rule are untouched.
+
+**B1 — eight stimuli had drifted off the problem their metadata names.** In S18, S22,
+S32, S38, S45, S47, S55, S59 the named problem was solved earlier in the context and
+the live content belonged to a different problem: two pasted by the student, two
+invented as practice by the tutor, one an entirely different topic (a work-rate
+"Alice and Bob paint a room" problem, outside the labelling rubric's stated
+mixture/weighted-average domain). Consequences, all verified: `is_eligible` scoped its
+answer check to the *latest student turn*, and 0 of the 8 state the answer there while
+8 of 8 state it earlier in the context, so the filter saw none of them; the R_H
+answer-leak guard resolves leakage strings via `problem_id`, so it was inoperative on
+all eight — S38's R_H states its live problem's answer ("in 12/5 hours") while
+`turn_leaks`, pointed at train-6, returns False and the test suite passes. The
+contamination was uneven across the stratification factor, 6 strong against 2 weak —
+the same skew that justified removing the earlier post-resolution batch.
+
+`is_eligible` now has three disqualifiers (closing sign-off; answer in the latest
+student turn; named problem already resolved anywhere in the context), matches every
+numeric spelling of the answer that `protocol.leakage` checks, and no longer treats
+`x = -21` as stating the answer 21 — that lookbehind bug had been dropping two
+candidates with live sign errors (C061, C068). The undisclosed `and "?" not in last`
+escape hatch is removed; it changes no candidate's eligibility. The **unchanged**
+selection rule re-run on the corrected filter rejects exactly those eight and nothing
+else, and leaves 75 weak / **26** strong eligible. Per §4's standing contingency the
+short stratum is taken entire: **56 stimuli, 30 weak / 26 strong**. Superseded
+selection preserved at `corpus/selection.pre-drift-fix.json`.
+
+**Pairing for the four newly selected stimuli** (C018, C021, C043, C088) went to fresh
+blind reviewers under the unchanged packet brief — no labels, no profiles, no policy
+names. Two more items (C026, C044) plus C088 were re-reviewed after a new
+`assemble` check caught that **three donor turns were each serving two stimuli**
+(AUDIT N6: those stimuli shared half their text but the §6.5 bootstrap resamples
+stimuli as if independent). In each case the stimulus whose own real turn the text was
+kept it; the transplant re-chose. `assemble` now fails on any duplicate response text,
+and `tests/test_stimuli.py` asserts it independently.
+
+**One reversed pair, repaired before freeze (PREREGISTRATION §4b).** The re-run
+manipulation check flagged **C002**: its R_H handed the student the conservation
+relation they had just said they could not form ("I'm still not sure how to put this
+into an equation…"), while its R_L withheld it — the poles were the wrong way round.
+A fresh blind reviewer, told only what the previous attempt had got wrong, independently
+reached the same conclusion and re-assigned the real turn to the **low** pole with E4 as
+the high counterpart. Worth recording that the *old* brief had passed this pair 60/60;
+the strengthened brief (below) caught it.
+
+**B2 — the freeze the runner advertised was not enforced.** `frozen_inputs()` and
+`contract_sha256()` read the *text* of `corpus/stimuli.sha256` and
+`labeling/labels.sha256` instead of hashing the artifacts, so either could be edited
+after scoring with nothing detecting it. The audit demonstrated this end to end: after
+1,080 mock ratings existed, moving a stimulus between strata left `contract_sha256`
+unchanged, the cache stamp valid, `run_meta.json` attesting the original hash, and
+`analyze.py` happily reporting 31 weak / 29 strong. Both now hash the artifacts and
+refuse on sidecar mismatch; `analyze.py` refuses to run if `stimuli.jsonl` changed since
+the run it is analysing; `analysis/analyze.py` and `PREREGISTRATION.md` are now recorded
+in `frozen_inputs` (recorded, not binding — see §5).
+
+**B3 — the primary test did not implement the pre-registered test.** `wilcoxon_report`
+dropped zeros with `vals != 0`, but a per-unit score is a mean of three integers, so a
+truly-zero PAG lands on ±4.44e-16 and survived, entering the signed-rank test as its
+smallest-magnitude difference with a sign set by rounding order. On real-shaped data
+this moved the primary p from .523 to .586 and the rank-biserial from −.140 to −.114.
+Now dropped with a 1e-9 tolerance; a test cross-checks the count against exact rational
+arithmetic. Also fixed: `mode=` → `method=` (a deprecated SciPy alias), an upper bound
+on SciPy in `requirements.txt`, and §6.5's description of which Wilcoxon branch runs.
+
+**B4 — the label reliability gate was a tautology.** With three reps and a binary
+label, `agreement_ok = n_top >= 2` is true by pigeonhole; "0 items dropped for <2/3
+agreement" had been reported as a reliability result in three documents. It is now
+annotated as structurally-always-true in the code, and the reported reliability is the
+unanimity rate (115/126) and pairwise inter-rep agreement, recomputed here as
+**94.4 / 94.4 / 93.7 %** over the 126-candidate pool (the 94.8/94.8/95.8 % figure is the
+earlier 96-item pool and was mis-scoped in the abstract). The three frozen stimuli whose
+labels the audit judged to contradict the v2 rubric were all drift items and left the
+set with B1.
+
+**Manipulation check re-run, with a stronger brief.** The old check no longer covered
+the frozen set (8 items gone, 4 added, 3 with replaced counterparts), so it was re-run
+from scratch. The audit had shown the old result could not have failed: a question mark
+decided 34 of 60 pairs with zero counterexamples, absence of `=` another 31, and
+`\boxed{}` appeared in 0 R_H against 20 R_L — cues that persist because the corpus
+candidate pools are still filtered by `has_question`/`leaks` in `packets`. The brief now
+names question marks, formatting and length as features that must not decide the answer
+and offers "tie" as the honest response. Scoring also hardened: duplicate item ratings
+now abort instead of silently last-file-wins, extras and malformed verdicts abort, and
+`report.json` records every per-item pick, its source file, and `n_raters_per_pair: 1`
+— the rate is agreement with the construction key, **not** inter-rater reliability, and
+is now named `key_agreement_rate`.
+
+**Disclosures added rather than fixed.** The tutor family is nearly collinear with the
+competence stratum (ped 23 weak / 9 strong; conv 7 weak / 17 strong), so every
+weak-vs-strong comparison is confounded with tutor policy; the authoring split is
+heavily on R_L (26 against 2) and the "lopsidedness bound" asserted in the tests was
+not one — the exact counts are now pinned by test; the §2 cancellation argument holds
+under additivity, not exactly; and §6.5 now states the expected CI half-width in
+advance so a null result can be read as a bound rather than as "no effect".
+
+**Also corrected from the audit's non-blocking list:** the de-selection count in the
+2026-08-08 re-selection entry above ("7 post-resolution plus 6 displaced") is wrong —
+12 items failed the eligibility filter (7 closing sign-offs, 5 already stating the
+answer) and 1 (C018) was displaced by the ordering; the perform pool is every policy
+except `conv_socratic`, not "conv-family"; `requirements.txt` was inherited from the
+source repo and declared three unused packages while referencing files that do not
+exist here; `results/cache/`, `results/wire/` and the spend ledger were gitignored
+although the README calls the cache "released"; `DEFAULT_SRC_LOGS` was a hard-coded
+absolute path and is now `$SRC_LOGS`-overridable; and `label_competence.py prepare` used
+to silently overwrite the frozen `labeling/RUBRIC.md`.
+
+**Re-run result.** After the C002 repair: **56/56 correct, 0 reversed, 0 tied**
+(`corpus/manip/report.json`), rater confidence high on 50, medium on 5, low on 1 — the
+low-confidence item is C002 itself, where the rater notes both replies request the same
+two expressions and the asymmetry is only that one pre-states the conservation relation.
+That is a real but small contrast and is disclosed as such. The figure is reported as
+`key_agreement_rate`, one rater per pair, and is a construction check on the pairing
+review rather than independent evidence that Δ measures scaffolding.
+
+**Final frozen set (`corpus/stimuli.jsonl`, sha256 in `corpus/stimuli.sha256`).**
+56 stimuli, 30 weak / 26 strong; evidence `moderate` 38 / `strong` 18 / `ambiguous` 0;
+R_H 54 corpus / 2 authored, R_L 30 corpus / 26 authored; 28 stimuli with no authored
+text (12 weak, 16 strong) backing the §6.3 re-estimate; families 32 ped / 24 conv; bases
+gpt 23 / gemini 19 / sonnet 14; problems 7–11 each across all six; real turn served the
+high pole 44 times and the low pole 12. No stimulus's context resolves its named
+problem, no R_H leaks its problem's answer, and no response text serves two stimuli —
+all three asserted in `tests/test_stimuli.py`. Dry run: 336 units, **1,008 calls, est
+$9.90, worst case $33.06** under the $40 cap. 50 tests pass, including the full
+1,008-call mock end-to-end, the offline-replay tripwire, and the new freeze-binding
+tests. Contract hash and per-file hashes are in `results/plan.json`.
+
+## 2026-08-08 — Second pre-flight remediation (pre-judging)
+
+The independent audit was extended to the full repository, not only the four items
+above. It remained **NO-GO** on nine blocking findings. The following changes were
+made with zero provider calls and zero judge scores.
+
+**Reconstruction and material validity.** The top-up step had reassigned C097–C126
+from whatever unsampled source turns happened to be visible, so a clean rebuild did
+not reproduce the labelled candidate pool. `corpus/candidates_topup.jsonl` is now the
+frozen 30-row replay recipe. `topup` verifies every source-derived field before
+writing it, and a clean-room test runs top-up, selection, assembly, freeze and verify
+in an isolated tree and compares all four artifacts byte for byte. C018 was then
+removed as a single pre-data material exclusion: the student's current line contains
+an unrepaired arithmetic error and the nominal high-scaffolding reply endorses it,
+while the low reply changes the computation. That pair varied correctness as well as
+scaffolding. The final set is **55 stimuli, 30 weak / 25 strong**. The retained blind
+manipulation ratings were pruned by item id without relabelling; the current result is
+**55/55**, 0 reversed and 0 tied.
+
+**Freeze and provenance.** Live preflight now aborts unless the worktree is clean and
+`HEAD` has a `prereg-final-*` tag. The contract binds every frozen-input hash, both
+request modules, the vendored request instrument, Python, and the installed Anthropic
+SDK. All later live modes recheck the full contract, commit and tag. The previous
+cache could be fabricated independently of the wire log; now every accepted live
+cache entry must match an fsynced wire record containing the provider response id,
+full raw response, parsed scores, served model and canonical row hash. Promotion
+hashes all four final files. Analysis verifies those hashes and requires one unique,
+complete row for every stimulus × arm × pole before it computes a statistic.
+
+**Spend controls.** The vendored client could retry five provider requests inside one
+ledger reservation. The live path now instantiates the Anthropic SDK with
+`max_retries=0`; one outer attempt is exactly one charged provider request. Each
+retry is separately reserved. Non-finite, non-positive and above-$40 caps are
+rejected, and an existing ledger's backend cap cannot be raised on resume. The
+990-call point estimate is $9.72. The per-request reservation now uses an 8,192-token
+input ceiling plus the full 512-token output allowance: $53.22 over 990 attempts,
+which is deliberately above the persisted $40 lifetime ceiling so unexpectedly large
+responses stop the study rather than outrun the cap.
+
+**Inference.** Several selected turns share a source tutoring run. Treating all 55
+stimuli as independent would understate uncertainty. Every registered contrast is
+now averaged within source run before inference: 23 runs overall, 18 represented in
+the weak stratum and 10 in the strong stratum. BCa resampling uses source-run means.
+The primary signed-rank p-value is calculated by exact conditional sign enumeration
+with average ranks for ties, a 1e-9 zero tolerance, and explicit sparse and all-zero
+behavior. This replaces the version-sensitive SciPy `method="auto"` branch and the
+unsupported stimulus-independence precision claim.
+
+**Current composition.** The 55 pairs span evidence moderate 37 / strong 18;
+families ped 31 / conv 24 (weak ped 23 / conv 7; strong ped 8 / conv 17); R_H 53
+corpus / 2 authored; R_L 29 corpus / 26 authored; and 27 all-corpus pairs (12 weak /
+15 strong). The stimulus sha256 is
+`1d240ebca255c7e5cfa393292eb5dc6a050f2ddee904e21267ab1a178b8c5376`.
+
+This entry does not claim that the final git freeze already exists. The material is a
+freeze candidate until the operator reviews and commits every artifact and creates
+the required tag. The live runner enforces that remaining boundary.
+
+**Offline verification after the fixes.** Python 3.12.8 with the exact pinned
+dependencies reports **70 passed, 0 skipped**. This includes the 990-call mock run,
+cache-only replay, isolated construction replay, tied/sparse/all-zero signed-rank
+cases, live-transport single-attempt capture, ledger attacks, cache/wire provenance,
+result-grid deletion/duplication and promoted/provenance-file tampering. The direct
+provenance
+check separately rebuilt all 55 contexts and 82 corpus-sourced responses byte for
+byte from `corpus/logs/`. `--manifest-only` records 330 units, 990 accepted calls,
+the $9.72 point estimate, $53.22 conservative no-retry request ceiling and $40 hard
+cap. No provider call was made.

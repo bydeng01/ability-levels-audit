@@ -9,9 +9,9 @@ not vendored). All output lives under results/ (enforced). Modes:
                         through the real instrument. Resolves and freezes the transport
                         contract -> results/preflight/resolved_config.json. Refuses to
                         freeze on any contract violation.
-  (default: paid)       the full 1,080-call pass. Requires a completed preflight whose
-                        contract_sha256 still matches the frozen inputs. Promotes final
-                        outputs only when EVERY unit has n_valid == 3 (transactional).
+  (default: paid)       the full pass derived from the frozen stimulus count. Requires
+                        a completed preflight whose contract and frozen-file hashes
+                        still match. Promotes only when EVERY unit has n_valid == 3.
   --pilot N             run only the first N schedule calls (shared cache, real spend,
                         no promotion). Writes results/pilot_report.json.
   --offline-cache-only  reconstruct finals from the released per-rep cache. ANY cache
@@ -24,8 +24,9 @@ Guardrails:
     provider request: a conservative worst-case pre-charge before the request, settled
     to actual usage-derived cost after. Hard cap via --cap (default $40), lifetime
     across invocations; a crash leaves the pre-charge committed (conservative).
-    Dollar accounting is per BILLED request: transport retries that fail bill nothing
-    and settle to $0; a billed-but-degraded response still settles at its real cost.
+    The Anthropic SDK's hidden retries are disabled. Every physical attempt is made
+    by this runner only after a separate worst-case reservation; an exception leaves
+    that reservation committed.
   - Quality circuit breaker: after a warmup of responses, abort if the usable-rating
     rate falls below the floor (systematic failure, not noise).
   - Per-call served-model check against the model identity FROZEN at preflight; abort
@@ -42,7 +43,9 @@ import argparse
 import contextlib
 import hashlib
 import json
+import math
 import os
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -53,16 +56,19 @@ sys.path.insert(0, str(ROOT))
 
 from analysis import judge_pedagogy as JP          # noqa: E402  vendored, frozen
 from agents.config import load_models_config       # noqa: E402  vendored
-from agents.model_client import ModelClient        # noqa: E402  vendored
 from judging import profile_judge as PJ            # noqa: E402
 
 RESULTS = ROOT / "results"
 CAP_DEFAULT_USD = 40.0
+HARD_LIVE_CAP_USD = 40.0
 # claude-opus-4-8 first-party pricing (USD per token).
 PRICE_IN = 5.00 / 1e6
 PRICE_OUT = 25.00 / 1e6
-# Conservative pre-charge: generous input bound + the full max_tokens output.
-WORST_CASE_IN_TOKENS = 4000
+# Conservative pre-charge: the request text is checked against a byte-based upper
+# bound (a tokenizer cannot emit more ordinary text tokens than UTF-8 bytes), with
+# room for the provider's message envelope, plus the full max_tokens output.
+WORST_CASE_IN_TOKENS = 8192
+REQUEST_ENVELOPE_TOKEN_ALLOWANCE = 512
 MAX_ATTEMPTS_PER_REP = 4
 BREAKER_WARMUP = 12
 BREAKER_MIN_ACCEPT = 0.5
@@ -70,6 +76,19 @@ CACHE_FLUSH_EVERY = 20
 
 FINAL_NAMES = ("per_rep_scores.jsonl", "per_unit.jsonl", "completeness.json",
                "run_meta.json")
+FREEZE_TAG_PREFIX = "prereg-final-"
+RUNTIME_RESULT_PATHS = (
+    "results/preflight/",
+    "results/cache/profile_pedagogy_cache.json",
+    "results/wire/calls.jsonl",
+    "results/spend_ledger.json",
+    "results/pilot_report.json",
+    "results/run_state.json",
+    "results/per_rep_scores.jsonl",
+    "results/per_unit.jsonl",
+    "results/completeness.json",
+    "results/run_meta.json",
+)
 
 # Synthetic preflight dialogue — deliberately NOT study material (no mixture/percent
 # problem, none of the frozen problem set's numbers as an answer).
@@ -105,14 +124,70 @@ def write_json(p: Path, obj) -> None:
 def judge_spec() -> dict:
     cfg = load_models_config(str(ROOT / "vendor/configs/models.yaml"))
     spec = cfg["roles"]["judge"]
-    assert spec.get("provider", cfg.get("provider")) == "anthropic", spec
-    assert spec["model"] == "claude-opus-4-8", spec
-    assert spec.get("temperature") is None, "judge temperature must be omitted"
+    if spec.get("provider", cfg.get("provider")) != "anthropic":
+        raise SystemExit(f"judge provider must be anthropic: {spec}")
+    if spec.get("model") != "claude-opus-4-8":
+        raise SystemExit(f"judge model drifted from claude-opus-4-8: {spec}")
+    if spec.get("temperature") is not None:
+        raise SystemExit("judge temperature must be omitted")
     return {"cfg": cfg, "spec": spec}
 
 
-def worst_case_call_usd(spec: dict) -> float:
+def worst_case_call_usd(spec: dict, system: str | None = None,
+                        user: str | None = None) -> float:
+    if (system is None) != (user is None):
+        raise ValueError("system and user must be supplied together")
+    if system is not None:
+        text_bytes = len(system.encode()) + len(user.encode())
+        if text_bytes + REQUEST_ENVELOPE_TOKEN_ALLOWANCE > WORST_CASE_IN_TOKENS:
+            raise SystemExit(
+                f"REQUEST EXCEEDS SPEND RESERVATION: {text_bytes} UTF-8 bytes plus "
+                f"{REQUEST_ENVELOPE_TOKEN_ALLOWANCE} envelope tokens exceeds the "
+                f"{WORST_CASE_IN_TOKENS}-token input reservation")
     return WORST_CASE_IN_TOKENS * PRICE_IN + spec.get("max_tokens", 512) * PRICE_OUT
+
+
+def _git_freeze_snapshot(allow_runtime_results: bool = False) -> dict:
+    try:
+        status = subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=all"],
+            cwd=ROOT, check=True, capture_output=True, text=True).stdout.strip()
+        commit = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, check=True,
+            capture_output=True, text=True).stdout.strip()
+        tags = subprocess.run(
+            ["git", "tag", "--points-at", "HEAD"], cwd=ROOT, check=True,
+            capture_output=True, text=True).stdout.splitlines()
+    except (OSError, subprocess.CalledProcessError) as e:
+        raise SystemExit(f"cannot verify the Git freeze: {e}")
+    dirty = []
+    for line in status.splitlines():
+        path = line[3:]
+        allowed = allow_runtime_results and any(
+            path == prefix or (prefix.endswith("/") and path.startswith(prefix))
+            for prefix in RUNTIME_RESULT_PATHS)
+        if not allowed:
+            dirty.append(line)
+    return {"git_commit": commit, "git_tags_at_head": sorted(tags),
+            "unexpected_git_status": dirty}
+
+
+def require_git_freeze(allow_runtime_results: bool = False) -> dict:
+    """Require the tagged source tree; later calls may add only named run outputs."""
+    snapshot = _git_freeze_snapshot(allow_runtime_results)
+    if snapshot["unexpected_git_status"]:
+        raise SystemExit(
+            "LIVE RUN REQUIRES THE FROZEN TREE TO BE CLEAN. Commit every intended "
+            "material, code, protocol, test, and reconstruction input first. Only "
+            "named runtime result files may appear after preflight.\n" +
+            "\n".join(snapshot["unexpected_git_status"]))
+    freeze_tags = [t for t in snapshot["git_tags_at_head"]
+                   if t.startswith(FREEZE_TAG_PREFIX)]
+    if not freeze_tags:
+        raise SystemExit(
+            f"LIVE PREFLIGHT REQUIRES A TAG AT HEAD named {FREEZE_TAG_PREFIX}<label>")
+    return {"git_commit": snapshot["git_commit"],
+            "git_freeze_tags": freeze_tags}
 
 
 # ---------------------------------------------------------------- spend ledger
@@ -123,9 +198,16 @@ class SpendLedger:
         self.path = path
         self.cap = float(cap_usd)
         self.backend = backend
+        if not math.isfinite(self.cap) or self.cap <= 0:
+            raise SystemExit("SPEND CAP must be a finite positive number")
+        if backend == "live" and self.cap > HARD_LIVE_CAP_USD:
+            raise SystemExit(
+                f"SPEND CAP ${self.cap:g} exceeds the immutable study ceiling "
+                f"${HARD_LIVE_CAP_USD:g}")
         self.settled = 0.0      # billed dollars, current backend regime
         self.committed = 0.0    # outstanding pre-charges (crash leaves them counted)
         self.invocations = []
+        self._stored_caps = {}
         self._this = {"pid": os.getpid(), "utc": now_utc(), "backend": backend,
                       "settled_usd": 0.0, "committed_usd": 0.0, "requests": 0}
         self._load()
@@ -154,23 +236,53 @@ class SpendLedger:
             self._corrupt(f"is unreadable ({e})")
         if not isinstance(blob, dict) or not isinstance(blob.get("invocations"), list):
             self._corrupt("has the wrong shape")
-        s = c = 0.0
+        stored_caps = blob.get("caps_usd_by_backend", {})
+        if not isinstance(stored_caps, dict):
+            self._corrupt("has invalid caps_usd_by_backend")
+        stored_cap = stored_caps.get(self.backend)
+        if stored_cap is None and any(
+                isinstance(inv, dict) and inv.get("backend") == self.backend
+                for inv in blob["invocations"]):
+            self._corrupt(f"has {self.backend} spend but no immutable stored cap")
+        if stored_cap is not None:
+            if not isinstance(stored_cap, (int, float)) or not math.isfinite(stored_cap):
+                self._corrupt(f"has an invalid stored {self.backend} cap")
+            if self.cap > stored_cap + 1e-12:
+                raise SystemExit(
+                    f"SPEND CAP cannot be raised for {self.backend}: ledger ceiling is "
+                    f"${stored_cap:g}, requested ${self.cap:g}")
+        self._stored_caps = dict(stored_caps)
+        total = blob.get("settled_usd_total")
+        if not isinstance(total, (int, float)) or not math.isfinite(total) or total < 0:
+            self._corrupt("has an invalid settled_usd_total")
+        s = c = all_settled = 0.0
         for inv in blob["invocations"]:
-            if not isinstance(inv.get("settled_usd"), (int, float)) or inv["settled_usd"] < 0:
+            if not isinstance(inv, dict):
+                self._corrupt("contains a non-object invocation")
+            settled = inv.get("settled_usd")
+            committed = inv.get("committed_usd", 0.0)
+            if (not isinstance(settled, (int, float)) or not math.isfinite(settled)
+                    or settled < 0):
                 self._corrupt("holds a non-numeric settled_usd")
+            if (not isinstance(committed, (int, float)) or not math.isfinite(committed)
+                    or committed < -1e-9):
+                self._corrupt("holds an invalid committed_usd")
+            all_settled += settled
             if inv.get("backend") == self.backend:
-                s += inv["settled_usd"]
-                c += max(0.0, inv.get("committed_usd", 0.0))
-        if abs(sum(i["settled_usd"] for i in blob["invocations"])
-               - blob.get("settled_usd_total", -1)) > 1e-6:
+                s += settled
+                c += max(0.0, committed)
+        if abs(all_settled - total) > 1e-6:
             self._corrupt("is internally inconsistent (totals != sum of invocations)")
         self.settled, self.committed = s, c
         self.invocations = blob["invocations"]
 
     def _persist(self):
         allrows = [*self.invocations, self._this]
+        caps = {**self._stored_caps, self.backend: self.cap}
+        self._stored_caps = caps
         write_json(self.path, {
             "cap_usd_current_backend": self.cap,
+            "caps_usd_by_backend": caps,
             "settled_usd_total": round(sum(i["settled_usd"] for i in allrows), 6),
             "note": "CUMULATIVE across invocations; rows labeled by backend (mock "
                     "rehearsals never consume the live allowance). committed_usd is "
@@ -179,6 +291,9 @@ class SpendLedger:
         })
 
     def charge(self, worst_case_usd: float, where: str):
+        if (not isinstance(worst_case_usd, (int, float))
+                or not math.isfinite(worst_case_usd) or worst_case_usd <= 0):
+            raise SystemExit("SPEND RESERVATION must be a finite positive number")
         projected = (self.settled + self.committed + self._this["settled_usd"]
                      + self._this["committed_usd"] + worst_case_usd)
         if projected > self.cap:
@@ -193,6 +308,9 @@ class SpendLedger:
         self._persist()
 
     def settle(self, worst_case_usd: float, actual_usd: float):
+        if (not isinstance(actual_usd, (int, float)) or not math.isfinite(actual_usd)
+                or actual_usd < 0 or actual_usd > worst_case_usd + 1e-12):
+            raise SystemExit("SPEND SETTLEMENT is invalid or exceeds its reservation")
         self._this["committed_usd"] -= worst_case_usd
         self._this["settled_usd"] += actual_usd
         self._persist()
@@ -229,17 +347,27 @@ class LiveCaller:
     def __init__(self, cfg: dict):
         if not os.environ.get("ANTHROPIC_API_KEY"):
             raise SystemExit("live mode needs ANTHROPIC_API_KEY in the environment")
-        self.client = ModelClient(models_cfg=cfg, backend="live", logger=None)
+        import anthropic
+        self.spec = cfg["roles"]["judge"]
+        # The runner, ledger, and wire log own retries. SDK retries would create
+        # unreserved physical requests inside one logical call.
+        self.client = anthropic.Anthropic(
+            api_key=os.environ["ANTHROPIC_API_KEY"], max_retries=0)
 
     def call(self, system: str, user: str, seed: int) -> dict:
-        comp = self.client.complete(role="judge", system=system,
-                                    messages=[{"role": "user", "content": user}],
-                                    seed=seed)
-        raw = comp.raw_response or {}
-        return {"text": comp.text,
-                "served_model": raw.get("model"),
-                "stop_reason": raw.get("stop_reason"),
-                "in_tokens": comp.input_tokens, "out_tokens": comp.output_tokens}
+        del seed  # Anthropic path intentionally has no seed.
+        response = self.client.messages.create(
+            model=self.spec["model"], system=system,
+            messages=[{"role": "user", "content": user}],
+            max_tokens=self.spec.get("max_tokens", 512))
+        text = "".join(
+            b.text for b in response.content if getattr(b, "type", None) == "text")
+        return {"text": text,
+                "response_id": getattr(response, "id", None),
+                "served_model": getattr(response, "model", None),
+                "stop_reason": getattr(response, "stop_reason", None),
+                "in_tokens": getattr(response.usage, "input_tokens", None),
+                "out_tokens": getattr(response.usage, "output_tokens", None)}
 
 
 class MockCaller:
@@ -298,11 +426,99 @@ class RepCache:
 
 
 # ---------------------------------------------------------------- wire log
-def wire_write(rec: dict):
+def _wire_digest(rec: dict) -> str:
+    unsigned = {k: v for k, v in rec.items() if k != "wire_sha256"}
+    payload = json.dumps(unsigned, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode()).hexdigest()
+
+
+def wire_write(rec: dict) -> str:
     p = RESULTS / "wire" / "calls.jsonl"
     p.parent.mkdir(parents=True, exist_ok=True)
+    digest = _wire_digest(rec)
+    row = {**rec, "wire_sha256": digest}
     with open(p, "a") as f:
-        f.write(json.dumps(rec) + "\n")
+        f.write(json.dumps(row) + "\n")
+        f.flush()
+        os.fsync(f.fileno())
+    return digest
+
+
+def validate_live_cache_provenance(cache: RepCache, expected_user_sha256=None,
+                                   frozen_model=None) -> bool:
+    """Require every live cache entry to match a hashed, provider-identified wire row."""
+    if (cache.stamp or {}).get("backend") != "live":
+        return False
+    if expected_user_sha256 is not None:
+        extras = sorted(set(cache.entries) - set(expected_user_sha256))
+        if extras:
+            raise SystemExit(f"LIVE CACHE PROVENANCE: unexpected key {extras[0]}")
+    if not cache.entries:
+        return True
+    p = RESULTS / "wire" / "calls.jsonl"
+    if not p.exists():
+        raise SystemExit("LIVE CACHE PROVENANCE: cache exists without a wire log")
+    by_digest = {}
+    for lineno, line in enumerate(p.read_text().splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except Exception as e:  # noqa: BLE001
+            raise SystemExit(f"LIVE CACHE PROVENANCE: invalid wire row {lineno}: {e}")
+        digest = row.get("wire_sha256")
+        if digest != _wire_digest(row):
+            raise SystemExit(f"LIVE CACHE PROVENANCE: wire hash mismatch at row {lineno}")
+        if row.get("backend") == "live" and row.get("parsed_ok"):
+            if not row.get("response_id"):
+                raise SystemExit(
+                    f"LIVE CACHE PROVENANCE: live wire row {lineno} has no response id")
+            response_text = row.get("response_text")
+            if not isinstance(response_text, str):
+                raise SystemExit(
+                    f"LIVE CACHE PROVENANCE: live wire row {lineno} has no raw response")
+            if row.get("response_sha256") != hashlib.sha256(
+                    response_text.encode()).hexdigest():
+                raise SystemExit(
+                    f"LIVE CACHE PROVENANCE: response hash mismatch at row {lineno}")
+            if JP.parse_pedagogy_scores(response_text) != row.get("scores"):
+                raise SystemExit(
+                    f"LIVE CACHE PROVENANCE: parsed scores mismatch at row {lineno}")
+            by_digest[digest] = row
+    response_ids = set()
+    for key, entry in cache.entries.items():
+        digest = entry.get("wire_sha256")
+        row = by_digest.get(digest)
+        if row is None:
+            raise SystemExit(
+                f"LIVE CACHE PROVENANCE: {key} has no matching accepted wire row")
+        if row.get("key") != key or row.get("scores") != entry.get("scores"):
+            raise SystemExit(f"LIVE CACHE PROVENANCE: wire/cache mismatch for {key}")
+        if row.get("response_id") != entry.get("response_id"):
+            raise SystemExit(f"LIVE CACHE PROVENANCE: response-id mismatch for {key}")
+        if row["response_id"] in response_ids:
+            raise SystemExit(
+                f"LIVE CACHE PROVENANCE: duplicate provider response id for {key}")
+        response_ids.add(row["response_id"])
+        if (expected_user_sha256 is not None
+                and row.get("user_sha256") != expected_user_sha256[key]):
+            raise SystemExit(f"LIVE CACHE PROVENANCE: prompt hash mismatch for {key}")
+        if row.get("served_model") != entry.get("served_model"):
+            raise SystemExit(f"LIVE CACHE PROVENANCE: served-model mismatch for {key}")
+        if frozen_model is not None and row.get("served_model") != frozen_model:
+            raise SystemExit(f"LIVE CACHE PROVENANCE: frozen-model mismatch for {key}")
+    return True
+
+
+def expected_user_hashes(sched: list[dict], by_id: dict, profiles: dict) -> dict:
+    out = {}
+    for call in sched:
+        key = PJ.cache_key(call["stimulus_id"], call["arm"], call["pole"], call["rep"])
+        user = PJ.build_user(by_id[call["stimulus_id"]], call["arm"],
+                             call["pole"], profiles)
+        PJ.assert_prompt_pure(user, call["arm"], profiles)
+        out[key] = hashlib.sha256(user.encode()).hexdigest()
+    return out
 
 
 # ---------------------------------------------------------------- run lock / promotion
@@ -338,20 +554,49 @@ def promote(staging: Path, payload: dict):
         raise SystemExit(f"refusing to promote an incomplete set: missing {missing}")
     for n in FINAL_NAMES:
         os.replace(staging / n, RESULTS / n)
-    mark_state("complete", payload)
+    result_sha256 = {n: sha_file(RESULTS / n) for n in FINAL_NAMES}
+    mark_state("complete", {**payload, "result_sha256": result_sha256})
     shutil.rmtree(staging, ignore_errors=True)
 
 
 # ---------------------------------------------------------------- frozen inputs
+def sha_artifact(artifact: Path, sidecar: Path) -> str:
+    """sha256 of the ARTIFACT, cross-checked against its recorded sidecar.
+
+    AUDIT-2026-08-08 B2: this used to return the sidecar's *text* without ever
+    hashing the file, so editing `stimuli.jsonl` or `labels.jsonl` while leaving
+    the sidecar alone left `contract_sha256`, the cache stamp and the recorded
+    provenance completely unchanged — the two artifacts that matter most were the
+    only two outside the freeze the runner claims to enforce. Now the artifact is
+    hashed, and a sidecar that disagrees is a hard stop rather than the value used.
+    """
+    actual = sha_file(artifact)
+    recorded = sidecar.read_text().split()[0] if sidecar.exists() else None
+    if recorded != actual:
+        raise SystemExit(
+            f"FROZEN INPUT MISMATCH: {artifact.relative_to(ROOT)} hashes to {actual} "
+            f"but {sidecar.relative_to(ROOT)} records {recorded}. A frozen artifact "
+            "and its recorded hash disagree — refusing to run. Re-freeze deliberately "
+            "if the change is intended.")
+    return actual
+
+
 def frozen_inputs() -> dict:
     return {
-        "stimuli_sha256": (ROOT / "corpus/stimuli.sha256").read_text().split()[0],
-        "labels_sha256": (ROOT / "labeling/labels.sha256").read_text().split()[0],
+        "stimuli_sha256": sha_artifact(ROOT / "corpus/stimuli.jsonl",
+                                       ROOT / "corpus/stimuli.sha256"),
+        "labels_sha256": sha_artifact(ROOT / "labeling/labels.jsonl",
+                                      ROOT / "labeling/labels.sha256"),
         "profiles_yaml_sha256": sha_file(ROOT / "profiles/profiles.yaml"),
         "models_yaml_sha256": sha_file(ROOT / "vendor/configs/models.yaml"),
         "judge_pedagogy_py_sha256": sha_file(ROOT / "vendor/analysis/judge_pedagogy.py"),
         "profile_judge_py_sha256": sha_file(ROOT / "judging/profile_judge.py"),
+        "run_study_py_sha256": sha_file(ROOT / "judging/run_study.py"),
         "rubric_md_sha256": sha_file(ROOT / "vendor/supplement/judge_pedagogy_rubric.md"),
+        "analyze_py_sha256": sha_file(ROOT / "analysis/analyze.py"),
+        "prereg_md_sha256": sha_file(ROOT / "protocol/PREREGISTRATION.md"),
+        "requirements_txt_sha256": sha_file(ROOT / "requirements.txt"),
+        "topup_recipe_sha256": sha_file(ROOT / "corpus/candidates_topup.jsonl"),
     }
 
 
@@ -359,6 +604,7 @@ def frozen_inputs() -> dict:
 def mode_manifest(spec: dict):
     stimuli = PJ.load_stimuli()
     profiles = PJ.load_profiles()
+    system = PJ.build_system()
     units = [(s["stimulus_id"], arm, pole)
              for s in stimuli for arm in PJ.ARMS for pole in PJ.POLES]
     with open(RESULTS / "input_manifest.jsonl", "w") as f:
@@ -367,6 +613,7 @@ def mode_manifest(spec: dict):
                 for pole in PJ.POLES:
                     user = PJ.build_user(s, arm, pole, profiles)
                     PJ.assert_prompt_pure(user, arm, profiles)
+                    worst_case_call_usd(spec["spec"], system, user)
                     f.write(json.dumps({
                         "stimulus_id": s["stimulus_id"], "arm": arm, "pole": pole,
                         "user_sha256": hashlib.sha256(user.encode()).hexdigest(),
@@ -374,12 +621,19 @@ def mode_manifest(spec: dict):
     est_in = 1640 + 95 * 2 / 3          # measured pedjudge basis + profile block share
     n_calls = len(units) * PJ.REPS
     plan = {
-        "design": "60 stimuli x 3 arms x 2 poles x 3 reps",
+        # Derived from the artifact: a hard-coded stimulus count already went stale
+        # during pre-flight remediation.
+        "design": (f"{len(stimuli)} stimuli x {len(PJ.ARMS)} arms x "
+                   f"{len(PJ.POLES)} poles x {PJ.REPS} reps"),
         "n_stimuli": len(stimuli), "n_units": len(units), "reps": PJ.REPS,
         "n_calls_planned": n_calls,
         "judge_model": spec["spec"]["model"],
         "est_cost_usd": round(n_calls * (est_in * PRICE_IN + 52 * PRICE_OUT), 2),
-        "worst_case_cost_usd": round(n_calls * worst_case_call_usd(spec["spec"]), 2),
+        "no_retry_reservation_usd": round(
+            n_calls * worst_case_call_usd(spec["spec"]), 2),
+        "retry_inclusive_request_ceiling_usd": round(
+            n_calls * MAX_ATTEMPTS_PER_REP * worst_case_call_usd(spec["spec"]), 2),
+        "hard_live_cap_usd": HARD_LIVE_CAP_USD,
         "contract_sha256": PJ.contract_sha256(spec["spec"]),
         "frozen_inputs": frozen_inputs(),
         "note": "the ~814-token system prompt is below claude-opus-4-8's 1024-token "
@@ -389,13 +643,14 @@ def mode_manifest(spec: dict):
     with open(RESULTS / "frozen_inputs.sha256", "w") as f:
         for k, v in sorted(frozen_inputs().items()):
             f.write(f"{v}  {k}\n")
-    print(f"manifest: {len(units)} units, {n_calls} calls planned, "
-          f"est ${plan['est_cost_usd']}, worst-case ${plan['worst_case_cost_usd']}")
+    print(f"manifest: {len(units)} units, {n_calls} valid calls planned, "
+          f"est ${plan['est_cost_usd']}, no-retry reservation "
+          f"${plan['no_retry_reservation_usd']}, hard cap ${HARD_LIVE_CAP_USD:g}")
 
 
 def _attempt_rep(key, system, user, seed, caller, backend, ledger, breaker, spec,
                  frozen_model):
-    wc = worst_case_call_usd(spec)
+    wc = worst_case_call_usd(spec, system, user)
     for attempt in range(1, MAX_ATTEMPTS_PER_REP + 1):
         ledger.charge(wc, where=key)
         t0 = time.time()
@@ -408,12 +663,14 @@ def _attempt_rep(key, system, user, seed, caller, backend, ledger, breaker, spec
         deg = degraded_reason(res)
         scores = None if deg else JP.parse_pedagogy_scores(res["text"])
         ok = scores is not None
-        wire_write({"key": key, "attempt": attempt, "backend": backend,
+        wire_sha = wire_write({"key": key, "attempt": attempt, "backend": backend,
+                    "response_id": res.get("response_id"),
                     "served_model": res["served_model"], "stop_reason": res["stop_reason"],
                     "in_tokens": res["in_tokens"], "out_tokens": res["out_tokens"],
                     "cost_usd": round(cost, 6) if backend == "live" else 0.0,
-                    "degraded": deg, "parsed_ok": ok,
-                    "response_text": res["text"][:2000],
+                    "degraded": deg, "parsed_ok": ok, "scores": scores,
+                    "response_text": res["text"],
+                    "response_sha256": hashlib.sha256(res["text"].encode()).hexdigest(),
                     "user_sha256": hashlib.sha256(user.encode()).hexdigest(),
                     "latency_s": round(time.time() - t0, 2), "utc": now_utc()})
         if frozen_model is not None and res["served_model"] != frozen_model:
@@ -423,12 +680,15 @@ def _attempt_rep(key, system, user, seed, caller, backend, ledger, breaker, spec
         breaker.record(ok, where=key)
         if ok:
             return {"scores": scores, "served_model": res["served_model"],
+                    "response_id": res.get("response_id"),
+                    "wire_sha256": wire_sha,
                     "usage": {"in": res["in_tokens"], "out": res["out_tokens"]},
                     "attempts": attempt, "utc": now_utc()}
     return None
 
 
 def mode_preflight(spec: dict, backend: str, cap: float):
+    git_freeze = require_git_freeze() if backend == "live" else {}
     profiles = PJ.load_profiles()
     system = PJ.build_system()
     ledger = SpendLedger(RESULTS / "spend_ledger.json", cap, backend)
@@ -437,7 +697,7 @@ def mode_preflight(spec: dict, backend: str, cap: float):
     for arm in ("D", "P_nov"):
         user = PJ.build_user(PREFLIGHT_STIMULUS, arm, "high", profiles)
         PJ.assert_prompt_pure(user, arm, profiles)
-        wc = worst_case_call_usd(spec["spec"])
+        wc = worst_case_call_usd(spec["spec"], system, user)
         ledger.charge(wc, where=f"preflight:{arm}")
         if backend == "mock":
             res = caller.call_key(f"PREFLIGHT|{arm}", attempt=2)
@@ -482,6 +742,7 @@ def mode_preflight(spec: dict, backend: str, cap: float):
         "frozen_inputs": frozen_inputs(),
         "spend": ledger.summary(),
         "calls": records,
+        **git_freeze,
     }
     write_json(RESULTS / "preflight" / "resolved_config.json", resolved)
     print(f"preflight PASS: served model {resolved['served_model_frozen']!r}, "
@@ -500,9 +761,23 @@ def load_resolved(spec: dict, backend: str) -> dict:
             "PREFLIGHT CONTRACT MISMATCH: a frozen input (stimuli, profiles, prompt "
             "templates, judge config, schedule) changed after the preflight. Re-run "
             "--preflight deliberately; do not score under an untested contract.")
+    current_frozen = frozen_inputs()
+    if resolved.get("frozen_inputs") != current_frozen:
+        changed = sorted(k for k in set(current_frozen) | set(resolved.get("frozen_inputs", {}))
+                         if current_frozen.get(k) != resolved.get("frozen_inputs", {}).get(k))
+        raise SystemExit(
+            f"PREFLIGHT FROZEN-INPUT MISMATCH: {changed}. Re-run --preflight only "
+            "after a deliberate pre-data re-freeze.")
     if resolved.get("backend") != backend:
         raise SystemExit(f"preflight was run with backend={resolved.get('backend')!r}, "
                          f"this run is {backend!r}; re-run --preflight for this backend.")
+    if backend == "live":
+        freeze = require_git_freeze(allow_runtime_results=True)
+        if freeze["git_commit"] != resolved.get("git_commit"):
+            raise SystemExit("GIT FREEZE MISMATCH: HEAD moved after live preflight")
+        if not set(resolved.get("git_freeze_tags", [])) <= set(
+                freeze["git_freeze_tags"]):
+            raise SystemExit("GIT FREEZE MISMATCH: preflight freeze tag is not at HEAD")
     return resolved
 
 
@@ -516,8 +791,19 @@ def mode_score(spec: dict, backend: str, cap: float, pilot_n: int | None,
     cache_name = "profile_pedagogy_cache.json" if backend == "live" else "mock_cache.json"
     cache = RepCache(RESULTS / "cache" / cache_name, stamp)
     by_id = {s["stimulus_id"]: s for s in stimuli}
+    expected_prompts = expected_user_hashes(sched, by_id, profiles)
+    if backend == "live":
+        validate_live_cache_provenance(cache, expected_prompts)
 
     if cache_only:
+        # Reconstruction must be held to the same contract as scoring: a released
+        # cache replayed under an untested/changed contract is not a reproduction
+        # (AUDIT-2026-08-08 N7). results/preflight/ is tracked, so a released repo
+        # carries what this needs.
+        resolved = load_resolved(spec, backend)
+        if backend == "live":
+            validate_live_cache_provenance(
+                cache, expected_prompts, resolved["served_model_frozen"])
         missing = [c for c in sched
                    if PJ.cache_key(c["stimulus_id"], c["arm"], c["pole"], c["rep"])
                    not in cache.entries]
@@ -527,7 +813,8 @@ def mode_score(spec: dict, backend: str, cap: float, pilot_n: int | None,
                 f"ratings are not in the released cache (first: {missing[0]}). "
                 "Refusing to fabricate or fetch; reconstruction must be exact.")
         finalize(spec, backend, cache, sched, by_id,
-                 note="offline reconstruction from the released per-rep cache")
+                 note="offline reconstruction from the released per-rep cache",
+                 frozen_model=resolved["served_model_frozen"])
         return
 
     resolved = load_resolved(spec, backend)
@@ -537,6 +824,8 @@ def mode_score(spec: dict, backend: str, cap: float, pilot_n: int | None,
     caller = (MockCaller(spec["spec"]) if backend == "mock" else LiveCaller(spec["cfg"]))
 
     todo = sched if pilot_n is None else sched[:pilot_n]
+    if pilot_n is not None and not 1 <= pilot_n <= len(sched):
+        raise SystemExit(f"--pilot must be between 1 and {len(sched)}")
     if pilot_n is None:
         mark_state("scoring", {"complete": False, "backend": backend,
                                "note": "scoring in progress; any previously promoted "
@@ -565,6 +854,9 @@ def mode_score(spec: dict, backend: str, cap: float, pilot_n: int | None,
     finally:
         cache.flush()
 
+    if backend == "live":
+        validate_live_cache_provenance(cache, expected_prompts, frozen_model)
+
     print(f"scored: {n_hit} cache hits, {n_new} new ratings; "
           f"spend {json.dumps(ledger.summary())}")
     if pilot_n is not None:
@@ -575,10 +867,11 @@ def mode_score(spec: dict, backend: str, cap: float, pilot_n: int | None,
         print("pilot only — nothing promoted. See results/pilot_report.json")
         return
     finalize(spec, backend, cache, sched, by_id, note="scored run",
-             extra={"spend": ledger.summary()})
+             extra={"spend": ledger.summary()}, frozen_model=frozen_model)
 
 
-def finalize(spec, backend, cache, sched, by_id, note, extra=None):
+def finalize(spec, backend, cache, sched, by_id, note, extra=None,
+             frozen_model=None):
     """Completeness gate + transactional promotion of the final outputs."""
     units: dict[tuple, list] = {}
     for c in sched:
@@ -624,17 +917,32 @@ def finalize(spec, backend, cache, sched, by_id, note, extra=None):
         for r in per_unit_rows:
             f.write(json.dumps(r) + "\n")
     write_json(staging / "completeness.json", completeness)
+    # `reportable` must follow the provenance of the RATINGS, not just the flag this
+    # invocation was launched with (AUDIT-2026-08-08 N7). The cache stamp records the
+    # backend the ratings were produced under, so a mock cache cannot be promoted as
+    # reportable by relabelling the run.
+    cache_backend = (cache.stamp or {}).get("backend")
+    expected_prompts = expected_user_hashes(sched, by_id, PJ.load_profiles())
+    live_provenance_ok = (
+        validate_live_cache_provenance(cache, expected_prompts, frozen_model)
+        if backend == "live" else False)
+    reportable = backend == "live" and cache_backend == "live" and live_provenance_ok
     write_json(staging / "run_meta.json", {
         "note": note, "backend": backend,
-        "reportable": backend == "live",
+        "cache_backend": cache_backend,
+        "reportable": reportable,
+        "live_provenance_ok": live_provenance_ok,
         "judge_model": spec["spec"]["model"],
         "contract_sha256": PJ.contract_sha256(spec["spec"]),
         "frozen_inputs": frozen_inputs(),
         "n_units": len(units), "n_per_rep_rows": len(per_rep_rows),
+        "cache_sha256": sha_file(cache.path) if cache.path.exists() else None,
+        "wire_sha256": (sha_file(RESULTS / "wire/calls.jsonl")
+                         if (RESULTS / "wire/calls.jsonl").exists() else None),
         "utc": now_utc(), **(extra or {})})
     promote(staging, {"complete": True, "backend": backend, "note": note})
     print(f"PROMOTED {len(per_unit_rows)} units / {len(per_rep_rows)} per-rep rows "
-          f"to results/ ({'REPORTABLE' if backend == 'live' else 'NOT reportable: ' + backend})")
+          f"to results/ ({'REPORTABLE' if reportable else 'NOT reportable: backend=' + str(backend) + ', ratings=' + str(cache_backend)})")
 
 
 def main():
@@ -648,7 +956,8 @@ def main():
                     help="lifetime spend cap in USD (default %(default)s)")
     args = ap.parse_args()
 
-    assert RESULTS == ROOT / "results"
+    if RESULTS != ROOT / "results":
+        raise SystemExit("runner output namespace must be ROOT/results")
     RESULTS.mkdir(exist_ok=True)
     spec = judge_spec()
 

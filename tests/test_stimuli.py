@@ -14,6 +14,17 @@ from protocol.leakage import turn_leaks     # noqa: E402  vendored, frozen
 
 STIMULI = ROOT / "corpus/stimuli.jsonl"
 
+# The frozen design, pinned exactly (AUDIT-2026-08-08 B1/N2). Every number the paper
+# reports about the composition of the frozen set is asserted here, so a disclosed
+# figure cannot drift away from the artifact without a test failing. The strong
+# stratum is 25, not 30: eligibility left 26 and the pre-data audit excluded C018
+# for a rubric conflict and response-pair contingency confound (Amendment A4).
+N_STIMULI = 55
+PER_STRATUM = {"weak": 30, "strong": 25}
+PROVENANCE = {"r_high": {"corpus": 53, "authored": 2},
+              "r_low": {"corpus": 29, "authored": 26}}
+ALL_CORPUS = {"weak": 12, "strong": 15}
+
 
 def _stimuli():
     if not STIMULI.exists():
@@ -21,25 +32,33 @@ def _stimuli():
     return [json.loads(l) for l in open(STIMULI)]
 
 
-def test_design_is_sixty_stimuli_thirty_per_stratum():
+def test_design_matches_the_frozen_strata():
     s = _stimuli()
-    assert len(s) == 60
-    assert Counter(x["competence_label"] for x in s) == {"weak": 30, "strong": 30}
-    assert len({x["stimulus_id"] for x in s}) == 60
+    assert len(s) == N_STIMULI
+    assert Counter(x["competence_label"] for x in s) == PER_STRATUM
+    assert len({x["stimulus_id"] for x in s}) == N_STIMULI
+    assert "C018" not in {x["candidate_id"] for x in s}
 
 
-def test_neither_pole_is_wholly_authored():
-    """Authoring must not fully replace either pole. The source tutors are
-    pedagogically tuned, so a real turn is usually the high-scaffolding one and
-    authored counterparts land disproportionately on R_L; that residual imbalance
-    is disclosed, is inert for the primary endpoint (identical texts are judged in
-    all three arms, so a stimulus-level artifact cancels in Δ(P_nov) − Δ(P_adv)),
-    and is checked directly by the all-corpus robustness analysis below. What must
-    not happen is a pole with no corpus grounding at all."""
+def test_authoring_split_is_exactly_as_disclosed():
+    """The authoring/pole split is a disclosed FACT about the frozen set, so pin it.
+
+    The previous assertion (`n_corpus >= 10` per pole) was advertised in
+    PREREGISTRATION §2 as "a lopsidedness bound" but would have passed with nearly
+    every response authored on one pole — it bounded only "a pole with no corpus grounding
+    at all" (AUDIT-2026-08-08 N2). The imbalance is real and heavy: authored text sits
+    on R_L 26 times against 2 on R_H, because the source tutors are pedagogically
+    tuned so the real turn is usually the high pole. An additive artifact is inert
+    for the primary endpoint by construction — the identical R_H/R_L texts are judged
+    in all three arms, so a stimulus-level artifact enters every arm's Δ equally and cancels in
+    Δ(P_nov) − Δ(P_adv) under additivity — and it is checked directly by the
+    all-corpus robustness analysis. What must not happen is the number drifting away
+    from what the paper says it is.
+    """
     s = _stimuli()
-    for pole in ("r_high_provenance", "r_low_provenance"):
-        n_corpus = sum(1 for x in s if x[pole] == "corpus")
-        assert n_corpus >= 10, f"{pole}: only {n_corpus} corpus-sourced responses"
+    for pole, expected in PROVENANCE.items():
+        got = Counter(x[f"{pole}_provenance"] for x in s)
+        assert dict(got) == expected, f"{pole}: {dict(got)} != disclosed {expected}"
 
 
 def test_all_corpus_subset_can_support_the_robustness_check():
@@ -50,8 +69,41 @@ def test_all_corpus_subset_can_support_the_robustness_check():
     allc = [x for x in s if x["r_high_provenance"] == "corpus"
             and x["r_low_provenance"] == "corpus"]
     per = Counter(x["competence_label"] for x in allc)
-    assert len(allc) >= 20, f"only {len(allc)} authoring-free stimuli"
-    assert min(per.get("weak", 0), per.get("strong", 0)) >= 10, per
+    assert dict(per) == ALL_CORPUS, f"{dict(per)} != disclosed {ALL_CORPUS}"
+    assert min(per.values()) >= 10, per
+
+
+def test_no_response_text_serves_two_stimuli():
+    """Two stimuli sharing a donor turn are not independent observations, but the
+    §6.5 bootstrap resamples stimuli as if they were (AUDIT-2026-08-08 N6)."""
+    seen = {}
+    for x in _stimuli():
+        for pole in ("r_high", "r_low"):
+            txt = x[pole].strip()
+            assert txt not in seen, (
+                f"{x['stimulus_id']}:{pole} duplicates {seen.get(txt)}")
+            seen[txt] = f"{x['stimulus_id']}:{pole}"
+
+
+def test_no_context_has_already_resolved_its_named_problem():
+    """Every stimulus's `problem_id` must still describe its live content.
+
+    AUDIT-2026-08-08 B1: eight stimuli had drifted onto a *different* problem after
+    the named one was solved earlier in the dialogue. Because every guard keys on
+    `problem_id`, that silently disabled both the eligibility filter and the R_H
+    answer-leak check below — one of those items' R_H stated its live problem's
+    answer while `turn_leaks`, pointed at the named problem, reported nothing.
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "bs_elig", ROOT / "corpus/build_stimuli.py")
+    BS = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(BS)
+    problems = M.problem_index(str(ROOT / "vendor/domain/algebra/problems.yaml"))
+    for x in _stimuli():
+        assert not BS._states_answer_in(x["context"], problems[x["problem_id"]]), (
+            f"{x['stimulus_id']}: the context already resolves {x['problem_id']}, so "
+            "the dialogue has moved past the problem its metadata names")
 
 
 def test_authored_share_is_recorded_and_reportable():
@@ -95,6 +147,17 @@ def test_every_stimulus_carries_its_blind_labels():
         assert lab["agreement_ok"]
         assert x["competence_label"] == lab["competence"]
         assert x["evidence_strength"] == lab["evidence_strength"]
+
+
+def test_manipulation_check_covers_exactly_the_final_pairs():
+    key = json.loads((ROOT / "corpus/manip/_key.json").read_text())
+    report = json.loads((ROOT / "corpus/manip/report.json").read_text())
+    expected = {x["candidate_id"] for x in _stimuli()}
+    assert {row["candidate_id"] for row in key.values()} == expected
+    assert {row["candidate_id"] for row in report["per_item"].values()} == expected
+    assert report["n_pairs"] == N_STIMULI
+    assert report["n_correct"] == N_STIMULI
+    assert report["n_reversed"] == report["n_tied"] == 0
 
 
 def test_coverage_is_spread_across_problems_and_bases():

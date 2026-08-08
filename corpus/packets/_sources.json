@@ -2772,5 +2772,119 @@
    "conf-s0-ped-r6",
    0
   ]
+ },
+ "C043": {
+  "real": [
+   "abl-s0-conv_socratic-r1",
+   2
+  ],
+  "E1": [
+   "conf-s0-ped-r8",
+   2
+  ],
+  "E2": [
+   "conf-s0-ped-r9",
+   0
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r9",
+   0
+  ],
+  "E4": [
+   "abl-s0-ped_no_gate-r9",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r5",
+   1
+  ],
+  "P2": [
+   "conf-gemini-s0-ped-r5",
+   2
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r5",
+   2
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r2",
+   2
+  ]
+ },
+ "C088": {
+  "real": [
+   "abl-s0-ped_no_cascade-r2",
+   1
+  ],
+  "E1": [
+   "abl-s0-ped_no_gate-r3",
+   1
+  ],
+  "E2": [
+   "abl-s0-ped_no_tracker-r2",
+   1
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r2",
+   1
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r8",
+   1
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r3",
+   1
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r6",
+   1
+  ],
+  "P3": [
+   "conf-s0-ped-r3",
+   1
+  ],
+  "P4": [
+   "conf-gemini-s0-ped-r5",
+   1
+  ]
+ },
+ "C021": {
+  "real": [
+   "conf-gpt-s0-conv-r0",
+   0
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r9",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r5",
+   0
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r0",
+   0
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r7",
+   0
+  ],
+  "P1": [
+   "conf-s0-conv-r5",
+   0
+  ],
+  "P2": [
+   "abl-s0-ped_no_gate-r2",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r9",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ]
  }
 }

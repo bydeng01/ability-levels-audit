@@ -1,0 +1,131 @@
+{
+ "instructions": "You are constructing paired tutor responses for a study of tutoring quality.\n\nFor each item you get: the algebra problem the dialogue is about, the DIALOGUE\nCONTEXT (ending with the student's latest message), the tutor turn that actually\ncame next in that session, and pools of candidate tutor turns taken from other\nsessions on the SAME problem.\n\nYour job per item is to produce TWO alternative replies to this same context:\n\n  R_HIGH (high scaffolding): responds to where this student actually is and\n          prompts the student to take the next reasoning step themselves. It may\n          give a hint, a partial structure, or a focused question, but it must\n          LEAVE the next step for the student and must NOT state the final answer.\n\n  R_LOW  (low scaffolding): performs the step for the student \u2014 states the result,\n          works the algebra out, or gives the final answer \u2014 without asking the\n          student to produce anything.\n\nBoth must be plausible replies to THIS context and to THIS problem.\n\nProcedure per item:\n 1. Decide which pole the real_next_turn serves: \"high\" or \"low\". Judge by what it\n    does (elicits vs performs), not by whether it contains a question mark.\n 2. For the OTHER pole, first look at the candidate list for that pole\n    (elicit_candidates for high, perform_candidates for low). If one of them is a\n    coherent reply to THIS context \u2014 it addresses what this student just said and\n    does not refer to anything that did not happen here \u2014 choose it by its ref.\n 3. If none fits, AUTHOR the counterpart yourself. Match the real turn's length\n    (within roughly +/-40%), register, and formatting conventions (the corpus mixes\n    plain prose with occasional markdown/LaTeX). Do not mention any tutoring\n    strategy, policy, or system by name. Do not address the student by name.\n 4. Never let the two poles be paraphrases of each other; the difference must be\n    WHO does the next reasoning step.\n\nOutput one JSON object per item, in order, as JSON Lines:\n{\"candidate_id\": \"Cxxx\", \"real_turn_pole\": \"high\"|\"low\",\n \"counterpart_source\": \"corpus\"|\"authored\",\n \"counterpart_ref\": \"E2\"|\"P1\"|null,\n \"counterpart_text\": \"<full text if authored, else null>\",\n \"note\": \"<= 15 words on why>\"}\n",
+ "items": [
+  {
+   "candidate_id": "C043",
+   "problem_statement": "How many liters of a 50% acid solution must be added to 48 liters of a 20% acid solution to produce a 30% acid solution?",
+   "context": "Student: So, we have a 50% acid solution and we're adding it to a 20% acid solution. We want the final solution to be 30% acid. Um, isn't this a mixture problem? I'm not really sure how to start with this one... How do we set this up?\n\nTutor: You're right, this is a mixture problem! Great identification.\n\nLet's think about what's actually happening physically. We're mixing two solutions together to get a third solution.\n\nHere's a good way to start: what are the three \"things\" we're mixing or producing in this problem? Can you identify them?\n\nStudent: I think I can start to think about it. We've got the amount of the 50% acid solution, the amount of the 20% acid solution, and the overall final solution with 30% acid. But how do these amounts relate to each other in an equation? I'm still stuck on translating this into an equation...\n\nTutor: Great, you've identified the three solutions perfectly! Now let's think about what's actually being conserved when you mix these solutions together.\n\nHere's a key question: when you pour the two solutions together, what happens to the **total amount of acid**? Does acid appear or disappear, or does it stay the same?\n\nStudent: So, the total amount of acid stays the same... But I still don't know how to turn that into an equation. I guess I need to figure out an equation that relates the amounts of the two mixtures and the final mixture, somehow. Let me think...",
+   "real_next_turn": "You're on the right track! The acid is conserved - that's the key insight.\n\nSo let's think about this carefully. If you have, say, 10 liters of a 20% acid solution, how much **actual acid** (in liters) is in that solution?",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "You have everything you need! Remember that the acid doesn't appear or disappear \u2014 the acid from the first solution **plus** the acid from the second solution **equals** the acid in the final mixture. Can you write that as an equation using your three expressions?"
+    },
+    {
+     "ref": "E2",
+     "text": "Good restatement! Let's build toward the equation one piece at a time.\n\nStart with what you already have: if you have 48 liters of a 20% acid solution, how many liters of pure acid are actually in that solution?"
+    },
+    {
+     "ref": "E3",
+     "text": "You're on the right track by re-reading carefully! Let's build this up step by step.\n\nFirst, let's think about what we're actually mixing. We have two solutions going *in*, and one solution coming *out*.\n\nHere's a question to get you started: **What is the unknown quantity we're trying to find?** Can you give it a name (like a variable)?"
+    },
+    {
+     "ref": "E4",
+     "text": "Good start \u2014 you're identifying the right pieces. Let's focus on just one of them first: if you have 48 liters of a 20% acid solution, how many liters of actual acid are in it?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "Good\u2014\\(9.6\\) liters of acid from the original solution is correct.\n\nLet the unknown amount of 50% solution be \\(x\\) liters. Then the acid from that added solution is \u201c50% of \\(x\\),\u201d and the total final volume is the original 48 liters plus \\(x\\) liters."
+    },
+    {
+     "ref": "P2",
+     "text": "Spot on! You have set up the perfect equation for this mixture problem. \n\nTo find the volume of the 50% solution needed, go ahead and solve that equation for `x`. A good first step would be to distribute the `0.30` on the right side of the equation."
+    },
+    {
+     "ref": "P3",
+     "text": "Yes, that equation is exactly right: \\(9.6 + 0.50x = 0.30(48+x)\\).\n\nNow solve it by first distributing the \\(0.30\\) on the right side, then collect the \\(x\\)-terms on one side and the constant terms on the other. Keep \\(x\\) as the number of liters of 50% solution added."
+    },
+    {
+     "ref": "P4",
+     "text": "Excellent\u2014that\u2019s the full setup. Now set the total pure acid expression equal to the pure acid required in the final mixture:\n\n\\[\n48(0.2)+0.5x = 0.3(48+x)\n\\]\n\nFrom here, just solve this equation for \\(x\\)."
+    }
+   ]
+  },
+  {
+   "candidate_id": "C088",
+   "problem_statement": "How many liters of water (0% acid) must be added to 30 liters of a 40% acid solution to dilute it to a 25% acid solution?",
+   "context": "Student: We have 30 liters of a 40% acid solution and we want to add some liters of water to make it a 25% acid solution. The water is 0% acid, so it doesn't add any acid. I need to figure out how many liters of water to add to make it 25% acid.\n\nLet's say x is the number of liters of water I need to add... I don't know where to start.\n\nTutor: You're off to a great start \u2014 you've got the right variable and you know water adds no acid. Here's a focused question: how many **liters of acid** are currently in the 30-liter solution, given that it's 40% acid?\n\nStudent: To find the liters of acid, I multiply the total liters (30) by the percentage (40% or 0.40). So, that's 30 * 0.40 = 12 liters of acid.\n\nNow, I have that and I want to turn it into a 25% acid solution, but I still have to consider the water...",
+   "real_next_turn": "Exactly right \u2014 there are 12 liters of acid, and that amount **stays the same** no matter how much water you add. So here's the next piece: after you add x liters of water, what is the **total volume** of the new solution in terms of x?",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "Exactly right \u2014 there are 12 liters of acid, and that amount doesn't change when you add water. \n\nNow think about what happens after you add some unknown amount of water (call it *x*): the total volume increases, but those 12 liters of acid must now represent 25% of the new total volume. Can you write an equation that connects those two quantities?"
+    },
+    {
+     "ref": "E2",
+     "text": "Exactly right! Now, when you add water to that solution, does the amount of pure acid (12 liters) change?"
+    },
+    {
+     "ref": "E3",
+     "text": "Great job, there are exactly 12 liters of pure acid in the mix! Since you are only adding water, that amount of pure acid won't change. If you add an unknown amount of water to the original 30 liters, how can you express the total volume of the new mixture, and how does that relate to the target 25% concentration?"
+    },
+    {
+     "ref": "E4",
+     "text": "Spot on, you have exactly 12 liters of pure acid. Since adding water doesn't change the amount of acid, that 12 liters will make up exactly 25% of your *new* total volume. How can you express the new total volume using the $x$ liters of water you are adding, and how does that relate to the 12 liters of acid?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "Yes, exactly \u2014 you have 12 liters of acid, and that amount will stay unchanged after adding water. Now relate that 12 liters to the final mixture: it should be 25% of the total final volume. If you let the amount of water added be \\(x\\), then the final volume is \\(30 + x\\)."
+    },
+    {
+     "ref": "P2",
+     "text": "Yes, exactly: the mixture contains 12 liters of acid, and adding water doesn\u2019t change that amount. Now relate that same 12 liters to the final mixture: it should be 25% of the total final volume, which is \\(30+x\\)."
+    },
+    {
+     "ref": "P3",
+     "text": "Exactly right \u2014 there are 12 liters of pure acid, and that amount doesn't change when you add water. Now you have everything you need: set that amount of pure acid equal to your expression for the acid in the final mixture, and solve for x."
+    },
+    {
+     "ref": "P4",
+     "text": "Spot on! You have perfectly described the relationship between the acid, the new volume, and the new concentration. \n\nNow, translate that final sentence into a mathematical equation. Once you have that equation set up, you can solve it for $x$ to find the amount of water needed."
+    }
+   ]
+  },
+  {
+   "candidate_id": "C021",
+   "problem_statement": "How many liters of water (0% acid) must be added to 18 liters of a 50% acid solution to dilute it to a 20% acid solution?",
+   "context": "Student: Let's see... I have 18 liters of 50% acid solution, and I need to add some water to make a 20% acid solution... I think I can use the pure acid method. If I let x be the liters of water added, then the amount of pure acid in the 50% solution is... 0.50 * 18 = 9?",
+   "real_next_turn": "Yes, exactly: the original solution contains\n\n\\[\n0.50 \\times 18 = 9\n\\]\n\nliters of pure acid.\n\nSince water is 0% acid, adding \\(x\\) liters of water adds **no acid**, so the amount of acid stays \\(9\\) liters.\n\nThe total volume after adding water is:\n\n\\[\n18 + x\n\\]\n\nYou want the final solution to be 20% acid, so:\n\n\\[\n\\frac{9}{18+x} = 0.20\n\\]\n\nNow solve:\n\n\\[\n9 = 0.20(18+x)\n\\]\n\n\\[\n9 = 3.6 + 0.20x\n\\]\n\n\\[\n5.4 = 0.20x\n\\]\n\n\\[\nx = 27\n\\]\n\nSo you must add:\n\n\\[\n\\boxed{27 \\text{ liters of water}}\n\\]",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "Good start! You've identified the unknown x as the amount of water to add. \n\nNow, let's think about the acid itself. When you mix these two liquids together, what happens to the **amount of acid** in the solution? Does it change?"
+    },
+    {
+     "ref": "E2",
+     "text": "Yes, you are absolutely right! There are 9 liters of acid in the original solution. \n\nNow, think about the final mixture. How does the amount of acid you just found relate to the total volume of the new mixture and its desired concentration?"
+    },
+    {
+     "ref": "E3",
+     "text": "Great start! You're thinking about this exactly right. So what does 0.50 \u00d7 18 give you? And what does that number represent physically?"
+    },
+    {
+     "ref": "E4",
+     "text": "You've perfectly identified the expressions for the amount of pure acid before and after adding the water! Think about what happens to the actual amount of pure acid when you only add water. How should the amount of acid in the starting mixture compare to the amount of acid in the final mixture?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "## Setting Up the Equation\n\nYou're on the right track! Let's fill in each part:\n\n| | Liters | \u00d7 | Concentration | = | Acid Amount |\n|---|---|---|---|---|---|\n| Original solution | 18 | \u00d7 | 0.50 | = | 9 liters of acid |\n| Water added | x | \u00d7 | 0.00 | = | 0 liters of acid |\n| Final solution | (18 + x) | \u00d7 | 0.20 | = | 0.20(18 + x) |\n\n## The Equation\n\n$$9 + 0 = 0.20(18 + x)$$\n\n## Solving\n\n$$9 = 3.6 + 0.20x$$\n\n$$5.4 = 0.20x$$\n\n$$x = 27$$\n\n## Answer\n\nYou need to add **27 liters of water** to dilute the solution to 20% acid.\n\n**Quick check:** 9 liters of acid \u00f7 (18 + 27) total liters = 9/45 = **0.20 \u2713**"
+    },
+    {
+     "ref": "P2",
+     "text": "You've made great progress identifying that there are 9 liters of acid, and that's the key quantity here. Think about what happens to that acid when you add water \u2014 the amount of acid doesn't change, only the total volume does. Consider what it means for the final mixture to be 20% acid."
+    },
+    {
+     "ref": "P3",
+     "text": "Good start\u2014choosing \\(x\\) for the liters of water and finding the original amount of pure acid are exactly the right first steps.\n\nNow think about the key conservation idea: adding water changes the total volume, but it does **not** change the amount of pure acid. Relate the unchanged acid amount to the new total mixture and the desired 20% concentration."
+    },
+    {
+     "ref": "P4",
+     "text": "Good start\u2014you\u2019ve identified the key fixed quantity: the amount of acid stays the same when you add water.  \n\nUse the conservation idea: the original amount of acid must equal the acid amount in the final diluted mixture."
+    }
+   ]
+  }
+ ]
+}

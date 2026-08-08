@@ -8,6 +8,12 @@ __pycache__/
 
 # runner scratch (regenerated; never part of a freeze)
 results/tmp.*
-results/cache/
-results/wire/
-results/spend_ledger.json
+# NB: exclude the cache dir's CONTENTS, not the dir itself — git cannot re-include a
+# file whose parent directory is excluded.
+results/cache/*
+
+# ...but the LIVE per-rep cache, the wire log and the spend ledger are the release's
+# provenance record, not scratch: README documents --offline-cache-only as replaying
+# "the released per-rep cache", and that path cannot work on a clone if the cache is
+# ignored (AUDIT-2026-08-08 N8). Mock rehearsal caches stay ignored.
+!results/cache/profile_pedagogy_cache.json
