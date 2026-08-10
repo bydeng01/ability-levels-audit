@@ -483,3 +483,83 @@ check separately rebuilt all 55 contexts and 82 corpus-sourced responses byte fo
 byte from `corpus/logs/`. `--manifest-only` records 330 units, 990 accepted calls,
 the $9.72 point estimate, $53.22 conservative no-retry request ceiling and $40 hard
 cap. No provider call was made.
+
+## 2026-08-10 — Fourth pre-flight audit and the fixes it forced (pre-judging)
+
+A fourth independent adversarial pass (`protocol/AUDIT-2026-08-10-endpoint-sensitivity.md`)
+returned **GO-WITH-FIXES** on three blocking findings. All three are fixed below, together
+with the factual corrections from its non-blocking list. **Zero judge calls and zero
+provider calls existed at any point in this entry**; no stimulus, label, profile text or
+registered estimand was changed, and `corpus/stimuli.jsonl` / `labeling/labels.jsonl` are
+byte-identical to the previous freeze (`1d240ebc…8c5376`, `fda2bc3d…2707d4`).
+
+**B1 — the response scale is asymmetrically censored against one direction of the primary
+endpoint.** The audit noticed that the companion study already published per-turn pedagogy
+scores for every corpus turn, from this same judge and instrument, and joined them to the
+82 corpus-sourced poles of the frozen 55. The poles do not sit in the middle of the scale:
+`R_H` averages 4.553/5 with 25 of 53 pinned at exactly 5.000, `R_L` averages 1.782 with 17
+of 29 pinned at exactly 1.000, and the implied no-profile Δ over the 27 all-corpus pairs is
+2.889 of a possible 4. In the weak stratum that leaves 6.23 scale points of headroom in the
+registered positive direction against 1.77 in the negative, and 16 of the 30 weak `R_H`
+cannot move up at all. Censoring cannot manufacture an effect, so §6.2's positive reading
+survives; the null branch does not, because the pedagogically standard response (advanced
+label → withholding rated higher, telling rated lower) moves both poles in exactly the
+censored directions and would also null out A5.1's §6.3 safeguard. Recorded as **Amendment
+A6**, with §6.2 amended so a joint null is registered as *uninformative* rather than as
+"the profile did not reach the rating", and with a ceiling/floor diagnostic and the
+165-call test–retest check registered as reported outputs. The instrument was **not**
+changed — it is reused verbatim for commensurability, and re-cutting the manipulation after
+an audit is what the freeze exists to prevent.
+
+**B2 — A5.7's "a reply with no usage accounting is refused and retried" was true of the
+scoring path only.** `mode_preflight` still computed cost from possibly-`None` token counts
+before consulting `degraded_reason`, so a preflight reply without usage raised `TypeError`
+after the ledger charge and before any wire row — the exact defect A5.7 claims to have
+removed, sitting on the first paid command. Fixed by mirroring `_attempt_rep`'s guard.
+Verified both ways: with the guard the run refuses cleanly with "missing usage accounting";
+without it, `TypeError: unsupported operand type(s) for *: 'NoneType' and 'float'`.
+
+**B3 — `analyze.py`'s integrity chain terminated in an untracked file.** It verified itself
+and `PREREGISTRATION.md` against `run_meta.json`, and `run_meta.json` against
+`run_state.json` — both untracked and hand-writable — so editing the estimator and
+re-stamping two hashes produced a fabricated primary endpoint with exit code 0 and a
+legitimate `contract_sha256`. `results/plan.json` records the same `frozen_inputs` and *is*
+committed under the freeze tag, so the chain now terminates there. Two regression tests
+added; removing the check kills both and nothing else.
+
+**Also corrected from the audit's non-blocking list.** §8's token arithmetic was wrong in
+both figures — the system prompt measures ~1,000 Anthropic tokens rather than ~814 and the
+profile block ~124 rather than 95, calibrated against Anthropic-reported `input_tokens` on
+3,120 logged companion-study calls carrying this byte-identical system prompt — so the
+inference that it sits below the 1,024-token prompt-cache minimum was wrong; nothing turns
+on it, because no `cache_control` breakpoint is ever sent. §8's "four attempts for every
+unit … is intentionally impossible" conflated the aggregate reservation ceiling with
+settled spend: reservations settle immediately, so 3,960 requests cost ~$38.9 and the
+circuit breaker, not the cap, is what prevents that regime. The tutor **base** is
+confounded with the pole (corpus `r_low` is gpt 26 / gemini 2 / sonnet 1 against `r_high`
+gemini 23 / sonnet 19 / gpt 11) and was disclosed nowhere — now in A6.5, §2's neighbourhood
+and the abstract, with the note that §6.3's all-corpus subset does not control it. §6.3's
+authoring-robustness re-estimate runs on 8 and 7 source runs, not the 27/12/15 stimulus
+counts the text quoted. The comment claiming `results/preflight/` is tracked was false, and
+the `git_commit` equality check means committing it breaks the path that consumes it; both
+the comment and the README now say so, with the operator consequence stated: **no commits
+between `--preflight` and the end of the run**. The abstract's "If null" branch stated the
+unconditional reading A5.1 already forbids.
+
+**Deliberately not applied.** The audit's N1 (no exception handling around the provider
+call, so a transient 429 aborts a ~27-minute run) and N2 (a zeroed — not deleted — ledger
+bypasses the wire cross-check) are real, but both are changes to money-handling code with
+no coverage for the new paths, hours before it spends real money; the cache makes N1
+recoverable by re-running and N2 is an integrity-of-the-record gap rather than a spend
+hole. Recorded as open. The frozen parser's edge cases (a two-digit score coercing to its
+leading digit; a reply carrying only `overall` counting as a full valid rep while thinning
+the §6.3 sub-score means) are in vendored code that must not be edited for
+commensurability. The single label the audit's independent re-read disputed (C036 / S01,
+strong stratum, unanimous 3/3 in the released labels) was **not** changed: one rater on a
+genuine rubric boundary is not grounds for re-cutting a frozen label.
+
+**Offline verification after the fixes.** 81 passed, 0 skipped. `build_stimuli.py verify`
+still rebuilds all 55 contexts and 82 corpus-sourced responses byte-identically. Design
+unchanged at 55 stimuli / 330 units / 990 calls. `contract_sha256` and the frozen-input
+manifest are regenerated, so the tree needs a fresh commit and a new `prereg-final-*` tag
+before preflight. No provider call was made.

@@ -270,8 +270,12 @@ the profile block sits outside that dialogue, so "grounded in behavioural eviden
 "obeyed an instruction to ignore the profile" predict the same null. The registered
 reading is therefore: a null PAG_weak supports evidence-grounding **only if** the §6.3
 pure profile effect is non-null, i.e. only if the judge demonstrably used the profile at
-all. If both are null, the registered conclusion is that the profile did not reach the
-rating, which is a statement about this instrument rather than about evidence-grounding.
+all. If both are null, the registered conclusion is **not** that the profile did not reach
+the rating: **Amendment A6** shows the two poles already sit at 4.55 and 1.78 on a 1-5
+scale, so a profile effect in one direction is largely unobservable, and a joint null is
+registered as **uninformative** between "the profile did not reach the rating" and "the
+profile effect fell in the direction this scale cannot express". Either way it is a
+statement about this instrument rather than about evidence-grounding.
 We report effect sizes with CIs, not null-vs-significant dichotomies.
 
 **6.3 Secondary (labelled as such):**
@@ -283,7 +287,10 @@ We report effect sizes with CIs, not null-vs-significant dichotomies.
   only the metadata differing.
 - **Authoring robustness (pre-registered).** Re-estimate the primary endpoint on the
   subset of stimuli whose *both* poles are real corpus turns (27 stimuli: 12 weak,
-  15 strong) — no authored text anywhere. Authoring is heavily on `R_L`
+  15 strong — but **8 and 7 source runs**, which is what the test actually sees, so its
+  floor on p is 0.0078 / 0.0156 against the primary's 7.6e-06; Amendment A6.6). Note this
+  subset removes authored text but **not** the base × pole confound (A6.5). Authoring is
+  heavily on `R_L`
   (26 of 28 authored responses; Amendment A3), and although an additive artifact is
   inert for PAG by construction (§2), this subset removes the question entirely.
   Reported alongside the primary,
@@ -513,6 +520,78 @@ rather than left to be noticed after the data exists.
    word-spelled `solution_form` answers (verified inert — 0 of the 126 candidates change
    eligibility, and the byte-identical reconstruction of the frozen 55 still passes).
 
+**A6 (2026-08-10) — the response scale is asymmetrically censored against one direction of
+the primary endpoint, and a base × pole confound** (`protocol/AUDIT-2026-08-10-endpoint-sensitivity.md`).
+A fourth adversarial pass was completed **before any provider call and with zero judge
+scores in existence**. It changed no stimulus, no label, no profile text and no registered
+estimand: `corpus/stimuli.jsonl` and `labeling/labels.jsonl` still hash to `1d240ebc…8c5376`
+and `fda2bc3d…2707d4`. What follows is disclosure.
+
+1. **Where the poles already sit on the scale.** The companion study released per-turn
+   pedagogy scores for all 2,219 corpus turns
+   (`results/{ablation,confirmatory,confirmatory_gpt,confirmatory_gemini}/pedagogy_detail.json`),
+   produced by the same `claude-opus-4-8` judge, the same frozen instrument, temperature
+   omitted, `max_tokens` 512, 3 reps. Joining them to the 82 corpus-sourced poles of the
+   frozen 55 (0 lookup misses) gives: `R_H` mean **4.553 / 5** with **25 of 53 at exactly
+   5.000**; `R_L` mean **1.782** with **17 of 29 at exactly 1.000**. Over the 27 all-corpus
+   pairs the implied no-profile `Δ` is **2.889** (sd 1.09, max 4.00) — the contrast already
+   consumes about three quarters of the usable range. For the 55 real turns, whose D-arm
+   prompt is byte-identical to a call the companion study actually made, the figures are
+   4.488 (18 of 43 at 5.000) on the high pole and 1.694 (8 of 12 at 1.000) on the low.
+
+2. **What that does to `PAG`.** Writing `a_H = S_H(P_adv) − S_H(P_nov)` and
+   `a_L = S_L(P_adv) − S_L(P_nov)`, the primary endpoint is `PAG = a_L − a_H`. In the weak
+   stratum the observed positions bound the two terms unequally: **6.23 scale points of
+   headroom in the positive (registered "anchoring") direction against 1.77 in the
+   negative** — `a_H` can fall by 3.57 on average but rise by at most 0.43, and for
+   **16 of the 30 weak stimuli it cannot rise at all**, their `R_H` having already scored
+   5/5/5. (Prior scores exist for all 30 weak `R_H` but only the 12 corpus-sourced weak
+   `R_L`; the 18 authored ones are unmeasured, so the floor term is the weaker half of
+   this estimate.)
+
+3. **The registered consequence.** Censoring cannot manufacture an effect, so a non-null
+   `PAG_weak` remains interpretable as profile influence and §6.2's positive reading is
+   unaffected. The null branch is what changes. §6.2 registers two readings of a null and
+   discriminates between them with §6.3's pure profile effect; **there is a third, and it
+   is hereby registered**: the profile effect fell in the direction this scale cannot
+   express. It is not idle — it is what the *pedagogically standard* response produces
+   (an advanced label makes withholding more appropriate, raising `R_H` and lowering
+   `R_L`, both of which are the censored movements), and in that world §6.3's pure profile
+   effect is censored on both poles too, so the A5.1 safeguard would also read null. **A
+   joint null of `PAG_weak` and §6.3 is therefore reported as uninformative between "the
+   profile did not reach the rating" and "the profile effect was not expressible", and
+   the earlier reading is not asserted over the later one.**
+
+4. **Diagnostic registered now, reported whatever it shows.** Per arm and pole, the
+   fraction of units at `overall == 5.000` and at `== 1.000`, and the same for the four
+   sub-scores. Also registered as a secondary: the 55 × 3 = **165 D-arm calls on the real
+   pole are byte-identical repeats of published companion-study calls**, so their
+   agreement with the released 3-rep means is reported as a test–retest check on the
+   frozen instrument and as evidence on whether the judge still behaves as measured.
+
+5. **Tutor base is confounded with the pole.** Among the 82 corpus-sourced responses,
+   `r_high` is gemini 23 / sonnet 19 / gpt 11 while `r_low` is **gpt 26 / gemini 2 /
+   sonnet 1**. With the 26 authored `R_L`, essentially every low pole is either GPT-written
+   or authored while the high pole is mostly gemini/sonnet, so `Δ` contrasts text from
+   different model families as well as different scaffolding — the mechanical source of the
+   `\boxed{}` cue already disclosed in A5.6. This is the same class of artifact as the
+   authoring imbalance in §2, with the same additivity argument and the same limit:
+   inert for `PAG` under additivity, not inert for an artifact that interacts with the
+   profile. The §6.3 all-corpus re-estimate does **not** control it (it removes authoring,
+   not base). Corpus `r_low` also averages 374 characters against `r_high` at 254.
+
+6. **Cluster counts for the §6.3 authoring-robustness re-estimate.** Under A4.3's
+   source-run inference unit, the 27 all-corpus stimuli sit in **8 weak and 7 strong source
+   runs**, not 12 and 15. Minimum attainable two-sided exact p is therefore 0.0078 and
+   0.0156, against 7.6e-06 for the 18-cluster primary; the two are not comparable at face
+   value and will not be reported as though they were.
+
+7. **Corrections to §8's token arithmetic** (below, corrected in place): the system prompt
+   is ~1,000 Anthropic tokens, not ~814, and the profile block ~124, not 95 — calibrated
+   against Anthropic-reported `input_tokens` on 3,120 logged companion-study calls carrying
+   this byte-identical system prompt. The cost consequence is negligible and conservative
+   (measured point estimate ~$10.0 against the registered $9.72).
+
 ## 8. Budget
 
 Cost basis measured from the source pedagogy-judge log (3,120 calls: 1,639.6 input /
@@ -524,8 +603,17 @@ allowance. The runner also verifies that the request's UTF-8 byte length plus a
 reservation totals $53.22 for 990 attempts ($53.33 including preflight), so the
 **$40 hard lifetime cap** would stop the study if actual usage approached the bound;
 at the measured usage it leaves ample room. Four attempts for every main-schedule
-unit would have a $212.89 request ceiling and is intentionally impossible. Pilot calls
+unit would reserve $212.89 in aggregate, but each reservation is settled to actual usage
+immediately, so the cap meters **settled** spend: at the measured basis 3,960 requests
+cost ~$38.9 and would *not* by themselves trip the $40 ceiling. What actually prevents
+that regime is the quality circuit breaker, which aborts once the usable-rating rate
+falls below 50%; the cap is the backstop, not the mechanism (Amendment A6.7 / audit
+2026-08-10 N4). Pilot calls
 populate the main cache rather than adding a second set, and all modes share the same
 persisted ledger. The cap must be finite and positive, cannot exceed $40, and cannot
-be raised on resume. The ~814-token system prompt is below claude-opus-4-8's
-1024-token prompt-cache minimum, so no caching discount is assumed.
+be raised on resume. No `cache_control` breakpoint is ever sent, so no prompt-caching
+discount applies and none is assumed. (The system prompt measures ~1,000 Anthropic
+tokens and the profile block ~124 — calibrated against Anthropic-reported `input_tokens`
+on 3,120 companion-study calls carrying this byte-identical system prompt; earlier drafts
+said 814 and 95, and inferred from the 814 figure that the prompt sat below
+claude-opus-4-8's 1,024-token cache minimum. It does not, but nothing turns on it.)

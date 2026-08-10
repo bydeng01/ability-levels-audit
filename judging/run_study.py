@@ -638,8 +638,10 @@ def mode_manifest(spec: dict):
         "hard_live_cap_usd": HARD_LIVE_CAP_USD,
         "contract_sha256": PJ.contract_sha256(spec["spec"]),
         "frozen_inputs": frozen_inputs(),
-        "note": "the ~814-token system prompt is below claude-opus-4-8's 1024-token "
-                "prompt-cache minimum, so no cache discount is assumed",
+        "note": "no cache_control breakpoint is ever sent, so no prompt-cache discount "
+                "applies and none is assumed (the ~1000-token system prompt is at "
+                "claude-opus-4-8's 1024-token cache minimum, not below it as earlier "
+                "drafts said; nothing turns on it)",
     }
     write_json(RESULTS / "plan.json", plan)
     with open(RESULTS / "frozen_inputs.sha256", "w") as f:
@@ -713,7 +715,14 @@ def mode_preflight(spec: dict, backend: str, cap: float):
             res = caller.call_key(f"PREFLIGHT|{arm}", attempt=2)
         else:
             res = caller.call(system, user, seed=0)
-        cost = res["in_tokens"] * PRICE_IN + res["out_tokens"] * PRICE_OUT
+        # Same guard as _attempt_rep: a reply with no usage accounting is degraded, not
+        # free. A5.7 recorded this fix but applied it only to the scoring path, so the
+        # "missing usage accounting" refusal below stayed unreachable HERE — the very
+        # first paid command (AUDIT-2026-08-10-endpoint-sensitivity B2).
+        if res["in_tokens"] is None or res["out_tokens"] is None:
+            cost = wc
+        else:
+            cost = res["in_tokens"] * PRICE_IN + res["out_tokens"] * PRICE_OUT
         ledger.settle(wc, cost if backend == "live" else 0.0)
         parsed = JP.parse_pedagogy_scores(res["text"])
         rec = {"arm": arm, "parsed_ok": parsed is not None,
@@ -808,8 +817,14 @@ def mode_score(spec: dict, backend: str, cap: float, pilot_n: int | None,
     if cache_only:
         # Reconstruction must be held to the same contract as scoring: a released
         # cache replayed under an untested/changed contract is not a reproduction
-        # (AUDIT-2026-08-08 N7). results/preflight/ is tracked, so a released repo
-        # carries what this needs.
+        # (AUDIT-2026-08-08 N7).
+        #
+        # CAVEAT, not yet resolved: results/preflight/ is NOT tracked, and the git_commit
+        # equality check below means committing it to publish it moves HEAD and breaks
+        # this path on every clone. So `--offline-cache-only --judge-backend live` works
+        # in the operator's own tree before any further commit, and NOT in a released
+        # repository (AUDIT-2026-08-10-endpoint-sensitivity N5). Consequence for the
+        # operator: do not create any commit between --preflight and the end of the run.
         resolved = load_resolved(spec, backend)
         if backend == "live":
             validate_live_cache_provenance(

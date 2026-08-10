@@ -112,9 +112,15 @@ separation = anchoring.]]
 mode: the same struggling learner is judged to need less scaffolding purely
 because of a label. Implications for learner-conditioned reward models and
 adaptive-tutor evaluation.]]
-[[If null: the judge tracks behavioural evidence over stated labels in this
-setting — an encouraging validity result for pedagogy rubrics under learner
-metadata, bounded by the single domain and judge family.]]
+[[If null AND the pure profile effect is non-null: the judge tracks behavioural
+evidence over stated labels in this setting — an encouraging validity result for
+pedagogy rubrics under learner metadata, bounded by the single domain and judge
+family.]]
+[[If both are null: this is reported as uninformative, not as evidence-grounding.
+The frozen system prompt tells the judge to rate on the dialogue alone, and the two
+poles already sit near the ends of the 1–5 scale, so "the profile never reached the
+rating" and "the profile effect fell in the direction the scale cannot express" both
+predict exactly this. See Amendments A5 and A6.]]
 
 **Limitations.** One judge family (the blind competence labels are also
 Claude-family, disclosed; the tutor-pipeline circularity is removed but
@@ -132,7 +138,12 @@ evidence-strength moderation spans only moderate and strong, so the ambiguous en
 — where profile use is most defensible — is untested. Nearly half of `R_L`
 responses are authored. The `R_H`/`R_L` contrast carries surface cues (a question
 mark in 37/55 `R_H` against 1/55 `R_L`; `\boxed{}` in 0 against 18), so Δ is not a
-pure scaffolding contrast. Scaffolding preference is rubric-scored rather than
+pure scaffolding contrast; among corpus-sourced responses the tutor base is also
+confounded with the pole (`R_L` is 26/29 GPT-base against 11/53 for `R_H`), so Δ
+contrasts writing from different model families as well. On the companion study's
+own scores the two poles already sit at 4.55 and 1.78 on the 1–5 scale, leaving the
+primary endpoint substantially more room to move in the anchoring direction than
+against it (Amendment A6). Scaffolding preference is rubric-scored rather than
 forced-choice (a forced-choice robustness check is a labelled exploratory
 follow-up).
 

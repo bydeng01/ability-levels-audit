@@ -87,11 +87,15 @@ def _mk_results(tmp_path, pag_weak=1.5, pag_strong=0.1, noise=0.05, n=30):
     # run_meta must pin the stimuli it was scored against (AUDIT-2026-08-08 B2)
     stim_sha = hashlib.sha256(
         (tmp_path / "corpus/stimuli.jsonl").read_bytes()).hexdigest()
+    frozen = {"stimuli_sha256": stim_sha, **bound}
     (tmp_path / "results/run_meta.json").write_text(json.dumps(
         {"backend": "live", "reportable": True, "contract_sha256": "test",
          "live_provenance_ok": True,
          "n_units": len(units), "n_per_rep_rows": len(units) * 3,
-         "frozen_inputs": {"stimuli_sha256": stim_sha, **bound}}))
+         "frozen_inputs": frozen}))
+    # The committed anchor the run record is checked against; without it the integrity
+    # chain terminates in untracked files again (AUDIT-2026-08-10 B3).
+    (tmp_path / "results/plan.json").write_text(json.dumps({"frozen_inputs": frozen}))
     (tmp_path / "results/per_rep_scores.jsonl").write_text("synthetic\n")
     (tmp_path / "results/completeness.json").write_text(json.dumps({"complete": True}))
     (tmp_path / "results/cache").mkdir()
@@ -310,6 +314,42 @@ def test_analysis_refuses_edited_analysis_code_or_plan(tmp_path, monkeypatch):
     (tmp_path / "results/run_meta.json").write_text(json.dumps(meta))
     _refresh_hashes(tmp_path)
     with pytest.raises(SystemExit, match="records no analyze_py_sha256"):
+        AN.load(False)
+
+
+def test_analysis_refuses_a_restamped_run_record(tmp_path, monkeypatch):
+    """Re-stamping the untracked chain must not launder an edited estimator.
+
+    The N2 gate above trusts run_meta.json, and run_meta.json is certified only by
+    run_state.json — both untracked and hand-writable. Editing analyze.py and then
+    rewriting BOTH records by hand passed every check and reported the fabricated
+    number. results/plan.json is committed under the freeze tag and carries the same
+    frozen_inputs, so the chain now terminates in git
+    (AUDIT-2026-08-10-endpoint-sensitivity B3).
+    """
+    monkeypatch.setattr(AN, "ROOT", tmp_path)
+    _mk_results(tmp_path)
+    AN.load(False)                                  # baseline: anchored and unmodified
+
+    target = tmp_path / "analysis/analyze.py"
+    target.write_bytes(target.read_bytes() + b"\n# post-hoc estimator change\n")
+    # ...and cover the tracks the N2 gate would otherwise catch.
+    meta = json.loads((tmp_path / "results/run_meta.json").read_text())
+    meta["frozen_inputs"]["analyze_py_sha256"] = hashlib.sha256(
+        target.read_bytes()).hexdigest()
+    (tmp_path / "results/run_meta.json").write_text(json.dumps(meta))
+    _refresh_hashes(tmp_path)
+
+    with pytest.raises(SystemExit, match="DISAGREE WITH THE COMMITTED PLAN"):
+        AN.load(False)
+
+
+def test_analysis_refuses_when_the_committed_plan_is_absent(tmp_path, monkeypatch):
+    """A missing anchor fails closed rather than falling back to the untracked chain."""
+    monkeypatch.setattr(AN, "ROOT", tmp_path)
+    _mk_results(tmp_path)
+    (tmp_path / "results/plan.json").unlink()
+    with pytest.raises(SystemExit, match="results/plan.json is missing"):
         AN.load(False)
 
 

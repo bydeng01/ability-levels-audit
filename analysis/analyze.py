@@ -126,6 +126,13 @@ def _validate_analysis_code_unchanged(meta: dict) -> None:
     but nothing rechecked them at ANALYSIS time — so the estimator could be edited after
     the scores existed and `summary.json` would still carry the run's legitimate
     `contract_sha256` (AUDIT-2026-08-08-preflight-review-3 N2).
+
+    That check trusted `run_meta.json`, which is untracked and hand-writable, so
+    re-stamping it (and `run_state.json`, which certifies it) restored a fabricated
+    result to a clean bill of health. `results/plan.json` records the same
+    `frozen_inputs` and IS committed under the freeze tag, so anchoring to it terminates
+    the chain in git rather than in a file the analyst can edit
+    (AUDIT-2026-08-10-endpoint-sensitivity B3).
     """
     frozen = meta.get("frozen_inputs") or {}
     for field, path in (("analyze_py_sha256", ROOT / "analysis/analyze.py"),
@@ -141,6 +148,23 @@ def _validate_analysis_code_unchanged(meta: dict) -> None:
                 f"ANALYSIS CODE OR PLAN CHANGED SINCE SCORING: {path.relative_to(ROOT)} "
                 f"was {recorded} at scoring time and is {actual} now. The registered "
                 "analysis is not the one about to run. Refusing to analyse.")
+    # Everything above trusts run_meta.json, which is untracked and hand-writable — so
+    # re-stamping it (and run_state.json, which certifies it) restored a fabricated
+    # result to a clean bill of health. results/plan.json records the same frozen_inputs
+    # and IS committed under the freeze tag, so this is where the chain reaches git
+    # (AUDIT-2026-08-10-endpoint-sensitivity B3).
+    plan_path = ROOT / "results/plan.json"
+    if not plan_path.exists():
+        raise SystemExit(
+            "results/plan.json is missing. It is the committed record of the frozen "
+            "inputs and the only anchor the analyst cannot rewrite. Refusing to analyse.")
+    if json.loads(plan_path.read_text()).get("frozen_inputs") != frozen:
+        raise SystemExit(
+            "FROZEN INPUTS DISAGREE WITH THE COMMITTED PLAN: results/run_meta.json "
+            "records a different frozen-input set than results/plan.json, which is "
+            "committed under the freeze tag. Either the run was scored against "
+            "materials the released plan does not describe, or the run record was "
+            "edited afterwards. Refusing to analyse.")
 
 
 def _validate_promoted_hashes(state: dict) -> None:

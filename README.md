@@ -82,6 +82,12 @@ python3 analysis/figures/fig1.py             # the abstract's figure
 cache and aborts on any miss; `--judge-backend mock` exercises the full pipeline with
 synthetic scores (never reportable).
 
+**Do not create any commit between `--preflight` and the end of the run.** Every live
+command after preflight requires `HEAD` to equal the commit preflight froze, so a commit
+in between blocks the paid run. The same check means live `--offline-cache-only` replays
+in the operator's own tree, not in a clone whose history includes the commit that
+published the cache (AUDIT-2026-08-10 N5).
+
 ## Freeze discipline
 
 Stimuli, labels, profile texts, judge prompt, executed request code, exact dependency
