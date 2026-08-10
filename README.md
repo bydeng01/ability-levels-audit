@@ -1,7 +1,7 @@
 # label-vs-evidence — profile anchoring in pedagogy-aware LLM judges
 
 **Working title:** *Do Pedagogy-Aware LLM Judges Generalize Across Student Ability
-Levels?* — AAAI-27 Student Abstract.
+Levels?*
 
 When a learner's *stated* profile conflicts with the competence the learner
 *demonstrates* in the dialogue, does a pedagogy-aware LLM judge ground its rating in

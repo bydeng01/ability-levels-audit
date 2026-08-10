@@ -9,7 +9,7 @@ added after the independent pre-flight audit in `protocol/AUDIT-2026-08-08.md`
 (Amendments A2–A4, all made with zero judge scores in existence). Anything analyzed
 beyond §6 is exploratory and will be labelled as such.
 
-Target venue: AAAI-27 Student Abstract (2 pages, one figure). Companion full paper:
+Format: 2 pages, one figure. Companion full paper:
 the conv-vs-ped-tutor study (source corpus `ab5ea2a99d67cc2b23808c52e841301c5e56d887`),
 whose frozen pedagogy-judge instrument this study reuses verbatim.
 

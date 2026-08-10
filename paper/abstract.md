@@ -1,6 +1,6 @@
 # Do Pedagogy-Aware LLM Judges Generalize Across Student Ability Levels?
 
-*AAAI-27 Student Abstract draft. Two pages, one figure. Numbers marked
+*Draft. Two pages, one figure. Numbers marked
 `[[key]]` are filled from `analysis/out/summary.json` after the paid run; no
 number below is real until that fill happens.*
 
