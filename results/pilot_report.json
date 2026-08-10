@@ -1,0 +1,19 @@
+{
+  "pilot_calls": 12,
+  "cache_hits": 0,
+  "new_ratings": 12,
+  "breaker": {
+    "responses": 12,
+    "accepted": 12
+  },
+  "spend": {
+    "cap_usd": 40.0,
+    "backend": "live",
+    "prior_settled_usd": 0.0166,
+    "this_run_settled_usd": 0.1255,
+    "lifetime_settled_usd": 0.1421,
+    "outstanding_committed_usd": 0.0,
+    "requests_this_run": 12
+  },
+  "utc": "2026-08-10T13:11:58Z"
+}
