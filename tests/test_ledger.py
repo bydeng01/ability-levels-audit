@@ -59,10 +59,19 @@ def test_crash_leaves_precharge_committed(tmp_path):
 
 
 def test_mock_rows_never_consume_the_live_allowance(tmp_path):
+    """A crashed mock rehearsal's outstanding pre-charge must not eat the live budget.
+
+    The old version settled the mock charge to $0.00 before asserting, so
+    `live.settled == 0.0` held whether or not the ledger partitioned rows by backend —
+    changing the partition to `if True:` passed the whole suite
+    (AUDIT-2026-08-08-preflight-review-3 N2b, mutation M6). Leaving the mock charge
+    UNSETTLED, which is exactly what a crashed rehearsal persists, makes the partition
+    load-bearing.
+    """
     p = tmp_path / "ledger.json"
     mock = SpendLedger(p, cap_usd=1.0, backend="mock")
-    mock.charge(0.9, "rehearsal")
-    mock.settle(0.9, 0.0)
+    mock.charge(0.9, "rehearsal")                       # deliberately never settled
+    assert json.loads(p.read_text())["invocations"][0]["committed_usd"] == 0.9
     live = SpendLedger(p, cap_usd=1.0, backend="live")
     assert live.settled == 0.0 and live.committed == 0.0
     live.charge(0.9, "paid")  # full allowance available
@@ -134,3 +143,46 @@ def test_breaker_tolerates_healthy_rate():
     br = Breaker()
     for i in range(BREAKER_WARMUP * 3):
         br.record(i % 10 != 0, "unit")  # 90% accept
+
+
+def test_reply_without_usage_is_refused_and_retried_not_crashed(tmp_path, monkeypatch):
+    """A degraded reply with no usage accounting must be refused, then retried.
+
+    `degraded_reason` has a "missing usage accounting" branch that could never run: the
+    cost line above it multiplied `None` by a float and raised TypeError, killing the
+    run after the request had been billed and before the wire row was written, so the
+    refuse-and-retry the module docstring promises never happened
+    (AUDIT-2026-08-08-preflight-review-3 N7).
+    """
+    import judging.run_study as RS
+    from analysis import judge_pedagogy as JP
+
+    monkeypatch.setattr(RS, "RESULTS", tmp_path)
+    good = json.dumps({k: 3 for k in JP.FIELDS})
+
+    class Caller:
+        calls = 0
+
+        def call(self, system, user, seed):
+            Caller.calls += 1
+            usage = ({"in_tokens": None, "out_tokens": None} if Caller.calls == 1
+                     else {"in_tokens": 1700, "out_tokens": 52})
+            return {"text": good, "response_id": f"msg_{Caller.calls}",
+                    "served_model": "m", "stop_reason": "end_turn", **usage}
+
+    spec = {"max_tokens": 512}
+    ledger = SpendLedger(tmp_path / "ledger.json", cap_usd=1.0, backend="live")
+    rec = RS._attempt_rep("S01|D|high|0", "sys", "user", seed=0, caller=Caller(),
+                          backend="live", ledger=ledger, breaker=Breaker(), spec=spec,
+                          frozen_model="m")
+
+    assert Caller.calls == 2, "the usage-less reply was accepted instead of retried"
+    assert rec is not None and rec["response_id"] == "msg_2"
+    rows = [json.loads(l)
+            for l in (tmp_path / "wire/calls.jsonl").read_text().splitlines()]
+    assert len(rows) == 2, "the refused attempt left no wire record"
+    assert rows[0]["degraded"] == "missing usage accounting"
+    assert rows[0]["parsed_ok"] is False and rows[0]["scores"] is None
+    # billed but unaccounted: settled at the full reservation, never as free
+    assert rows[0]["cost_usd"] == pytest.approx(worst_case_call_usd(spec))
+    assert ledger.summary()["this_run_settled_usd"] > worst_case_call_usd(spec)

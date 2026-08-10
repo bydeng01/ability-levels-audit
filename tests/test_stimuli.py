@@ -129,6 +129,35 @@ def test_poles_differ_and_r_high_never_leaks_the_answer():
             f"{x['stimulus_id']}: R_H leaks the answer"
 
 
+def test_answer_guards_actually_fire_on_text_that_states_the_answer():
+    """Positive controls for the two guards the frozen set relies on.
+
+    `test_poles_differ_and_r_high_never_leaks_the_answer` and
+    `test_no_context_has_already_resolved_its_named_problem` both assert only that the
+    guard returns False on the frozen text, so stubbing `turn_leaks` to return False
+    passed the whole suite (AUDIT-2026-08-08-preflight-review-3 N2b, mutation M4).
+    These pin the other direction, including the word-spelled forms the eligibility
+    filter used to miss (N9).
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "bs_guards", ROOT / "corpus/build_stimuli.py")
+    BS = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(BS)
+    problems = M.problem_index(str(ROOT / "vendor/domain/algebra/problems.yaml"))
+    for pid in sorted({x["problem_id"] for x in _stimuli()}):
+        problem = problems[pid]
+        lk = problem.leakage or {}
+        numeric, solution = lk.get("numeric_form", []), lk.get("solution_form", [])
+        assert numeric and solution, pid
+        assert turn_leaks(f"So x = {numeric[0]} liters.", numeric, solution), pid
+        assert turn_leaks(f"In short, {solution[0]}.", numeric, solution), pid
+        assert BS._states_answer_in(f"So x = {numeric[0]} liters.", problem), pid
+        assert BS._states_answer_in(f"In short, {solution[0]}.", problem), pid
+        # the deliberate carve-out: an unrepaired sign error is a live next step
+        assert not BS._states_answer_in(f"I got x = -{numeric[0]}.", problem), pid
+
+
 def test_context_ends_with_a_student_turn():
     """Turns are separated by a blank line *followed by a speaker label*; a turn's
     own text may contain blank lines, so a bare "\\n\\n" split is not a turn split."""

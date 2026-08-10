@@ -17,3 +17,8 @@ results/cache/*
 # "the released per-rep cache", and that path cannot work on a clone if the cache is
 # ignored (AUDIT-2026-08-08 N8). Mock rehearsal caches stay ignored.
 !results/cache/profile_pedagogy_cache.json
+
+# analysis output is regenerated from the promoted results; leaving it tracked makes
+# the worktree dirty after `analyze.py` and then trips require_git_freeze on any later
+# live command (AUDIT-2026-08-08-preflight-review-3 N10).
+analysis/out/

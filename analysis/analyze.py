@@ -119,6 +119,30 @@ def assert_stimuli_unchanged(meta: dict) -> None:
             "to analyse.")
 
 
+def _validate_analysis_code_unchanged(meta: dict) -> None:
+    """This script and the plan it implements must be the ones the run was frozen under.
+
+    `frozen_inputs` binds `analyze.py` and `PREREGISTRATION.md` for every LIVE command,
+    but nothing rechecked them at ANALYSIS time — so the estimator could be edited after
+    the scores existed and `summary.json` would still carry the run's legitimate
+    `contract_sha256` (AUDIT-2026-08-08-preflight-review-3 N2).
+    """
+    frozen = meta.get("frozen_inputs") or {}
+    for field, path in (("analyze_py_sha256", ROOT / "analysis/analyze.py"),
+                        ("prereg_md_sha256", ROOT / "protocol/PREREGISTRATION.md")):
+        recorded = frozen.get(field)
+        if recorded is None:
+            raise SystemExit(
+                f"results/run_meta.json records no {field}; refusing to analyse a run "
+                "whose analysis code and plan are not bound.")
+        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        if recorded != actual:
+            raise SystemExit(
+                f"ANALYSIS CODE OR PLAN CHANGED SINCE SCORING: {path.relative_to(ROOT)} "
+                f"was {recorded} at scoring time and is {actual} now. The registered "
+                "analysis is not the one about to run. Refusing to analyse.")
+
+
 def _validate_promoted_hashes(state: dict) -> None:
     recorded = state.get("result_sha256")
     if not isinstance(recorded, dict):
@@ -186,6 +210,7 @@ def load(allow_mock: bool):
     if meta.get("reportable"):
         _validate_live_provenance_files(meta)
     assert_stimuli_unchanged(meta)
+    _validate_analysis_code_unchanged(meta)
     units = [json.loads(l) for l in open(ROOT / "results/per_unit.jsonl")]
     stimulus_rows = [json.loads(l) for l in open(ROOT / "corpus/stimuli.jsonl")]
     stimuli = {s["stimulus_id"]: s for s in stimulus_rows}

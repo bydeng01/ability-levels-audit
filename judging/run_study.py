@@ -15,7 +15,9 @@ not vendored). All output lives under results/ (enforced). Modes:
   --pilot N             run only the first N schedule calls (shared cache, real spend,
                         no promotion). Writes results/pilot_report.json.
   --offline-cache-only  reconstruct finals from the released per-rep cache. ANY cache
-                        miss aborts. No provider call, no synthetic score.
+                        miss aborts, and any disagreement with the already-promoted
+                        finals aborts without overwriting them. No provider call, no
+                        synthetic score.
   --judge-backend mock  full pipeline, deterministic synthetic scores, no key. Uses a
                         separate cache namespace. NEVER reportable.
 
@@ -658,9 +660,17 @@ def _attempt_rep(key, system, user, seed, caller, backend, ledger, breaker, spec
             res = caller.call_key(key, attempt)
         else:
             res = caller.call(system, user, seed=seed)
-        cost = res["in_tokens"] * PRICE_IN + res["out_tokens"] * PRICE_OUT
-        ledger.settle(wc, cost if backend == "live" else 0.0)
         deg = degraded_reason(res)
+        # A reply with no usage accounting is degraded, not free: settling it at the
+        # reservation is the conservative reading of a request we know was billed.
+        # Computing cost first raised TypeError on `None` tokens and killed the run
+        # before the wire row was written, so the "missing usage" refusal below was
+        # unreachable (AUDIT-2026-08-08-preflight-review-3 N7).
+        if res["in_tokens"] is None or res["out_tokens"] is None:
+            cost = wc
+        else:
+            cost = res["in_tokens"] * PRICE_IN + res["out_tokens"] * PRICE_OUT
+        ledger.settle(wc, cost if backend == "live" else 0.0)
         scores = None if deg else JP.parse_pedagogy_scores(res["text"])
         ok = scores is not None
         wire_sha = wire_write({"key": key, "attempt": attempt, "backend": backend,
@@ -814,7 +824,8 @@ def mode_score(spec: dict, backend: str, cap: float, pilot_n: int | None,
                 "Refusing to fabricate or fetch; reconstruction must be exact.")
         finalize(spec, backend, cache, sched, by_id,
                  note="offline reconstruction from the released per-rep cache",
-                 frozen_model=resolved["served_model_frozen"])
+                 frozen_model=resolved["served_model_frozen"],
+                 compare_existing=True)
         return
 
     resolved = load_resolved(spec, backend)
@@ -871,8 +882,15 @@ def mode_score(spec: dict, backend: str, cap: float, pilot_n: int | None,
 
 
 def finalize(spec, backend, cache, sched, by_id, note, extra=None,
-             frozen_model=None):
-    """Completeness gate + transactional promotion of the final outputs."""
+             frozen_model=None, compare_existing=False):
+    """Completeness gate + transactional promotion of the final outputs.
+
+    `compare_existing` makes reconstruction REPORT a discrepancy instead of
+    repairing one. Replaying the released cache used to os.replace its output over
+    whatever was promoted, so a post-hoc edit of the promoted scores was silently
+    reverted and never reported — the one tool that could have detected the edit
+    destroyed the evidence of it (AUDIT-2026-08-08-preflight-review-3 N1).
+    """
     units: dict[tuple, list] = {}
     for c in sched:
         units.setdefault((c["stimulus_id"], c["arm"], c["pole"]), []).append(
@@ -940,6 +958,17 @@ def finalize(spec, backend, cache, sched, by_id, note, extra=None,
         "wire_sha256": (sha_file(RESULTS / "wire/calls.jsonl")
                          if (RESULTS / "wire/calls.jsonl").exists() else None),
         "utc": now_utc(), **(extra or {})})
+    if compare_existing:
+        # run_meta.json carries this invocation's timestamp, so only the three data
+        # files are comparable; they are a pure function of the cache.
+        for name in ("per_rep_scores.jsonl", "per_unit.jsonl", "completeness.json"):
+            current = RESULTS / name
+            if current.exists() and current.read_bytes() != (staging / name).read_bytes():
+                raise SystemExit(
+                    f"OFFLINE RECONSTRUCTION MISMATCH: results/{name} differs from what "
+                    "the released per-rep cache rebuilds. The promoted results are not "
+                    "the ones the cache and wire log support. Nothing was overwritten — "
+                    f"the rebuild is in {staging} for comparison.")
     promote(staging, {"complete": True, "backend": backend, "note": note})
     print(f"PROMOTED {len(per_unit_rows)} units / {len(per_rep_rows)} per-rep rows "
           f"to results/ ({'REPORTABLE' if reportable else 'NOT reportable: backend=' + str(backend) + ', ratings=' + str(cache_backend)})")

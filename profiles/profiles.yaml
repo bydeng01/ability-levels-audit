@@ -1,7 +1,13 @@
 # FROZEN learner-profile texts — the manipulated factor of the study.
 #
 # Constraints (build prompt, Phase 4):
-#   - matched for length and specificity, differing ONLY in stated ability;
+#   - matched for length and specificity;
+#     NB (Amendment A5): the texts are NOT a minimal contrast on ability. Sentence (3)
+#     also states a help-seeking preference ("usually need step-by-step help" against
+#     "usually work through problems independently without help"), which is the
+#     construct the rubric's assistance_calibration dimension scores. Disclosed in
+#     PREREGISTRATION §2 and A5; deliberately not edited, because re-cutting the
+#     manipulation after an audit is what the freeze exists to prevent;
 #   - neither may hint at the dialogue (no mixture/percent/algebra-task specifics
 #     beyond naming the course subject, identical in both);
 #   - neither may instruct the judge how to weigh the profile.

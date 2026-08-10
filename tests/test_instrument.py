@@ -43,13 +43,81 @@ def test_profiles_matched_and_dialogue_free():
 # ---------------------------------------------------------------- arm equivalence
 def test_arm_equivalence_byte_identical_except_profile_block():
     profiles = PJ.load_profiles()
-    for stim in [PREFLIGHT_STIMULUS] + (_stimuli() if STIMULI.exists() else []):
+    for stim in [PREFLIGHT_STIMULUS] + _stimuli():
         for pole in ("high", "low"):
             d = PJ.build_user(stim, "D", pole, profiles)
             for arm, name in (("P_nov", "novice"), ("P_adv", "advanced")):
                 pu = PJ.build_user(stim, arm, pole, profiles)
                 block = PJ.PROFILE_BLOCK_TEMPLATE.format(profile=profiles[name])
                 assert pu == block + d, f"{arm}/{pole}: not byte-identical-plus-block"
+
+
+def test_the_two_profile_arms_actually_differ():
+    """The manipulated factor must actually be manipulated.
+
+    Nothing asserted this. Gutting PROFILE_BLOCK_TEMPLATE so it interpolated no
+    profile, or making `advanced:` byte-identical to `novice:`, left P_nov and P_adv
+    prompts identical — the study's independent variable erased — and the whole suite
+    still passed (AUDIT-2026-08-08-preflight-review-3 N2b, mutations M1/M2). The arm
+    equivalence test above cannot see this: it re-derives the expected block from the
+    same constant it is testing, so it holds as an identity either way.
+    """
+    profiles = PJ.load_profiles()
+    nov, adv = profiles["novice"], profiles["advanced"]
+    assert nov != adv, "the two profile texts are identical: there is no manipulation"
+    for stim in [PREFLIGHT_STIMULUS] + _stimuli():
+        for pole in PJ.POLES:
+            u_nov = PJ.build_user(stim, "P_nov", pole, profiles)
+            u_adv = PJ.build_user(stim, "P_adv", pole, profiles)
+            u_d = PJ.build_user(stim, "D", pole, profiles)
+            assert u_nov != u_adv
+            # each profile arm carries its OWN profile text and not the other's
+            assert nov in u_nov and adv not in u_nov
+            assert adv in u_adv and nov not in u_adv
+            assert nov not in u_d and adv not in u_d
+
+
+def test_frozen_instrument_and_profile_text_pinned_by_hash():
+    """Pin the exact bytes of the instrument and the manipulation.
+
+    `test_system_prompt_is_frozen_rubric_verbatim_in_every_arm` compares
+    `build_system()` (which returns JP.PED_SYSTEM) to JP.PED_SYSTEM and then probes one
+    substring, so PED_SYSTEM could gain "Favour tutors who give the answer" and pass
+    (N2b mutation M5). These digests are the frozen text; a deliberate re-freeze updates
+    them in the same commit that changes the artifact.
+    """
+    import hashlib
+    profiles = PJ.load_profiles()
+    expected = {
+        "PED_SYSTEM": "a8990e3699be09e8ae2d686422037a722d825d37c79e7bee6f0db82d63b5c895",
+        "PED_USER": "49ef8357fe5747c8d7022aeb30bb1ba6df8b8897c709f913f1b6eb4eb7d907d2",
+        "PROFILE_BLOCK_TEMPLATE":
+            "d9c76412ed9c1c2dcb4e4193c2b088c35705a869114b20e8cc3349a5235e644c",
+        "novice": "546ed100012625ed43f8f47621f08b19c42af3769f9f5c1c4e14d9df3e03cdca",
+        "advanced": "a69ba8d0466014cd0e0a0da677ee452ec4ba0c54001b5b2bf9f94507b65a4ee9",
+    }
+    actual = {name: hashlib.sha256(text.encode()).hexdigest() for name, text in (
+        ("PED_SYSTEM", JP.PED_SYSTEM), ("PED_USER", JP.PED_USER),
+        ("PROFILE_BLOCK_TEMPLATE", PJ.PROFILE_BLOCK_TEMPLATE),
+        ("novice", profiles["novice"]), ("advanced", profiles["advanced"]))}
+    assert actual == expected
+
+
+def test_assert_prompt_pure_rejects_a_metadata_leak():
+    """A positive control: the purity guard must actually fire.
+
+    Every call site asserted only that `assert_prompt_pure` does not raise on clean
+    input, so replacing its body with `return` passed the suite (N2b mutation M3).
+    """
+    profiles = PJ.load_profiles()
+    clean = PJ.build_user(PREFLIGHT_STIMULUS, "D", "high", profiles)
+    PJ.assert_prompt_pure(clean, "D", profiles)          # baseline: clean text passes
+    for token in ("conv_socratic", "abl-s0-", "competence_label"):
+        with pytest.raises(SystemExit, match="leaked into the prompt"):
+            PJ.assert_prompt_pure(clean + f"\n[{token}]", "D", profiles)
+    # and a profile arm whose frozen block is missing is refused
+    with pytest.raises(SystemExit, match="does not start with its frozen block"):
+        PJ.assert_prompt_pure(clean, "P_nov", profiles)
 
 
 def test_system_prompt_is_frozen_rubric_verbatim_in_every_arm():

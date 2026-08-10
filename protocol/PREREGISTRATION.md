@@ -67,7 +67,12 @@ independently labelled). No student simulation differs between conditions.
   `D` (dialogue + response), `P_nov` (novice profile + dialogue + response),
   `P_adv` (advanced profile + dialogue + response). Profile texts are frozen in
   `profiles/profiles.yaml`, length-matched, and contain no dialogue hints and no
-  weighing instructions.
+  instruction to the judge about how to weigh them. They are **not** a minimal
+  contrast on ability: each also states a help-seeking preference ("usually need
+  step-by-step help" against "usually work through problems independently without
+  help"), which is the construct the rubric's `assistance_calibration` dimension
+  scores directly. The endpoint is therefore profile *influence*, not anchoring on an
+  ability label alone — see **Amendment A5**, recorded before any judge call.
 - **Demonstrated competence** (between-stimulus, the stratification factor): 30 weak /
   25 strong per the independent blind labels (§3; the strong stratum is short of 30
   under §4's take-all clause and one invalid pair was excluded before data collection
@@ -259,7 +264,14 @@ the judge's scaffolding preference for the same visibly struggling learner.
 Primary test: two-sided exact conditional Wilcoxon signed-rank on the 18
 weak-stratum source-run means against 0, with a source-run BCa bootstrap CI on mean
 PAG_weak and the rank-biserial correlation as effect size. A null (CI tight around 0)
-is a publishable finding: the judge grounds its preference in behavioural evidence.
+is a publishable finding, but **only conditionally** — see **Amendment A5**. The frozen
+system prompt instructs the judge to "Base your rating only on the dialogue shown", and
+the profile block sits outside that dialogue, so "grounded in behavioural evidence" and
+"obeyed an instruction to ignore the profile" predict the same null. The registered
+reading is therefore: a null PAG_weak supports evidence-grounding **only if** the §6.3
+pure profile effect is non-null, i.e. only if the judge demonstrably used the profile at
+all. If both are null, the registered conclusion is that the profile did not reach the
+rating, which is a statement about this instrument rather than about evidence-grounding.
 We report effect sizes with CIs, not null-vs-significant dichotomies.
 
 **6.3 Secondary (labelled as such):**
@@ -390,7 +402,10 @@ From the same audit, none data-dependent (no judge score existed):
    exactly) and to the limitations: the tutor family is nearly collinear with the
    competence stratum (ped 23 weak / 9 strong; conv 7 weak / 17 strong), and the
    R_H/R_L contrast carries surface cues (a question mark in 37/56 R_H against 1/56
-   R_L; `\boxed{}` in 0/56 R_H against 18/56 R_L) that the manipulation check cannot
+   R_L; `\boxed{}` in 0/56 R_H against 18/56 R_L) — **[figures in this item describe the
+   56-stimulus set A3 was written against and are superseded by A4 and A5: the frozen 55
+   are ped 23 weak / 8 strong, and the denominators are 55, not 56]** — that the
+   manipulation check cannot
    fully control — so §4b's 56/56 result is reported as a construction check, not as
    independent evidence that Δ measures scaffolding.
 
@@ -424,6 +439,79 @@ the following frozen corrections.
 The final composition is `moderate` 37 / `strong` 18; tutor family ped 31 / conv 24
 (weak: ped 23 / conv 7; strong: ped 8 / conv 17); and 27 all-corpus pairs (12 weak /
 15 strong). Authored-response and punctuation counts stated above are unchanged.
+
+**A5 (2026-08-08) — construct-validity disclosures and composition facts found by a
+third pre-flight audit** (`protocol/AUDIT-2026-08-08-preflight-review-3.md`). A third
+adversarial pass was completed **before any provider call and with zero judge scores in
+existence**. It changed no stimulus, no label, no profile text and no registered
+estimand: `corpus/stimuli.jsonl` and `labeling/labels.jsonl` still hash to
+`1d240ebc…8c5376` and `fda2bc3d…2707d4`. What follows is disclosure, recorded here
+rather than left to be noticed after the data exists.
+
+1. **The instrument instructs the judge to ignore the manipulated factor.** The frozen
+   `PED_SYSTEM` ends with "Base your rating only on the dialogue shown", and opens with
+   "read in the context of the dialogue shown"; the profile block is prepended to the
+   user message, outside the triple-quoted `DIALOGUE:` region. The instrument was reused
+   verbatim for commensurability with the companion study and is **not** changed here.
+   The consequence is registered in §6.2: a null primary endpoint is evidence of
+   evidence-grounding only if §6.3's pure profile effect is non-null. §4.1(b) already
+   cited this clause for a different purpose; that it also bears on the main
+   manipulation was not previously stated.
+
+2. **The profiles bundle stated ability with a stated assistance need** (§2). "Usually
+   need step-by-step help" versus "usually work through problems independently without
+   help" is precisely what `assistance_calibration` scores, so a positive PAG is
+   consistent with a *correctly* calibrated evaluator as well as with label anchoring.
+   Deliberately not fixed by editing the profile texts: they were frozen before any
+   judge call, and re-cutting the manipulation after an audit is the behaviour the
+   freeze exists to prevent. The endpoint is reported as profile influence, and the
+   ability-anchoring reading is offered only where the pure profile effect and the
+   evidence gradient support it.
+
+3. **The strong stratum is entirely strong-sampling-prior.** Prior × blind label over
+   the 126-candidate pool is {(weak,weak) 45, (strong,weak) 39, (weak,strong) 9,
+   (strong,strong) 33}; after eligibility it is {38, 37, 1, 25}; over the frozen 55 it
+   is {23, 7, 0, 25}. The nine candidates whose blind label overturned the prior toward
+   "strong" are the only counterexamples in the pool, and eight fail `is_eligible` while
+   the ninth is C018, removed by A4's pre-data exclusion. §3's insistence that the
+   tracker is a sampling prior and not ground truth remains true of the *procedure*, but
+   the released materials contain no case where the blind pass overturned the prior
+   toward "strong", so that independence is not testable inside the frozen set and the
+   strong stratum inherits any bias the prior carries. This affects §6.1, PAG_strong and
+   §6.4; the primary endpoint is within-stimulus and is unaffected.
+
+4. **The eligibility filter is strongly family-differential.** It drops 24 of 70
+   conv-family candidates (34%) against 1 of 56 ped-family (2%); by policy,
+   `conv_no_final_answer` 44%, `conv` 33%, `ped` 2%. Its only operative disqualifier is
+   "the named problem is already resolved somewhere in the context", which is close to a
+   description of what the conv policies do. A3.6's disclosure that tutor family is
+   nearly collinear with the competence stratum stands; this records that a filter added
+   after the labels existed is part of what produced that shape.
+
+5. **23 of the 55 contexts contain no tutor turn at all** — a single student message,
+   `turn_index == 0` — and they are concentrated in the strong stratum (16 of 25 strong,
+   7 of 30 weak). The amount of behavioural evidence available to ground a rating is
+   therefore systematically smaller in the strong stratum while the profile block is a
+   constant 95 tokens, which confounds every weak-versus-strong comparison. "55 dialogue
+   contexts" in §2 should be read as "55 rating contexts, 23 of them a single student
+   turn". The within-stimulus primary endpoint is unaffected.
+
+6. **Corrected figures.** A3.6's "ped 23 weak / 9 strong" and its `/56` denominators
+   describe the superseded 56-stimulus set; the frozen 55 are ped 23 weak / 8 strong,
+   with a question mark in 37 of 55 `R_H` against 1 of 55 `R_L` and `\boxed{}` in 0
+   against 18. §4b and A4 already carry the correct values; A3 is annotated in place
+   rather than rewritten. §2's "7 tutor policies × 3 tutor bases" is loose: the corpus is
+   140 runs — 5 ablation policies × 10 replicates on the sonnet base, plus 3 conditions ×
+   3 bases × 10 replicates — and only `conv` and `ped` exist on all three bases.
+
+7. **Integrity fixes to the executed code**, none of which touch a registered estimand:
+   `--offline-cache-only` now aborts on any disagreement with the promoted finals
+   instead of silently overwriting them; `analysis/analyze.py` verifies its own digest
+   and this document's against the ones the run recorded before computing anything; a
+   reply carrying no usage accounting is refused and retried rather than raising inside
+   the cost computation; and `is_eligible` now also matches `protocol.leakage`'s
+   word-spelled `solution_form` answers (verified inert — 0 of the 126 candidates change
+   eligibility, and the byte-identical reconstruction of the frozen 55 still passes).
 
 ## 8. Budget
 

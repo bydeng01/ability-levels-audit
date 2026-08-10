@@ -9,10 +9,16 @@ import pytest
 
 # the repo's analysis/ dir is shadowed by the vendored `analysis` package (by
 # design), so the study's own analyze.py is loaded by file path
+REPO = Path(__file__).resolve().parents[1]
 _spec = importlib.util.spec_from_file_location(
-    "lve_analyze", Path(__file__).resolve().parents[1] / "analysis/analyze.py")
+    "lve_analyze", REPO / "analysis/analyze.py")
 AN = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(AN)
+
+# analyze.py now binds itself and the plan to the hashes the run recorded, so a
+# fixture ROOT must carry both files for the gate to have anything to check.
+BOUND_SOURCES = {"analyze_py_sha256": "analysis/analyze.py",
+                 "prereg_md_sha256": "protocol/PREREGISTRATION.md"}
 
 
 def _refresh_hashes(tmp_path):
@@ -26,9 +32,15 @@ def _refresh_hashes(tmp_path):
 
 def _mk_results(tmp_path, pag_weak=1.5, pag_strong=0.1, noise=0.05, n=30):
     """Synthetic per_unit.jsonl with a known anchoring structure."""
+    import shutil
     rng = np.random.default_rng(7)
     (tmp_path / "results").mkdir()
     (tmp_path / "corpus").mkdir()
+    bound = {}
+    for field, sub in BOUND_SOURCES.items():
+        (tmp_path / sub).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO / sub, tmp_path / sub)
+        bound[field] = hashlib.sha256((REPO / sub).read_bytes()).hexdigest()
     units, stimuli = [], []
     for stratum, pag in (("weak", pag_weak), ("strong", pag_strong)):
         for i in range(n):
@@ -79,7 +91,7 @@ def _mk_results(tmp_path, pag_weak=1.5, pag_strong=0.1, noise=0.05, n=30):
         {"backend": "live", "reportable": True, "contract_sha256": "test",
          "live_provenance_ok": True,
          "n_units": len(units), "n_per_rep_rows": len(units) * 3,
-         "frozen_inputs": {"stimuli_sha256": stim_sha}}))
+         "frozen_inputs": {"stimuli_sha256": stim_sha, **bound}}))
     (tmp_path / "results/per_rep_scores.jsonl").write_text("synthetic\n")
     (tmp_path / "results/completeness.json").write_text(json.dumps({"complete": True}))
     (tmp_path / "results/cache").mkdir()
@@ -271,3 +283,67 @@ def test_analysis_refuses_post_promotion_provenance_edit(tmp_path, monkeypatch):
         f.write("tamper\n")
     with pytest.raises(SystemExit, match="LIVE PROVENANCE CHANGED"):
         AN.load(False)
+
+
+def test_analysis_refuses_edited_analysis_code_or_plan(tmp_path, monkeypatch):
+    """The estimator and the plan must be the ones the run was frozen under.
+
+    `frozen_inputs` binds both for every LIVE command, but nothing rechecked them at
+    ANALYSIS time, so repointing the primary endpoint at the other stratum after the
+    scores existed produced a summary.json still stamped with the run's legitimate
+    contract hash (AUDIT-2026-08-08-preflight-review-3 N2).
+    """
+    monkeypatch.setattr(AN, "ROOT", tmp_path)
+    _mk_results(tmp_path)
+    AN.load(False)                                  # baseline: bound and unmodified
+
+    for sub in BOUND_SOURCES.values():
+        target = tmp_path / sub
+        original = target.read_bytes()
+        target.write_bytes(original + b"\n# post-hoc change\n")
+        with pytest.raises(SystemExit, match="ANALYSIS CODE OR PLAN CHANGED"):
+            AN.load(False)
+        target.write_bytes(original)
+
+    meta = json.loads((tmp_path / "results/run_meta.json").read_text())
+    del meta["frozen_inputs"]["analyze_py_sha256"]
+    (tmp_path / "results/run_meta.json").write_text(json.dumps(meta))
+    _refresh_hashes(tmp_path)
+    with pytest.raises(SystemExit, match="records no analyze_py_sha256"):
+        AN.load(False)
+
+
+def test_analysis_refuses_an_incomplete_promoted_unit(tmp_path, monkeypatch):
+    """The n_valid == 3 gate had no test; disabling it passed the suite (N2b, M10)."""
+    monkeypatch.setattr(AN, "ROOT", tmp_path)
+    _mk_results(tmp_path)
+    path = tmp_path / "results/per_unit.jsonl"
+    rows = [json.loads(l) for l in path.read_text().splitlines()]
+    rows[0]["n_valid"] = 2
+    path.write_text("".join(json.dumps(r) + "\n" for r in rows))
+    _refresh_hashes(tmp_path)
+    with pytest.raises(SystemExit, match="INCOMPLETE promoted unit"):
+        AN.load(False)
+
+
+def test_all_corpus_subset_requires_both_poles_from_the_corpus():
+    """§6.3's robustness subset is "no authored text anywhere" — both poles.
+
+    The definition was never exercised through analyze.py (test_stimuli.py recomputes
+    the subset inside the test), so flipping the `and` to an `or` — which would silently
+    widen the pre-registered subset from 27 stimuli to 55 — passed (N2b, M9).
+    """
+    combos = {"CC": ("corpus", "corpus"), "CA": ("corpus", "authored"),
+              "AC": ("authored", "corpus"), "AA": ("authored", "authored")}
+    stimuli, units = {}, []
+    for sid, (high, low) in combos.items():
+        stimuli[sid] = {"stimulus_id": sid, "competence_label": "weak",
+                        "source_run": f"run-{sid}", "evidence_strength": "moderate",
+                        "family": "ped", "base": "sonnet",
+                        "r_high_provenance": high, "r_low_provenance": low}
+        for arm in AN.ARMS:
+            for pole, val in (("high", 4.0), ("low", 3.0)):
+                units.append({"stimulus_id": sid, "arm": arm, "pole": pole,
+                              "overall_mean": val, "n_valid": 3})
+    rows = AN.build_deltas(units, stimuli)
+    assert {r["stimulus_id"] for r in rows if r["all_corpus"]} == {"CC"}

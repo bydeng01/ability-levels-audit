@@ -23,8 +23,8 @@ Subcommands (run in order; later ones consume earlier outputs):
   select      apply the pre-specified deterministic rule to the Phase 3 labels ->
               the 60 selected candidate ids (corpus/selection.json).
   pair        attach R_H / R_L to the selected stimuli from the response pools, with
-              authored overrides from corpus/authored_responses.yaml ->
-              corpus/pairing_draft.jsonl + corpus/pairing_report.md (for manual review).
+              authored counterparts taken from the blind review packets
+              (corpus/reviews/packet_*.jsonl) -> corpus/pairing_draft.jsonl.
   freeze      assemble corpus/stimuli.jsonl (+ sha256) and copy every referenced run
               dir's calls.jsonl into corpus/logs/<run>/.
   verify      rebuild every stimulus context from corpus/logs and assert byte-identical
@@ -91,7 +91,8 @@ CONFUSION_RE = re.compile(
 # the student solved the problem without emitting the marker during training. In
 # such a context neither pole is a scaffolding move — R_L is a closing remark and
 # any R_H must invent new work — so the R_H/R_L contrast measures something other
-# than scaffolding. Excluded at sampling for both strata.
+# than scaffolding. Excluded by `is_eligible` at SELECTION (cmd_select), identically
+# for both strata — not at candidate sampling.
 CLOSING_RE = re.compile(
     r"\b(thank you|thanks|i'?ll remember|good luck|have a (great|good)|"
     r"appreciate (it|your)|i'?ll (try to )?(remember|apply)|"
@@ -260,7 +261,12 @@ def _states_answer_in(text: str, problem) -> bool:
     for ans in answer_forms(problem):
         if re.search(r"(?<![\d.\-])" + re.escape(ans) + r"(?!\d)(?!\.\d)", text):
             return True
-    return False
+    # A word-spelled resolution ("the answer is twenty-four") states the answer too.
+    # Reusing the frozen matcher's solution_form list keeps this filter from being
+    # NARROWER than the leak guard it exists to protect
+    # (AUDIT-2026-08-08-preflight-review-3 N9). Verified inert on the frozen pool:
+    # 0 of the 126 candidates change eligibility, so the selection is untouched.
+    return turn_leaks(text, [], (problem.leakage or {}).get("solution_form") or [])
 
 
 def states_answer(rec: dict, problems_by_id: dict) -> bool:

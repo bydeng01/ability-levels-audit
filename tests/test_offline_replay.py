@@ -153,3 +153,30 @@ def test_live_cache_must_match_raw_response_prompt_and_response_id(tmp_results):
     cache.entries[key]["response_id"] = "msg_forged"
     with pytest.raises(SystemExit, match="response-id mismatch"):
         RS.validate_live_cache_provenance(cache, {key: user_sha}, "claude-opus-4-8")
+
+
+def test_replay_reports_a_tampered_promoted_result_without_overwriting(tmp_results):
+    """Reconstruction must REPORT a discrepancy, not silently repair it.
+
+    `--offline-cache-only` used to os.replace its rebuild over whatever was promoted, so
+    editing the promoted scores (and refreshing run_state's manifest, which is stored in
+    the very file it certifies) was reverted without a word — the one tool that could
+    detect the edit destroyed the evidence of it
+    (AUDIT-2026-08-08-preflight-review-3 N1).
+    """
+    _needs_stimuli()
+    spec = RS.judge_spec()
+    RS.mode_preflight(spec, "mock", cap=40.0)
+    RS.mode_score(spec, "mock", cap=40.0, pilot_n=None, cache_only=False)
+
+    per_unit = tmp_results / "per_unit.jsonl"
+    rows = [json.loads(l) for l in per_unit.read_text().splitlines()]
+    for row in rows:
+        if row["arm"] == "P_adv" and row["pole"] == "high":
+            row["overall_mean"] = 1.0
+    tampered = "".join(json.dumps(r) + "\n" for r in rows)
+    per_unit.write_text(tampered)
+
+    with pytest.raises(SystemExit, match="OFFLINE RECONSTRUCTION MISMATCH"):
+        RS.mode_score(spec, "mock", cap=40.0, pilot_n=None, cache_only=True)
+    assert per_unit.read_text() == tampered, "the tampered file was overwritten"
