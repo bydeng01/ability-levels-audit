@@ -1,0 +1,425 @@
+{
+ "instructions": "You are constructing paired tutor responses for a study of tutoring quality.\n\nFor each item you get: the algebra problem the dialogue is about, the DIALOGUE\nCONTEXT (ending with the student's latest message), the tutor turn that actually\ncame next in that session, and pools of candidate tutor turns taken from other\nsessions on the SAME problem.\n\nYour job per item is to produce TWO alternative replies to this same context:\n\n  R_HIGH (high scaffolding): responds to where this student actually is and\n          prompts the student to take the next reasoning step themselves. It may\n          give a hint, a partial structure, or a focused question, but it must\n          LEAVE the next step for the student and must NOT state the final answer.\n\n  R_LOW  (low scaffolding): performs the step for the student \u2014 states the result,\n          works the algebra out, or gives the final answer \u2014 without asking the\n          student to produce anything.\n\nBoth must be plausible replies to THIS context and to THIS problem.\n\nProcedure per item:\n 1. Decide which pole the real_next_turn serves: \"high\" or \"low\". Judge by what it\n    does (elicits vs performs), not by whether it contains a question mark.\n 2. For the OTHER pole, first look at the candidate list for that pole\n    (elicit_candidates for high, perform_candidates for low). If one of them is a\n    coherent reply to THIS context \u2014 it addresses what this student just said and\n    does not refer to anything that did not happen here \u2014 choose it by its ref.\n 3. If none fits, AUTHOR the counterpart yourself. Match the real turn's length\n    (within roughly +/-40%), register, and formatting conventions (the corpus mixes\n    plain prose with occasional markdown/LaTeX). Do not mention any tutoring\n    strategy, policy, or system by name. Do not address the student by name.\n 4. Never let the two poles be paraphrases of each other; the difference must be\n    WHO does the next reasoning step.\n\nOutput one JSON object per item, in order, as JSON Lines:\n{\"candidate_id\": \"Cxxx\", \"real_turn_pole\": \"high\"|\"low\",\n \"counterpart_source\": \"corpus\"|\"authored\",\n \"counterpart_ref\": \"E2\"|\"P1\"|null,\n \"counterpart_text\": \"<full text if authored, else null>\",\n \"note\": \"<= 15 words on why>\"}\n",
+ "items": [
+  {
+   "candidate_id": "C066",
+   "problem_statement": "A 60% acid solution is mixed with a 20% acid solution to make 40 liters of a 34% acid solution. How many liters of the 60% solution are used?",
+   "context": "Student: Let's see... I'll call the amount of the 60% acid solution used x. So, I'll mix x liters of 60% acid with some 20% acid solution to make a total of x + y liters of 34% acid solution. But I'm stuck here...\n\nTutor: You're off to a great start by defining your variables! If you look back at the problem, what does it say the total volume of that final mixture should be?\n\nStudent: The final mixture should be 40 liters. So, my expression for the total volume should just be 40... I'll replace x + y with 40. But I think I'm still missing something...",
+   "real_next_turn": "You've got the total volume figured out perfectly! Now let's think about the actual amount of pure acid in these liquids. If you have 40 liters of a 34% acid solution, how would you calculate the number of liters of pure acid in that final mixture?",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "Excellent! You now have expressions for the acid from each solution (0.6x and 0.2(40-x)) and the total acid in the final mixture (13.6 liters). Since the acid from both solutions must equal the acid in the final mixture, can you write an equation that sets these equal to each other?"
+    },
+    {
+     "ref": "E2",
+     "text": "Spot on! Now, if you have $x$ liters of a 60% acid solution, how would you write the amount of pure acid in just that part?"
+    },
+    {
+     "ref": "E3",
+     "text": "Spot on! You now have expressions for the amount of acid from the 60% solution, the 20% solution, and the final mixture. How do the amounts of acid from the two starting solutions combine to give you that total amount of acid? Try setting up an equation that connects these three pieces."
+    },
+    {
+     "ref": "E4",
+     "text": "Spot on! Now, if you have $x$ liters of a 60% acid solution, how would you write an expression for the amount of pure acid just in that first solution?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "Exactly right! You now have a system of two equations:\n- x + y = 40\n- 0.6x + 0.2y = 13.6\n\nYou can use substitution or elimination to solve for x. Try expressing y in terms of x using the first equation, then substituting into the second."
+    },
+    {
+     "ref": "P2",
+     "text": "Your verification is perfect! \u2713\n\nYou checked every piece:\n- \u2713 Both solution amounts add up to **14 + 26 = 40 liters** total\n- \u2713 The acid amounts add up correctly **8.4 + 5.2 = 13.6 liters**\n- \u2713 The final concentration is exactly **34%**\n\nThat's actually the best way to verify a mixture problem \u2014 check that both the **total volume** and the **acid concentration** match what the problem asked for.\n\nNice work! \ud83d\udc4d"
+    },
+    {
+     "ref": "P3",
+     "text": "Correct \u2014 the final mixture contains 13.6 liters of acid. Now relate the acid from the two starting solutions to the acid in the final mixture: acid from 60% solution plus acid from 20% solution equals total acid in the mixture."
+    },
+    {
+     "ref": "P4",
+     "text": "That's exactly right! Now just solve that equation for X by doing the algebra."
+    }
+   ]
+  },
+  {
+   "candidate_id": "C070",
+   "problem_statement": "How many liters of water (0% acid) must be added to 30 liters of a 40% acid solution to dilute it to a 25% acid solution?",
+   "context": "Student: We have 30 liters of a 40% acid solution and we want to add some liters of water to make it a 25% acid solution. The water is 0% acid, so it doesn't add any acid. I need to figure out how many liters of water to add to make it 25% acid.\n\nLet's say x is the number of liters of water I need to add... I don't know where to start.\n\nTutor: You're off to a great start \u2014 you've got the right variable and you know water adds no acid. Here's a focused question: how many **liters of acid** are currently in the 30-liter solution, given that it's 40% acid?\n\nStudent: To find the liters of acid, I multiply the total liters (30) by the percentage (40% or 0.40). So, that's 30 * 0.40 = 12 liters of acid.\n\nNow, I have that and I want to turn it into a 25% acid solution, but I still have to consider the water...\n\nTutor: Exactly right \u2014 there are 12 liters of acid, and that amount **stays the same** no matter how much water you add. So here's the next piece: after you add x liters of water, what is the **total volume** of the new solution in terms of x?\n\nStudent: The original solution is 30 liters, and adding x liters of water makes the total volume 30 + x.\n\nSo, the 12 liters of acid are in the new solution, and the total volume is 30 + x...\n\nTutor: Perfect \u2014 now you have everything you need to write the concentration of acid in the new solution. Can you write a fraction that represents the acid concentration (acid divided by total volume) in the new solution, and set it equal to 25%?\n\nStudent: The acid concentration is 12 liters (acid) divided by the total volume (30 + x). That's 12 / (30 + x).\n\nI can set that equal to 25% or 0.25. So, the equation is 12 / (30 + x) = 0.25.\n\nNow I have an equation, but I'm not sure how to solve it...",
+   "real_next_turn": "Great equation! To get x out of the denominator, what do you get if you multiply **both sides** of the equation by (30 + x)?",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "Spot on! You have set up the perfect equation: 0.25 * (30 + x) = 12. Now, all you need to do is solve this equation for x. What do you get when you isolate x?"
+    },
+    {
+     "ref": "E2",
+     "text": "Exactly! And you know that concentration needs to equal 25%, or 0.25. Can you set that expression equal to 0.25 and solve for x?"
+    },
+    {
+     "ref": "E3",
+     "text": "Excellent! That equation is exactly right. Now can you solve for x?"
+    },
+    {
+     "ref": "E4",
+     "text": "Yes! You want that concentration to equal 25% \u2014 so what equation do you get when you set your expression equal to 0.25?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "Yes, that equation is exactly the right setup: \\(0.25(30+x)=12\\). Now solve it by undoing the multiplication by \\(0.25\\), then subtracting 30 to isolate \\(x\\)."
+    },
+    {
+     "ref": "P2",
+     "text": "Yes, that equation is exactly right. Now solve \\(12 = 0.25(30+x)\\) for \\(x\\): first undo the multiplication by \\(0.25\\), then subtract 30. Keep \\(x\\) as the liters of water added, and don\u2019t forget the units."
+    },
+    {
+     "ref": "P3",
+     "text": "Perfect \u2014 that equation is exactly right! Now it's just a matter of solving for x using algebra."
+    },
+    {
+     "ref": "P4",
+     "text": "Perfect\u2014that equation is exactly the right setup. Now solve \\(12 = 0.25(30+x)\\) by first undoing the multiplication by \\(0.25\\), then subtracting 30 to isolate \\(x\\)."
+    }
+   ]
+  },
+  {
+   "candidate_id": "C074",
+   "problem_statement": "A 60% acid solution is mixed with a 20% acid solution to make 40 liters of a 34% acid solution. How many liters of the 60% solution are used?",
+   "context": "Student: We have a 60% acid solution, a 20% acid solution, and the final solution is 34% acid. The final solution has a total volume of 40 liters. I'm not really sure how to start with this one...\n\nTutor: Let's break this down step by step. \n\nTo start, we have two unknown quantities here - the amount of the 60% solution and the amount of the 20% solution. \n\nCan you think of a way to relate those two unknown amounts to each other, given that we know the total volume of the final solution is 40 liters?\n\nStudent: I think I can relate them by adding the two unknown amounts together, since they're both contributing to the total volume of the final solution. So, if we let x be the amount of the 60% solution, and y be the amount of the 20% solution, then x + y = 40. But that's still two unknowns, and I'm not sure how to connect them to the acid concentrations...\n\nTutor: Great start! You've got a solid first equation: x + y = 40. \n\nNow, let's think about the acid concentrations. When you mix the two solutions together, what exactly is being combined? Think about what the percentages represent - if you have x liters of a 60% acid solution, how much of that is actually acid?\n\nStudent: If I have x liters of a 60% acid solution, that means 60% of x is actually acid. So, I'd multiply x by 0.6 to get the number of liters of actual acid in that solution. And similarly, I'd multiply y by 0.2 to get the number of liters of actual acid in the 20% solution. But what do I do with that?",
+   "real_next_turn": "You're doing great! So you have 0.6x liters of acid from the first solution, and 0.2y liters of acid from the second solution.\n\nWhen you combine those two solutions, those amounts of acid get combined too. And you know something about the final combined solution - it's 34% acid with a total volume of 40 liters.\n\nSo, how much acid is in the final 40-liter solution? And how does that relate to the acid from the two individual solutions?",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "Exactly. Now do the same for the 20% solution: if there are \\(40-x\\) liters of it, how many liters of pure acid does that contribute?"
+    },
+    {
+     "ref": "E2",
+     "text": "Perfect, that's exactly right! Now apply that same thinking to the other two quantities in the problem: the 20% solution contributes some acid, and the final 40-liter mixture at 34% contains a total amount of acid. Can you write expressions for both of those, and then combine all three into one equation?"
+    },
+    {
+     "ref": "E3",
+     "text": "Perfect! So now you have expressions for the acid coming from each solution.\n\nWhen you combine them, you get the final 40-liter solution that is 34% acid. So how much actual acid is in that final solution?"
+    },
+    {
+     "ref": "E4",
+     "text": "Exactly! Using that same logic, how would you write an expression for the amount of pure acid in the 20% solution, knowing its volume is $40 - x$ liters?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "Perfect! Now you have the acid contributed by each solution. Think about how the total acid from both solutions must relate to the acid in the final 40-liter mixture at 34% concentration."
+    },
+    {
+     "ref": "P2",
+     "text": "Yes, \\(0.6x\\) is the acid from the 60% solution. Now do the same kind of expression for the acid from the \\(20\\%\\) solution, using the amount \\(40-x\\)."
+    },
+    {
+     "ref": "P3",
+     "text": "Yes, \\(0.6x\\) is exactly the acid from the 60% solution. Now do the same kind of expression for the 20% solution: the acid from that part is 20% of \\(40-x\\). Then relate the acid from both starting solutions to the acid in the final 40 liters of 34% solution."
+    },
+    {
+     "ref": "P4",
+     "text": "Excellent! That equation is exactly right! \ud83c\udf89\n\nNow it's just a matter of solving for x. Here's a hint for the next step:\n\n**Distribute the 0.2** across the (40 - x) term, and then **combine like terms**.\n\nGive that a try and see what you get!"
+    }
+   ]
+  },
+  {
+   "candidate_id": "C077",
+   "problem_statement": "How many liters of water (0% acid) must be added to 30 liters of a 40% acid solution to dilute it to a 25% acid solution?",
+   "context": "Student: There's 30 liters of 40% acid solution, and I need to add some water to get a 25% acid solution... I'm not sure how to set this up. Um, let's see... I need to choose the unknown, I guess. Let's say \\(x\\) is the number of liters of water to add...\n\nTutor: Good choice: \\(x\\) is the liters of water added. Before setting up the equation, how many liters of pure acid are in the original 30 liters of 40% acid solution?\n\nStudent: The original solution is 40% acid, so I multiply 30 by 0.4 (which is 40% as a decimal). That's 30 * 0.4.\n\nTutor: Yes, that\u2019s exactly the right quantity to focus on. Now relate that same amount of acid to the final mixture: after adding \\(x\\) liters of water, the total volume is \\(30+x\\), and the acid should be 25% of that total.\n\nStudent: So, the original amount of acid is 30 * 0.4, and in the final mixture, that same amount of acid should be 25% of the total volume (30 + \\(x\\)). That's 25% of (30 + \\(x\\)), which is 0.25(30 + \\(x\\)). I set these two equal to each other:\n\n30 * 0.4 = 0.25(30 + \\(x\\))\n\nTutor: Exactly\u2014that equation is set up correctly. Now solve  \n\\[\n30(0.4)=0.25(30+x)\n\\]\nby first simplifying the left side and distributing or dividing by \\(0.25\\). The value you get for \\(x\\) will be the liters of water to add.\n\nStudent: To simplify the left side, I multiply 30 by 0.4. That's 12. Now I have:\n\n12 = 0.25(30 + \\(x\\))\n\nTo get rid of the 0.25, I can divide both sides by 0.25. That gives me:\n\n48 = 30 + \\(x\\)\n\nNow I have to isolate \\(x\\), but I'm not sure how to do that...",
+   "real_next_turn": "Great work\u2014you\u2019ve reduced it to a simple equation: \\(48 = 30 + x\\). To isolate \\(x\\), undo the \u201cplus 30\u201d by doing the opposite operation to both sides. In other words, subtract 30 from both sides, then simplify.",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "You're almost there \u2014 so what do you get when you subtract 30 from both sides?"
+    },
+    {
+     "ref": "E2",
+     "text": "You're doing great, keep going! What do you get when you subtract 30 from both sides? \ud83d\ude0a"
+    },
+    {
+     "ref": "E3",
+     "text": "You are doing great, and your steps are completely correct! Go ahead and finish that subtraction to find the final value for $x$. How many liters of water do you need to add?"
+    },
+    {
+     "ref": "E4",
+     "text": "Exactly right! Go ahead and finish it off \u2014 what do you get for x?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "Excellent work \u2014 your algebra is spot on! You correctly found that you need to add 18 liters of water to dilute the solution to 25% acid."
+    },
+    {
+     "ref": "P2",
+     "text": "Excellent work! You correctly solved the equation to find that x = 18. That means you need to add exactly 18 liters of water to get a 25% acid solution. You've completely solved the problem!"
+    },
+    {
+     "ref": "P3",
+     "text": "Perfect \u2014 you've solved it correctly! You need to add **18 liters** of water to dilute the solution to 25% acid."
+    },
+    {
+     "ref": "P4",
+     "text": "Fantastic job! Your algebra is completely correct, and you've found the right answer. You need to add 18 liters of water to get a 25% acid solution. Well done working through the whole problem!"
+    }
+   ]
+  },
+  {
+   "candidate_id": "C080",
+   "problem_statement": "How many liters of a 70% acid solution must be added to 42 liters of a 10% acid solution to produce a 30% acid solution?",
+   "context": "Student: So we have 42 liters of a 10% acid solution, and we want to add some 70% acid solution to make a 30% acid solution... I need to figure out how much acid we have in the original 10% solution. Is it 42 * 0.10?\n\nTutor: Yes, that\u2019s exactly the right idea: amount of acid = total solution amount \u00d7 concentration.\n\nNext, think about conservation of acid: the acid you start with plus the acid you add must equal the acid in the final mixture. Keep track of both the total volume and the total acid amount after adding the unknown amount.\n\nStudent: So, I have 42 * 0.10 = 4.2 liters of pure acid in the original solution. Now, I need to think about how to set up an equation for the final mixture... Let's say x is the amount of 70% acid solution I add. The total amount of acid in the 70% solution is 0.70x. The final total solution volume is 42 + x. I'm not sure how to get the acid in the final mixture yet...",
+   "real_next_turn": "Great progress: you\u2019ve correctly identified the original acid, the added acid, and the final volume. Since the final mixture is supposed to be 30% acid, the amount of acid in the final mixture is 30% of the final total volume. So relate \u201ctotal acid after mixing\u201d to \u201c30% of \\(42+x\\).\u201d",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "Great progress identifying that the final volume is 42 + x! Now, if that final solution is 30% acid, how many liters of pure acid does it contain?"
+    },
+    {
+     "ref": "E2",
+     "text": "Great progress identifying the unknown and total volume! Now let's think about just one piece: how many liters of **pure acid** are in the 42 liters of 10% solution?"
+    },
+    {
+     "ref": "E3",
+     "text": "You're on exactly the right track! So, how many liters of pure acid are in that original 42-liter, 10% solution?"
+    },
+    {
+     "ref": "E4",
+     "text": "Great progress! You've correctly identified all the key quantities. Now think about conservation: the total amount of acid before mixing must equal the total amount of acid after mixing. You have two sources of acid going in \u2014 can you write an equation that captures that balance?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "Yes \u2014 that equation is exactly right:\n\n\\[\n4.2 + 0.7x = 12.6 + 0.3x\n\\]\n\nNow solve it:\n\nSubtract \\(0.3x\\) from both sides:\n\n\\[\n4.2 + 0.4x = 12.6\n\\]\n\nSubtract \\(4.2\\) from both sides:\n\n\\[\n0.4x = 8.4\n\\]\n\nDivide by \\(0.4\\):\n\n\\[\nx = \\frac{8.4}{0.4} = 21\n\\]\n\nSo you must add:\n\n\\[\n\\boxed{21 \\text{ liters}}\n\\]\n\nof the 70% acid solution."
+    },
+    {
+     "ref": "P2",
+     "text": "Exactly right setup.\n\nNow solve:\n\n\\[\n4.2 + 0.70x = 12.6 + 0.30x\n\\]\n\nSubtract \\(0.30x\\) from both sides:\n\n\\[\n4.2 + 0.40x = 12.6\n\\]\n\nSubtract \\(4.2\\) from both sides:\n\n\\[\n0.40x = 8.4\n\\]\n\nDivide by \\(0.40\\):\n\n\\[\nx = \\frac{8.4}{0.40} = 21\n\\]\n\nSo, you must add:\n\n\\[\n\\boxed{21 \\text{ liters}}\n\\]\n\nof the 70% acid solution."
+    },
+    {
+     "ref": "P3",
+     "text": "Yes, that\u2019s all set up correctly: you\u2019ve identified the pure acid from the original solution, the added solution, and the final mixture.  \n\nNow relate those quantities with: **original pure acid + added pure acid = final pure acid**. Substitute the expressions you already wrote into that relationship, then solve for \\(x\\)."
+    },
+    {
+     "ref": "P4",
+     "text": "Yes\u2014that setup is exactly right. Now your next step is just to solve that equation for \\(x\\): clear the denominator first, then collect the \\(x\\)-terms on one side and the constant terms on the other. Keep \\(x\\) in liters, since it represents the amount of 70% solution added."
+    }
+   ]
+  },
+  {
+   "candidate_id": "C086",
+   "problem_statement": "A 60% acid solution is mixed with a 20% acid solution to make 40 liters of a 34% acid solution. How many liters of the 60% solution are used?",
+   "context": "Student: Let's say we use x liters of the 60% solution. The amount of acid in the 60% solution is 0.60 (60% as a decimal) times x liters. The amount of acid in the 20% solution is... um... 0.20 times some number, but I'm not sure what that number is yet. The amount of acid in the final mixture is 0.34 (34% as a decimal) times 40 liters. I'm stuck here...",
+   "real_next_turn": "Good start: if the total mixture is 40 liters and \\(x\\) liters come from the 60% solution, how many liters must come from the 20% solution?",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "Great progress setting up the variables! Think about the final mixture: you have 40 liters of a 34% acid solution \u2014 how many liters of pure acid does that final mixture actually contain?"
+    },
+    {
+     "ref": "E2",
+     "text": "Great job defining the amounts of each solution! If you have $x$ liters of a solution that is 60% acid, how would you write an expression for the amount of pure acid in just that part?"
+    },
+    {
+     "ref": "E3",
+     "text": "Good news \u2014 you actually already know a lot! Let's start simple: if you use *x* liters of the 60% solution, and the total mixture is 40 liters, how many liters of the 20% solution would you be using?"
+    },
+    {
+     "ref": "E4",
+     "text": "Great setup so far! You've identified all the key pieces. Now, what relationship connects the acid from the 60% solution, the acid from the 20% solution, and the acid in the final mixture?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "## Simplifying the Equation\n\nGreat setup! Let's work through it step by step.\n\n**Start with:**\n$$0.60x + 0.20(40 - x) = 13.6$$\n\n**Step 1: Distribute the 0.20**\n$$0.60x + 8 - 0.20x = 13.6$$\n\n**Step 2: Combine like terms** (combine the x terms on the left)\n$$0.40x + 8 = 13.6$$\n\n**Step 3: Subtract 8 from both sides**\n$$0.40x = 5.6$$\n\n**Step 4: Divide both sides by 0.40**\n$$x = 14$$\n\n## Answer\n\nYou need **14 liters** of the 60% acid solution (and 40 - 14 = **26 liters** of the 20% solution).\n\n**Quick check:** \n- Acid from 60% solution: 0.60 \u00d7 14 = 8.4\n- Acid from 20% solution: 0.20 \u00d7 26 = 5.2\n- Total acid: 8.4 + 5.2 = **13.6** \u2713\n- Percentage: 13.6 \u00f7 40 = **34%** \u2713"
+    },
+    {
+     "ref": "P2",
+     "text": "Great setup \u2014 your variable and mixture equation are exactly the right idea.\n\nFor simplifying, use the distributive property first, then combine the terms with \\(x\\) on the left and the constant terms separately. After that, isolate \\(x\\) by undoing the addition/subtraction and multiplication."
+    },
+    {
+     "ref": "P3",
+     "text": "Good setup \u2014 your acid amounts are being represented correctly. The next thing to use is the **total volume relationship**: the liters of the 60% solution and the liters of the 20% solution together must make the full mixture. Once you connect \\(x\\) and \\(y\\) that way, you can combine it with your acid-sum idea."
+    },
+    {
+     "ref": "P4",
+     "text": "Great setup! Now simplify:\n\n\\[\n0.60x + 0.20(40-x)=13.6\n\\]\n\nDistribute the \\(0.20\\):\n\n\\[\n0.60x + 8 - 0.20x = 13.6\n\\]\n\nCombine like terms:\n\n\\[\n0.40x + 8 = 13.6\n\\]\n\nSubtract 8 from both sides:\n\n\\[\n0.40x = 5.6\n\\]\n\nDivide by \\(0.40\\):\n\n\\[\nx = \\frac{5.6}{0.40}=14\n\\]\n\nSo, **14 liters of the 60% acid solution** are used."
+    }
+   ]
+  },
+  {
+   "candidate_id": "C089",
+   "problem_statement": "How many liters of pure acid (100% acid) must be added to 36 liters of a 20% acid solution to produce a 40% acid solution?",
+   "context": "Student: Let's say we add x liters of pure acid to the original solution. I think the total amount of pure acid after adding x liters is 0.20 * 36 + x, because we start with 36 liters of 20% acid solution and add x liters of pure acid. The total volume after adding x liters of pure acid is 36 + x. I'm not really sure how to set up the equation for the amount of acid in the final mixture...\n\nTutor: You've done a great job finding the expressions for the total amount of acid and the total volume! To set up your equation, think about the definition of concentration. How does the desired final concentration relate to the total amount of acid and the total volume you just found?\n\nStudent: The final concentration of 40% acid means that 40% of the total volume is acid. I think I can set up the equation 0.40 * (36 + x) = 0.20 * 36 + x, because the amount of acid in the final mixture is 40% of the total volume.\n\nTutor: Spot on! Your equation perfectly represents the problem. Now you just need to solve that equation for x. Try distributing the 0.40 on the left side and calculating the multiplication on the right side, then group your x terms together. What do you get?\n\nStudent: I think I can do that. Distributing the 0.40 gives 0.40 * 36 + 0.40x = 0.20 * 36 + x. Simplifying the left side gives 14.4 + 0.40x = 7.2 + x. Then I can subtract 7.2 from both sides to get 7.2 + 0.40x - 7.2 = x, which simplifies to 0.40x = x - 7.2.\n\nTutor: You did the distribution and multiplication perfectly to get `14.4 + 0.40x = 7.2 + x`! However, take a closer look at your subtraction step. \n\nWhen you subtract 7.2 from the left side (`14.4 - 7.2`), you are left with just `7.2`. What should the full equation look like after subtracting 7.2 from both sides?\n\nStudent: If I subtract 7.2 from both sides, the equation would be 7.2 + 0.40x - 7.2 = x - 7.2. But 7.2 - 7.2 is 0, so it simplifies to 0 + 0.40x = x - 7.2, which is just 0.40x = x - 7.2. I think I made a mistake by not actually simplifying the left side correctly. \n\nLet me try to follow up with the correct algebra. If I subtract 7.2 from the left side, I get 7.2. Then the equation becomes 7.2 + 0.40x = x - 7.2. Subtracting 7.2 from both sides gives 7.2 - 7.2 + 0.40x = x - 7.2 + (-7.2), which simplifies to 0 + 0.40x = x - 7.2 - 7.2. That's just 0.40x = x - 14.4.",
+   "real_next_turn": "You are very close, but let's break down the subtraction step on the equation `14.4 + 0.40x = 7.2 + x` carefully. \n\nIf you subtract 7.2 from the left side, you get `14.4 - 7.2 + 0.40x`. If you subtract 7.2 from the right side, you get `7.2 - 7.2 + x`. Try simplifying each of those sides separately to see what your new equation should be.",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "You're on the right track \u2014 now can you simplify the left side by combining x and -0.40x into a single term?"
+    },
+    {
+     "ref": "E2",
+     "text": "Excellent work catching that error and fixing it! Your algebra is spot on this time.\n\nLet's just do a quick **sanity check** to make sure 36 liters makes sense:\n\n- You'd be adding 36 liters of pure acid to 36 liters of solution, giving you **72 liters total**\n- The acid content would be 7.2 + 36 = **43.2 liters of acid**\n- 43.2 \u00f7 72 = ?\n\nCan you work that out and confirm it equals 40%?"
+    },
+    {
+     "ref": "E3",
+     "text": "You did a great job distributing and multiplying to get `14.4 + 0.4x = 7.2 + x`. However, take a closer look at how you grouped the `x` terms. \n\nIf you subtract 7.2 from both sides, you are left with `7.2 + 0.4x = x`. From there, what do you get if you subtract `0.4x` from both sides to isolate x? Keep in mind that getting a negative volume is a good clue that a sign error might have sneaked in!"
+    },
+    {
+     "ref": "E4",
+     "text": "You correctly calculated that `1x - 0.4x` is `0.6x`, but be careful about which side of the equation it ends up on! When you subtract `0.4x` from the left side (`7.2 + x`), the `0.6x` should stay on the left side with the `7.2`. Try writing out that step again: what does `7.2 + x - 0.4x = 14.4` simplify to?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "Yes, that correction is right: you\u2019ve reached \\(-7.2 = -0.6x\\). Now divide both sides by \\(-0.6\\), and remember the negatives will cancel. The result will be the number of liters of pure acid to add."
+    },
+    {
+     "ref": "P2",
+     "text": "Great progress! You've correctly isolated everything \u2014 now just combine the like terms on the left side (x - 0.40x) and you're ready to solve for x."
+    },
+    {
+     "ref": "P3",
+     "text": "Your distribution on the right is correct, and subtracting \\(0.40x\\) from both sides is a good next move.  \n\nCheck the sign on \\(0.20\\cdot 36\\), though: a positive percent of a positive amount should be positive, not negative. Fix that value, then continue combining the \\(x\\)-terms."
+    },
+    {
+     "ref": "P4",
+     "text": "Your distribution is correct, but check the step where you subtract \\(x\\) from both sides: the right side has \\(0.4x\\), so subtracting \\(x\\) should change that term. You should get something like a constant equals \\(14.4\\) plus a negative \\(x\\)-term. Then subtract \\(14.4\\) from both sides and solve from there."
+    }
+   ]
+  },
+  {
+   "candidate_id": "C093",
+   "problem_statement": "How many liters of a 70% acid solution must be added to 42 liters of a 10% acid solution to produce a 30% acid solution?",
+   "context": "Student: Let's see... We have a 10% acid solution and we want to add a 70% acid solution to it to get a 30% acid solution. I think I'll let x be the liters of the 70% acid solution added...\n\nTutor: Good start! Let \\(x\\) be the liters of 70% acid solution added.\n\nNow set up the acid amounts:\n\n- Acid in 42 liters of 10% solution:  \n  \\[\n  0.10(42)=4.2\n  \\]\n- Acid in \\(x\\) liters of 70% solution:  \n  \\[\n  0.70x\n  \\]\n- Total mixture volume:  \n  \\[\n  42+x\n  \\]\n- Since the final mixture is 30% acid, the acid amount is:  \n  \\[\n  0.30(42+x)\n  \\]\n\nSo the equation is:\n\n\\[\n4.2+0.70x=0.30(42+x)\n\\]\n\nNow solve:\n\n\\[\n4.2+0.70x=12.6+0.30x\n\\]\n\n\\[\n0.40x=8.4\n\\]\n\n\\[\nx=21\n\\]\n\nSo you need to add:\n\n\\[\n\\boxed{21 \\text{ liters}}\n\\]\n\nStudent: I see how it works now. We set up the equation using the acid amounts from each solution and the final mixture, and then we solve for x. I'll try to remember to think about the acid amounts instead of just the total liquid volumes. And I'll try to use the decimal form of percentages to make the calculations easier.\n\nTutor: Exactly \u2014 that\u2019s the key idea.\n\nFor mixture problems, focus on the amount of the \u201cactive ingredient\u201d:\n\n\\[\n\\text{amount of acid} = \\text{concentration} \\times \\text{volume}\n\\]\n\nSo in this problem:\n\n\\[\n0.10(42)+0.70x=0.30(42+x)\n\\]\n\nYou\u2019re also right that using decimals for percentages usually makes the algebra cleaner.\n\nA good general template is:\n\n\\[\n(\\text{acid from first solution})+(\\text{acid from second solution})=(\\text{acid in final mixture})\n\\]\n\nNice work recognizing the structure!\n\nStudent: I'm glad I could recognize the structure and solve the problem correctly. I'll keep in mind to focus on the amount of the \"active ingredient\" and use the template:\n\n\\[\n(\\text{acid from first solution})+(\\text{acid from second solution})=(\\text{acid in final mixture})\n\\]\n\nThis will help me solve similar problems in the future and make the algebra cleaner by using decimals for percentages.\n\nTutor: Yes \u2014 that\u2019s a great takeaway.\n\nOne extra tip: always make sure the final mixture volume includes everything added. In this problem, that was:\n\n\\[\n42+x\n\\]\n\nSo the full setup was:\n\n\\[\n0.10(42)+0.70x=0.30(42+x)\n\\]\n\nThat structure will work for many mixture problems, whether it\u2019s acid, salt, sugar, or another ingredient.\n\nYou\u2019ve got the method down!\n\nStudent: I'm glad I could understand the method and apply it correctly. And I appreciate the extra tip about making sure the final mixture volume includes everything added. I'll keep that in mind for future problems. It's been really helpful to learn how to approach mixture problems in a systematic way.",
+   "real_next_turn": "You\u2019re welcome! You\u2019ve summarized the method really well.\n\nFor future mixture problems, just remember these steps:\n\n1. Define the unknown, like \\(x\\).\n2. Compute the amount of active ingredient in each part.\n3. Add the active ingredient amounts.\n4. Set that equal to the active ingredient in the final mixture.\n5. Solve.\n\nFor this problem, that gave:\n\n\\[\n0.10(42)+0.70x=0.30(42+x)\n\\]\n\nand the solution was:\n\n\\[\nx=21\n\\]\n\nSo the answer is:\n\n\\[\n\\boxed{21\\text{ liters}}\n\\]\n\nNice work!",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "You now have all three acid amounts \u2014 can you write an equation that says the acid from the 10% solution plus the acid from the 70% solution equals the acid in the final mixture?"
+    },
+    {
+     "ref": "E2",
+     "text": "You now have expressions for the acid coming in (4.2 and 0.7x) and the acid in the final mixture (0.3(42+x)) \u2014 can you write an equation that sets the total acid going in equal to the total acid in the final mixture?"
+    },
+    {
+     "ref": "E3",
+     "text": "Perfect \u2014 you now have all three pieces: pure acid in, pure acid in, and pure acid out. Can you write an equation that sets the total pure acid going *in* (from both solutions) equal to the pure acid in the *final* mixture?"
+    },
+    {
+     "ref": "E4",
+     "text": "Exactly. Now, what expression represents the **total liters of pure acid before mixing**, combining the acid from the 42 liters of 10% solution and the acid from the \\(x\\) liters of 70% solution?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "You're so welcome! It was a pleasure working through this problem with you. You clearly have a good mathematical instinct \u2014 you just needed a little nudge in the right direction, and you took it from there all on your own.\n\nKeep up the great work, and best of luck with your studies! Don't hesitate to come back if you ever need help. \ud83d\ude0a"
+    },
+    {
+     "ref": "P2",
+     "text": "You're very welcome! \ud83d\ude0a\n\nYou did the hard work yourself \u2014 I just asked a few guiding questions. That's the best way to really *learn* something rather than just see someone else do it.\n\nThose four steps you listed are a great framework that extends beyond just mixture problems. You'll find similar thinking applies to:\n- **Distance/rate/time** problems\n- **Investment/interest** problems\n- **Blending** problems (like mixing different grades of coffee or gasoline)\n\nThe common thread is always: *identify what's being conserved, set up an equation, solve, and verify.*\n\nGood luck with your future math work \u2014 you've clearly got a solid problem-solving approach! \ud83d\udc4d"
+    },
+    {
+     "ref": "P3",
+     "text": "That is wonderful to hear! Building that confidence is half the battle in math, and you have definitely earned it. \n\nI'm looking forward to our next session whenever you are ready. Have a fantastic day!"
+    },
+    {
+     "ref": "P4",
+     "text": "Excellent \u2014 you have all three pieces now! The pure acid before mixing must equal the pure acid after mixing, so try setting up an equation that combines the acid from the original solution, the acid from the 70% solution, and the acid in the final mixture."
+    }
+   ]
+  },
+  {
+   "candidate_id": "C094",
+   "problem_statement": "How many liters of a 70% acid solution must be added to 42 liters of a 10% acid solution to produce a 30% acid solution?",
+   "context": "Student: Let's see... I'll call the amount of 70% acid solution to be added x. So, I'll add x liters to the 42 liters of 10% acid solution to get a total of 42 + x liters of 30% acid solution. I need to find x... but I'm stuck here...",
+   "real_next_turn": "Great job defining your variables and the total volume! To build our equation, let's look at the actual amount of pure acid in each part. How many liters of pure acid are in the 42 liters of the 10% solution?",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "Great start! You're setting up the problem really well. So you've identified that the acid in the original solution is 0.10 \u00d7 42 liters.\n\nNow, what about the acid in the solution you're *adding*? How much acid is in the \"x\" liters of 70% solution?"
+    },
+    {
+     "ref": "E2",
+     "text": "Great\u2014now focus on the conservation idea: the pure acid you start with plus the pure acid you add must equal the pure acid in the final mixture. Can you write that as an equation using your three expressions?"
+    },
+    {
+     "ref": "E3",
+     "text": "Great job finding the amount of acid in each of the starting solutions! To find the answer, think about the principle of conservation: the total amount of acid before mixing must equal the total amount of acid in the final mixture. How can you represent the total volume and the total amount of acid in the final 30% solution?"
+    },
+    {
+     "ref": "E4",
+     "text": "Great work setting up all three pieces! Now, what relationship connects the acid coming *in* (from both starting solutions) to the acid in the final mixture?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "Good start! Let \\(x\\) be the liters of 70% acid solution added.\n\nNow set up the acid amounts:\n\n- Acid in 42 liters of 10% solution:  \n  \\[\n  0.10(42)=4.2\n  \\]\n- Acid in \\(x\\) liters of 70% solution:  \n  \\[\n  0.70x\n  \\]\n- Total mixture volume:  \n  \\[\n  42+x\n  \\]\n- Since the final mixture is 30% acid, the acid amount is:  \n  \\[\n  0.30(42+x)\n  \\]\n\nSo the equation is:\n\n\\[\n4.2+0.70x=0.30(42+x)\n\\]\n\nNow solve:\n\n\\[\n4.2+0.70x=12.6+0.30x\n\\]\n\n\\[\n0.40x=8.4\n\\]\n\n\\[\nx=21\n\\]\n\nSo you need to add:\n\n\\[\n\\boxed{21 \\text{ liters}}\n\\]"
+    },
+    {
+     "ref": "P2",
+     "text": "Yes, exactly: the 42 liters of 10% acid solution contains\n\n\\[\n0.10 \\times 42 = 4.2\n\\]\n\nliters of pure acid.\n\nNow let \\(x\\) be the liters of 70% acid solution added. That adds\n\n\\[\n0.70x\n\\]\n\nliters of pure acid.\n\nThe total mixture will be \\(42 + x\\) liters, and it should be 30% acid, so the pure acid in the final mixture is\n\n\\[\n0.30(42+x)\n\\]\n\nSet up the equation:\n\n\\[\n4.2 + 0.70x = 0.30(42+x)\n\\]\n\nNow solve:\n\n\\[\n4.2 + 0.70x = 12.6 + 0.30x\n\\]\n\n\\[\n0.40x = 8.4\n\\]\n\n\\[\nx = 21\n\\]\n\nSo, you must add:\n\n\\[\n\\boxed{21 \\text{ liters}}\n\\]\n\nof the 70% acid solution."
+    },
+    {
+     "ref": "P3",
+     "text": "Good progress: you\u2019ve identified \\(x\\), the initial pure acid, and the final total volume.  \n\nThink in terms of **conservation of pure acid**: the pure acid you start with plus the pure acid you add must equal the pure acid in the final mixture."
+    },
+    {
+     "ref": "P4",
+     "text": "Good start: choosing \\(x\\) for the liters added and identifying the original pure acid amount is exactly the right direction.  \n\nThink in terms of **conservation of pure acid**: the amount of pure acid before mixing plus the pure acid you add must equal the pure acid in the final mixture."
+    }
+   ]
+  },
+  {
+   "candidate_id": "C010",
+   "problem_statement": "How many liters of pure acid (100% acid) must be added to 36 liters of a 20% acid solution to produce a 40% acid solution?",
+   "context": "Student: Let's say we add x liters of pure acid to the 36 liters of 20% acid solution. The amount of acid in the 20% solution would be 0.2 * 36. The new solution should be 40% acid, so we want the total amount of acid in the new solution to be 40% of (36 + x).\n\nSo, the acid in the 20% solution is 0.2 * 36, and the acid in the new solution would be 0.4(36 + x). But wait, we're also adding pure acid, which is 100% acid, so we need to add x as is.\n\nHow do we put these together?",
+   "real_next_turn": "You\u2019re thinking about it exactly the right way.\n\nSet up the equation by saying:\n\n**acid already there + acid added = acid in final mixture**\n\n- Acid already in 36 L of 20% solution:  \n  \\[\n  0.20(36)=7.2\n  \\]\n- Acid added: since it\u2019s pure acid, that\u2019s  \n  \\[\n  x\n  \\]\n- Final mixture volume:  \n  \\[\n  36+x\n  \\]\n- Final mixture is 40% acid, so acid in final mixture:  \n  \\[\n  0.40(36+x)\n  \\]\n\nSo the equation is:\n\n\\[\n7.2+x=0.40(36+x)\n\\]\n\nNow solve:\n\n\\[\n7.2+x=14.4+0.4x\n\\]\n\nSubtract \\(0.4x\\) from both sides:\n\n\\[\n7.2+0.6x=14.4\n\\]\n\nSubtract \\(7.2\\):\n\n\\[\n0.6x=7.2\n\\]\n\nDivide by \\(0.6\\):\n\n\\[\nx=12\n\\]\n\nSo you must add:\n\n\\[\n\\boxed{12 \\text{ liters}}\n\\]\n\nof pure acid.",
+   "elicit_candidates": [
+    {
+     "ref": "E1",
+     "text": "Yes, that equation is perfectly correct! You've successfully captured the relationship between the amounts of acid. Now, you just need to solve that equation for x. What do you get when you simplify and solve it?"
+    },
+    {
+     "ref": "E2",
+     "text": "You've done a great job finding the expressions for the acid in the starting and final mixtures! Think about how the amount of acid you start with, plus the amount of acid you add, relates to the total amount of acid you end up with. How can you express that relationship as an equation?"
+    },
+    {
+     "ref": "E3",
+     "text": "Great start! You've identified the unknown clearly. Now let's think about what's actually happening chemically here.\n\nWhen you mix two solutions, what is it that's being conserved \u2014 what quantity stays the same on both sides of the equation?"
+    },
+    {
+     "ref": "E4",
+     "text": "Great progress identifying the total volume as 36 + x! Now, if the final solution has a total volume of (36 + x) liters and you want it to be 40% acid, how many liters of acid are actually in that final solution?"
+    }
+   ],
+   "perform_candidates": [
+    {
+     "ref": "P1",
+     "text": "You're exactly right \u2014 set those two expressions for the amount of pure acid equal to each other and solve for x!"
+    },
+    {
+     "ref": "P2",
+     "text": "Good progress: you\u2019ve correctly identified the acid amount and total volume after adding \\(x\\). Now use the idea that **concentration means \u201camount of acid compared to total amount of solution.\u201d**  \n\nSo relate your final acid amount and final total volume to the desired 40% concentration."
+    },
+    {
+     "ref": "P3",
+     "text": "Great work setting up the equation! Let's continue from there.\n\n## Simplifying Both Sides\n\n**Left side:**\n$$0.20(36) + 1.00x = 7.2 + x$$\n\n**Right side:**\n$$0.40(36 + x) = 14.4 + 0.40x$$\n\n## Solving for x\n\n$$7.2 + x = 14.4 + 0.40x$$\n\nSubtract $0.40x$ from both sides:\n$$7.2 + 0.60x = 14.4$$\n\nSubtract $7.2$ from both sides:\n$$0.60x = 7.2$$\n\nDivide both sides by $0.60$:\n$$x = 12$$\n\n## Answer\n\nYou need to add **12 liters of pure acid** to the 36 liters of 20% acid solution.\n\n## Quick Check \u2713\n- Acid before: $0.20(36) + 12 = 7.2 + 12 = 19.2$ liters of acid\n- Total solution: $36 + 12 = 48$ liters\n- Final concentration: $19.2 \\div 48 = 0.40 = $ **40%** \u2713"
+    },
+    {
+     "ref": "P4",
+     "text": "You're making great progress! The amount of pure acid already in the 20% solution follows directly from what \"20% acid solution\" means \u2014 the percentage tells you what fraction of that solution is pure acid.\n\nThink about how to apply that percentage to the 36 liters you already have."
+    }
+   ]
+  }
+ ]
+}

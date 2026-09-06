@@ -1,0 +1,34 @@
+{
+  "cap_usd_current_backend": 40.0,
+  "caps_usd_by_backend": {
+    "live": 40.0
+  },
+  "settled_usd_total": 10.01321,
+  "note": "CUMULATIVE across invocations; rows labeled by backend (mock rehearsals never consume the live allowance). committed_usd is a crash-conservative outstanding pre-charge.",
+  "invocations": [
+    {
+      "pid": 38812,
+      "utc": "2026-08-10T13:11:11Z",
+      "backend": "live",
+      "settled_usd": 0.016550000000000002,
+      "committed_usd": 0.0,
+      "requests": 2
+    },
+    {
+      "pid": 39053,
+      "utc": "2026-08-10T13:11:30Z",
+      "backend": "live",
+      "settled_usd": 0.12551000000000004,
+      "committed_usd": 0.0,
+      "requests": 12
+    },
+    {
+      "pid": 39841,
+      "utc": "2026-08-10T13:14:48Z",
+      "backend": "live",
+      "settled_usd": 9.871149999999998,
+      "committed_usd": 0.0,
+      "requests": 978
+    }
+  ]
+}

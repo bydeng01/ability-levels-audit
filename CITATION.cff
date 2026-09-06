@@ -1,0 +1,58 @@
+cff-version: 1.2.0
+title: "label-vs-evidence: profile anchoring in pedagogy-aware LLM judges"
+message: >-
+  If you use this repository — the code, the frozen study materials, or the
+  released results — please cite the paper below.
+type: software
+license: MIT
+repository-code: "https://github.com/bydeng01/ability-levels-audit"
+abstract: >-
+  Pre-registered audit of whether a pedagogy-aware LLM judge grounds its rating
+  in a learner's demonstrated competence or anchors on the learner profile it is
+  shown. Ships the frozen stimuli, labels, judge instrument, per-rep provenance
+  and the registered analysis for the 990-call study.
+keywords:
+  - LLM-as-a-judge
+  - automated evaluation
+  - pre-registration
+  - intelligent tutoring systems
+  - censored rating scales
+authors:
+  - family-names: Fan
+    given-names: Shuyi
+  - family-names: Deng
+    given-names: Boyuan
+  - family-names: Xu
+    given-names: Mengyu
+  - family-names: Xie
+    given-names: Xinhong
+  - family-names: Li
+    given-names: Chenyang
+  - family-names: Zhang
+    given-names: Hongyang
+preferred-citation:
+  type: article
+  title: >-
+    Difference-in-Differences on a Censored Rating Scale Can Manufacture an
+    Effect: Evidence from a Pre-Registered LLM-Judge Audit
+  authors:
+    - family-names: Fan
+      given-names: Shuyi
+    - family-names: Deng
+      given-names: Boyuan
+    - family-names: Xu
+      given-names: Mengyu
+    - family-names: Xie
+      given-names: Xinhong
+    - family-names: Li
+      given-names: Chenyang
+    - family-names: Zhang
+      given-names: Hongyang
+  year: 2026
+  month: 8
+  doi: 10.48550/arXiv.2608.27309
+  url: "https://arxiv.org/abs/2608.27309"
+  identifiers:
+    - type: other
+      value: "arXiv:2608.27309"
+      description: arXiv identifier

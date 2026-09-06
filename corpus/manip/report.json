@@ -1,0 +1,403 @@
+{
+  "n_pairs": 55,
+  "n_ratings_consumed": 55,
+  "n_correct": 55,
+  "n_reversed": 0,
+  "n_tied": 0,
+  "key_agreement_rate": 1.0,
+  "n_raters_per_pair": 1,
+  "reversed_stimuli": [],
+  "tied_stimuli": [],
+  "response_files": [
+    "resp1.jsonl",
+    "resp2.jsonl"
+  ],
+  "per_item": {
+    "M01": {
+      "candidate_id": "C002",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "low",
+      "source": "resp1.jsonl"
+    },
+    "M02": {
+      "candidate_id": "C004",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M03": {
+      "candidate_id": "C005",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M04": {
+      "candidate_id": "C007",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M05": {
+      "candidate_id": "C008",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "medium",
+      "source": "resp2.jsonl"
+    },
+    "M06": {
+      "candidate_id": "C010",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M07": {
+      "candidate_id": "C011",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M08": {
+      "candidate_id": "C012",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "medium",
+      "source": "resp1.jsonl"
+    },
+    "M09": {
+      "candidate_id": "C016",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M10": {
+      "candidate_id": "C017",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M12": {
+      "candidate_id": "C021",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M13": {
+      "candidate_id": "C023",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M14": {
+      "candidate_id": "C025",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M15": {
+      "candidate_id": "C026",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M16": {
+      "candidate_id": "C028",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M17": {
+      "candidate_id": "C031",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M18": {
+      "candidate_id": "C033",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M19": {
+      "candidate_id": "C036",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M20": {
+      "candidate_id": "C039",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M21": {
+      "candidate_id": "C043",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M22": {
+      "candidate_id": "C044",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M23": {
+      "candidate_id": "C046",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M24": {
+      "candidate_id": "C047",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M25": {
+      "candidate_id": "C049",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M26": {
+      "candidate_id": "C050",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M27": {
+      "candidate_id": "C051",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M28": {
+      "candidate_id": "C055",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M29": {
+      "candidate_id": "C057",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M30": {
+      "candidate_id": "C060",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M31": {
+      "candidate_id": "C063",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M32": {
+      "candidate_id": "C065",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M33": {
+      "candidate_id": "C066",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M34": {
+      "candidate_id": "C070",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "medium",
+      "source": "resp2.jsonl"
+    },
+    "M35": {
+      "candidate_id": "C074",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M36": {
+      "candidate_id": "C077",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M37": {
+      "candidate_id": "C080",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "medium",
+      "source": "resp1.jsonl"
+    },
+    "M38": {
+      "candidate_id": "C081",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M39": {
+      "candidate_id": "C085",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M40": {
+      "candidate_id": "C086",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M41": {
+      "candidate_id": "C087",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M42": {
+      "candidate_id": "C088",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M43": {
+      "candidate_id": "C089",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M44": {
+      "candidate_id": "C091",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M45": {
+      "candidate_id": "C092",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M46": {
+      "candidate_id": "C094",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M47": {
+      "candidate_id": "C105",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M48": {
+      "candidate_id": "C109",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M49": {
+      "candidate_id": "C111",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M50": {
+      "candidate_id": "C115",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M51": {
+      "candidate_id": "C116",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M52": {
+      "candidate_id": "C118",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M53": {
+      "candidate_id": "C119",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    },
+    "M54": {
+      "candidate_id": "C121",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp2.jsonl"
+    },
+    "M55": {
+      "candidate_id": "C122",
+      "high_is": "A",
+      "pick": "A",
+      "confidence": "medium",
+      "source": "resp2.jsonl"
+    },
+    "M56": {
+      "candidate_id": "C126",
+      "high_is": "B",
+      "pick": "B",
+      "confidence": "high",
+      "source": "resp1.jsonl"
+    }
+  },
+  "note": "blind, order-randomised, one rating per pair; checks that R_H leaves more of the next reasoning step to the student than R_L. Not a selection step, and not an inter-rater reliability statistic. The brief explicitly forbids deciding on question marks, formatting or length, which correlate with the poles in this material."
+}

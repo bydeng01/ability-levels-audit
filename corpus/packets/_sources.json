@@ -1,0 +1,2890 @@
+{
+ "C001": {
+  "real": [
+   "conf-gpt-s0-conv-r9",
+   2
+  ],
+  "E1": [
+   "conf-s0-ped-r8",
+   2
+  ],
+  "E2": [
+   "conf-s0-ped-r6",
+   1
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r2",
+   2
+  ],
+  "E4": [
+   "abl-s0-ped_no_tracker-r3",
+   2
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r5",
+   1
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r4",
+   2
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r6",
+   1
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r6",
+   2
+  ]
+ },
+ "C002": {
+  "real": [
+   "conf-gemini-s0-ped-r0",
+   1
+  ],
+  "E1": [
+   "conf-s0-ped-r4",
+   1
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r3",
+   1
+  ],
+  "E3": [
+   "abl-s0-ped_no_tracker-r6",
+   1
+  ],
+  "E4": [
+   "abl-s0-ped_no_tracker-r8",
+   1
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r5",
+   1
+  ],
+  "P2": [
+   "abl-s0-ped_no_tracker-r9",
+   1
+  ],
+  "P3": [
+   "conf-s0-ped-r2",
+   1
+  ],
+  "P4": [
+   "conf-s0-ped-r7",
+   1
+  ]
+ },
+ "C004": {
+  "real": [
+   "conf-gemini-s0-ped-r0",
+   2
+  ],
+  "E1": [
+   "abl-s0-ped_no_tracker-r1",
+   2
+  ],
+  "E2": [
+   "conf-s0-ped-r6",
+   1
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r6",
+   2
+  ],
+  "E4": [
+   "abl-s0-ped_no_tracker-r6",
+   2
+  ],
+  "P1": [
+   "abl-s0-ped_no_tracker-r8",
+   3
+  ],
+  "P2": [
+   "abl-s0-ped_no_tracker-r1",
+   3
+  ],
+  "P3": [
+   "conf-s0-ped-r9",
+   3
+  ],
+  "P4": [
+   "abl-s0-ped_no_gate-r6",
+   2
+  ]
+ },
+ "C005": {
+  "real": [
+   "conf-s0-ped-r3",
+   2
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r7",
+   1
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r7",
+   2
+  ],
+  "E3": [
+   "abl-s0-conv_no_final_answer-r3",
+   1
+  ],
+  "E4": [
+   "abl-s0-conv_no_final_answer-r7",
+   1
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r0",
+   2
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r5",
+   3
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r4",
+   2
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r7",
+   2
+  ]
+ },
+ "C008": {
+  "real": [
+   "abl-s0-ped_no_cascade-r0",
+   1
+  ],
+  "E1": [
+   "abl-s0-ped_no_cascade-r9",
+   1
+  ],
+  "E2": [
+   "abl-s0-ped_no_gate-r0",
+   1
+  ],
+  "E3": [
+   "abl-s0-ped_no_gate-r3",
+   1
+  ],
+  "E4": [
+   "abl-s0-ped_no_tracker-r2",
+   1
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r6",
+   1
+  ],
+  "P2": [
+   "conf-s0-ped-r3",
+   1
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r9",
+   1
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r3",
+   1
+  ]
+ },
+ "C012": {
+  "real": [
+   "abl-s0-conv_no_final_answer-r0",
+   1
+  ],
+  "E1": [
+   "abl-s0-ped_no_cascade-r7",
+   1
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r7",
+   1
+  ],
+  "E3": [
+   "abl-s0-conv_no_final_answer-r3",
+   2
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r7",
+   2
+  ],
+  "P1": [
+   "abl-s0-ped_no_gate-r7",
+   1
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r5",
+   3
+  ],
+  "P3": [
+   "abl-s0-conv_no_final_answer-r1",
+   2
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r8",
+   2
+  ]
+ },
+ "C016": {
+  "real": [
+   "abl-s0-ped_no_cascade-r2",
+   0
+  ],
+  "E1": [
+   "abl-s0-ped_no_gate-r2",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r5",
+   0
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r9",
+   0
+  ],
+  "E4": [
+   "conf-s0-ped-r5",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r4",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r5",
+   0
+  ],
+  "P3": [
+   "abl-s0-ped_no_gate-r1",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ]
+ },
+ "C017": {
+  "real": [
+   "abl-s0-conv_no_final_answer-r0",
+   1
+  ],
+  "E1": [
+   "conf-gpt-s0-ped-r2",
+   1
+  ],
+  "E2": [
+   "abl-s0-ped_no_tracker-r7",
+   0
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r7",
+   3
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r5",
+   1
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r5",
+   1
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r7",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r0",
+   1
+  ]
+ },
+ "C020": {
+  "real": [
+   "conf-gpt-s0-conv-r1",
+   3
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r9",
+   3
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r8",
+   3
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r8",
+   3
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r2",
+   3
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r5",
+   2
+  ],
+  "P2": [
+   "abl-s0-ped_no_tracker-r6",
+   2
+  ],
+  "P3": [
+   "conf-s0-ped-r9",
+   3
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r9",
+   1
+  ]
+ },
+ "C023": {
+  "real": [
+   "conf-gemini-s0-ped-r1",
+   3
+  ],
+  "E1": [
+   "abl-s0-ped_no_gate-r2",
+   3
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r5",
+   2
+  ],
+  "E3": [
+   "conf-s0-ped-r5",
+   3
+  ],
+  "E4": [
+   "abl-s0-conv_no_final_answer-r4",
+   2
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r1",
+   3
+  ],
+  "P2": [
+   "conf-s0-ped-r6",
+   3
+  ],
+  "P3": [
+   "abl-s0-ped_no_gate-r1",
+   3
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r8",
+   3
+  ]
+ },
+ "C025": {
+  "real": [
+   "conf-gemini-s0-ped-r3",
+   0
+  ],
+  "E1": [
+   "abl-s0-ped_no_cascade-r0",
+   0
+  ],
+  "E2": [
+   "conf-s0-ped-r9",
+   0
+  ],
+  "E3": [
+   "abl-s0-conv_no_final_answer-r0",
+   0
+  ],
+  "E4": [
+   "abl-s0-ped_no_gate-r0",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r5",
+   0
+  ],
+  "P2": [
+   "conf-s0-ped-r3",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r9",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r0",
+   0
+  ]
+ },
+ "C026": {
+  "real": [
+   "abl-s0-ped_no_cascade-r2",
+   1
+  ],
+  "E1": [
+   "conf-s0-ped-r6",
+   1
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r8",
+   1
+  ],
+  "E3": [
+   "abl-s0-conv_no_final_answer-r4",
+   1
+  ],
+  "E4": [
+   "abl-s0-ped_no_tracker-r3",
+   1
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r5",
+   1
+  ],
+  "P2": [
+   "conf-gpt-s0-conv-r1",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r1",
+   0
+  ],
+  "P4": [
+   "abl-s0-conv_no_final_answer-r2",
+   1
+  ]
+ },
+ "C028": {
+  "real": [
+   "conf-gemini-s0-ped-r2",
+   2
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r9",
+   2
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r8",
+   2
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r5",
+   2
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r4",
+   2
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r7",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r4",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ],
+  "P4": [
+   "conf-gemini-s0-ped-r5",
+   1
+  ]
+ },
+ "C030": {
+  "real": [
+   "conf-gpt-s0-conv-r2",
+   2
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r8",
+   2
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r2",
+   2
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r0",
+   1
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r5",
+   2
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r6",
+   2
+  ],
+  "P2": [
+   "conf-s0-ped-r3",
+   2
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r3",
+   2
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r3",
+   3
+  ]
+ },
+ "C031": {
+  "real": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r0",
+   0
+  ],
+  "E2": [
+   "abl-s0-conv_socratic-r8",
+   0
+  ],
+  "E3": [
+   "abl-s0-ped_no_tracker-r8",
+   0
+  ],
+  "E4": [
+   "conf-s0-ped-r6",
+   1
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r0",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-conv-r1",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r1",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r2",
+   0
+  ]
+ },
+ "C033": {
+  "real": [
+   "conf-gpt-s0-ped-r5",
+   1
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r7",
+   0
+  ],
+  "E2": [
+   "conf-gpt-s0-ped-r8",
+   0
+  ],
+  "E3": [
+   "conf-s0-ped-r8",
+   0
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r8",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r7",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r4",
+   0
+  ],
+  "P3": [
+   "abl-s0-ped_no_tracker-r4",
+   0
+  ],
+  "P4": [
+   "abl-s0-ped_no_gate-r6",
+   0
+  ]
+ },
+ "C039": {
+  "real": [
+   "conf-gemini-s0-ped-r0",
+   1
+  ],
+  "E1": [
+   "abl-s0-conv_no_final_answer-r3",
+   0
+  ],
+  "E2": [
+   "abl-s0-ped_no_tracker-r1",
+   1
+  ],
+  "E3": [
+   "abl-s0-ped_no_tracker-r6",
+   1
+  ],
+  "E4": [
+   "conf-s0-ped-r2",
+   1
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r5",
+   1
+  ],
+  "P2": [
+   "conf-gpt-s0-conv-r0",
+   0
+  ],
+  "P3": [
+   "conf-s0-ped-r3",
+   1
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r4",
+   0
+  ]
+ },
+ "C055": {
+  "real": [
+   "conf-gpt-s0-ped-r1",
+   1
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r7",
+   2
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r4",
+   1
+  ],
+  "E3": [
+   "abl-s0-conv_no_final_answer-r3",
+   1
+  ],
+  "E4": [
+   "abl-s0-conv_no_final_answer-r6",
+   1
+  ],
+  "P1": [
+   "abl-s0-ped_no_gate-r1",
+   1
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r7",
+   1
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r3",
+   2
+  ],
+  "P4": [
+   "abl-s0-ped_no_gate-r7",
+   3
+  ]
+ },
+ "C057": {
+  "real": [
+   "conf-gpt-s0-ped-r5",
+   1
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r7",
+   0
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r5",
+   0
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r8",
+   0
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r3",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r7",
+   0
+  ],
+  "P2": [
+   "conf-s0-ped-r8",
+   0
+  ],
+  "P3": [
+   "conf-gemini-s0-ped-r4",
+   0
+  ],
+  "P4": [
+   "conf-s0-ped-r5",
+   0
+  ]
+ },
+ "C065": {
+  "real": [
+   "conf-gemini-s0-ped-r0",
+   3
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r5",
+   1
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r2",
+   3
+  ],
+  "E3": [
+   "abl-s0-ped_no_tracker-r8",
+   3
+  ],
+  "E4": [
+   "conf-s0-ped-r1",
+   3
+  ],
+  "P1": [
+   "abl-s0-ped_no_gate-r0",
+   3
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r4",
+   3
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r6",
+   2
+  ],
+  "P4": [
+   "conf-gemini-s0-conv-r7",
+   1
+  ]
+ },
+ "C066": {
+  "real": [
+   "conf-gemini-s0-ped-r0",
+   1
+  ],
+  "E1": [
+   "abl-s0-ped_no_gate-r4",
+   1
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r4",
+   1
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r6",
+   1
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r2",
+   1
+  ],
+  "P1": [
+   "conf-s0-ped-r4",
+   1
+  ],
+  "P2": [
+   "conf-s0-conv-r5",
+   1
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r8",
+   3
+  ],
+  "P4": [
+   "abl-s0-ped_no_tracker-r5",
+   1
+  ]
+ },
+ "C070": {
+  "real": [
+   "abl-s0-ped_no_cascade-r2",
+   3
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r4",
+   2
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r0",
+   3
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r7",
+   3
+  ],
+  "E4": [
+   "abl-s0-ped_no_cascade-r6",
+   3
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r6",
+   2
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r4",
+   1
+  ],
+  "P3": [
+   "abl-s0-ped_no_gate-r3",
+   2
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r2",
+   3
+  ]
+ },
+ "C074": {
+  "real": [
+   "abl-s0-conv_socratic-r1",
+   2
+  ],
+  "E1": [
+   "conf-gpt-s0-ped-r3",
+   2
+  ],
+  "E2": [
+   "conf-s0-ped-r9",
+   2
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r8",
+   2
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r2",
+   2
+  ],
+  "P1": [
+   "abl-s0-ped_no_gate-r8",
+   2
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r9",
+   2
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r6",
+   1
+  ],
+  "P4": [
+   "abl-s0-conv_no_final_answer-r1",
+   1
+  ]
+ },
+ "C077": {
+  "real": [
+   "conf-gpt-s0-ped-r9",
+   3
+  ],
+  "E1": [
+   "abl-s0-ped_no_cascade-r7",
+   1
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r1",
+   2
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r8",
+   3
+  ],
+  "E4": [
+   "abl-s0-conv_no_final_answer-r3",
+   2
+  ],
+  "P1": [
+   "abl-s0-ped_no_gate-r2",
+   3
+  ],
+  "P2": [
+   "conf-gemini-s0-ped-r4",
+   3
+  ],
+  "P3": [
+   "abl-s0-ped_no_cascade-r4",
+   2
+  ],
+  "P4": [
+   "conf-gemini-s0-ped-r5",
+   3
+  ]
+ },
+ "C080": {
+  "real": [
+   "conf-gpt-s0-ped-r5",
+   1
+  ],
+  "E1": [
+   "conf-s0-ped-r8",
+   0
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r5",
+   0
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r6",
+   0
+  ],
+  "E4": [
+   "abl-s0-ped_no_gate-r4",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r7",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-conv-r2",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r9",
+   1
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r3",
+   1
+  ]
+ },
+ "C086": {
+  "real": [
+   "conf-gpt-s0-ped-r8",
+   0
+  ],
+  "E1": [
+   "conf-s0-ped-r8",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r8",
+   0
+  ],
+  "E3": [
+   "conf-s0-ped-r1",
+   0
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r3",
+   0
+  ],
+  "P1": [
+   "conf-s0-conv-r8",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r1",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r2",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r5",
+   0
+  ]
+ },
+ "C089": {
+  "real": [
+   "conf-gemini-s0-ped-r4",
+   3
+  ],
+  "E1": [
+   "abl-s0-ped_no_cascade-r3",
+   3
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r1",
+   2
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r6",
+   3
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r7",
+   3
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r3",
+   3
+  ],
+  "P2": [
+   "abl-s0-ped_no_gate-r7",
+   3
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r8",
+   3
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r3",
+   2
+  ]
+ },
+ "C093": {
+  "real": [
+   "conf-gpt-s0-conv-r9",
+   3
+  ],
+  "E1": [
+   "abl-s0-ped_no_cascade-r5",
+   3
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r8",
+   3
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r4",
+   3
+  ],
+  "E4": [
+   "conf-gpt-s0-ped-r8",
+   3
+  ],
+  "P1": [
+   "abl-s0-conv_no_final_answer-r1",
+   3
+  ],
+  "P2": [
+   "abl-s0-conv_no_final_answer-r0",
+   3
+  ],
+  "P3": [
+   "conf-gemini-s0-conv-r2",
+   3
+  ],
+  "P4": [
+   "abl-s0-ped_no_tracker-r3",
+   3
+  ]
+ },
+ "C094": {
+  "real": [
+   "conf-gemini-s0-ped-r0",
+   0
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r0",
+   0
+  ],
+  "E2": [
+   "conf-gpt-s0-ped-r2",
+   0
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r6",
+   0
+  ],
+  "E4": [
+   "abl-s0-ped_no_cascade-r7",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r9",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-conv-r0",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r9",
+   0
+  ]
+ },
+ "C010": {
+  "real": [
+   "conf-gpt-s0-conv-r1",
+   0
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r1",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r7",
+   0
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r9",
+   0
+  ],
+  "E4": [
+   "conf-s0-ped-r8",
+   0
+  ],
+  "P1": [
+   "abl-s0-ped_no_gate-r1",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r4",
+   0
+  ],
+  "P3": [
+   "conf-s0-conv-r8",
+   0
+  ],
+  "P4": [
+   "conf-s0-ped-r3",
+   0
+  ]
+ },
+ "C006": {
+  "real": [
+   "abl-s0-conv_no_final_answer-r0",
+   3
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r4",
+   3
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r2",
+   3
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r9",
+   3
+  ],
+  "E4": [
+   "abl-s0-ped_no_cascade-r8",
+   3
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r1",
+   3
+  ],
+  "P2": [
+   "conf-gpt-s0-conv-r9",
+   3
+  ],
+  "P3": [
+   "abl-s0-ped_no_gate-r6",
+   3
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r9",
+   2
+  ]
+ },
+ "C024": {
+  "real": [
+   "conf-gemini-s0-conv-r2",
+   2
+  ],
+  "E1": [
+   "abl-s0-ped_no_cascade-r5",
+   2
+  ],
+  "E2": [
+   "abl-s0-ped_no_gate-r2",
+   2
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r3",
+   2
+  ],
+  "E4": [
+   "abl-s0-conv_no_final_answer-r5",
+   2
+  ],
+  "P1": [
+   "abl-s0-conv_no_final_answer-r1",
+   3
+  ],
+  "P2": [
+   "abl-s0-conv_no_final_answer-r0",
+   3
+  ],
+  "P3": [
+   "conf-s0-ped-r6",
+   2
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r9",
+   2
+  ]
+ },
+ "C029": {
+  "real": [
+   "abl-s0-conv_no_final_answer-r0",
+   3
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r0",
+   3
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r5",
+   3
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r6",
+   3
+  ],
+  "E4": [
+   "abl-s0-ped_no_cascade-r4",
+   3
+  ],
+  "P1": [
+   "abl-s0-conv_no_final_answer-r1",
+   3
+  ],
+  "P2": [
+   "conf-gpt-s0-conv-r9",
+   3
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r9",
+   2
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r4",
+   3
+  ]
+ },
+ "C032": {
+  "real": [
+   "abl-s0-conv_no_final_answer-r0",
+   1
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r4",
+   1
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r7",
+   1
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r7",
+   1
+  ],
+  "E4": [
+   "abl-s0-ped_no_tracker-r6",
+   2
+  ],
+  "P1": [
+   "conf-gemini-s0-ped-r4",
+   2
+  ],
+  "P2": [
+   "abl-s0-conv_no_final_answer-r3",
+   1
+  ],
+  "P3": [
+   "conf-gemini-s0-conv-r2",
+   0
+  ],
+  "P4": [
+   "conf-s0-conv-r8",
+   0
+  ]
+ },
+ "C037": {
+  "real": [
+   "abl-s0-conv_no_final_answer-r2",
+   3
+  ],
+  "E1": [
+   "abl-s0-ped_no_cascade-r3",
+   3
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r2",
+   3
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r8",
+   3
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r3",
+   3
+  ],
+  "P1": [
+   "conf-s0-ped-r0",
+   3
+  ],
+  "P2": [
+   "conf-s0-ped-r5",
+   3
+  ],
+  "P3": [
+   "abl-s0-ped_no_gate-r2",
+   3
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r1",
+   3
+  ]
+ },
+ "C052": {
+  "real": [
+   "conf-gemini-s0-conv-r3",
+   3
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r1",
+   3
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r9",
+   2
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r3",
+   2
+  ],
+  "E4": [
+   "abl-s0-conv_no_final_answer-r1",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r7",
+   2
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r6",
+   2
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r3",
+   3
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r9",
+   1
+  ]
+ },
+ "C073": {
+  "real": [
+   "conf-gemini-s0-conv-r3",
+   3
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r3",
+   0
+  ],
+  "E2": [
+   "abl-s0-ped_no_gate-r0",
+   0
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r8",
+   3
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r9",
+   3
+  ],
+  "P1": [
+   "abl-s0-ped_no_gate-r6",
+   3
+  ],
+  "P2": [
+   "conf-gpt-s0-conv-r9",
+   3
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r7",
+   1
+  ],
+  "P4": [
+   "conf-s0-ped-r9",
+   3
+  ]
+ },
+ "C079": {
+  "real": [
+   "abl-s0-conv_no_final_answer-r0",
+   1
+  ],
+  "E1": [
+   "abl-s0-conv_no_final_answer-r9",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r4",
+   2
+  ],
+  "E3": [
+   "abl-s0-conv_no_final_answer-r3",
+   1
+  ],
+  "E4": [
+   "abl-s0-ped_no_gate-r2",
+   2
+  ],
+  "P1": [
+   "abl-s0-conv_no_final_answer-r2",
+   1
+  ],
+  "P2": [
+   "conf-s0-conv-r8",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r0",
+   1
+  ],
+  "P4": [
+   "conf-gemini-s0-ped-r5",
+   2
+  ]
+ },
+ "C084": {
+  "real": [
+   "abl-s0-conv_no_final_answer-r0",
+   1
+  ],
+  "E1": [
+   "conf-gpt-s0-ped-r8",
+   1
+  ],
+  "E2": [
+   "abl-s0-ped_no_gate-r6",
+   1
+  ],
+  "E3": [
+   "abl-s0-ped_no_tracker-r3",
+   1
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r3",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r4",
+   1
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r0",
+   1
+  ],
+  "P3": [
+   "conf-gemini-s0-ped-r4",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ]
+ },
+ "C041": {
+  "real": [
+   "conf-gemini-s0-conv-r2",
+   3
+  ],
+  "E1": [
+   "abl-s0-conv_no_final_answer-r1",
+   3
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r5",
+   2
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r7",
+   3
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r5",
+   3
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r9",
+   3
+  ],
+  "P2": [
+   "conf-gemini-s0-ped-r6",
+   3
+  ],
+  "P3": [
+   "conf-gemini-s0-ped-r7",
+   3
+  ],
+  "P4": [
+   "abl-s0-conv_no_final_answer-r0",
+   3
+  ]
+ },
+ "C050": {
+  "real": [
+   "conf-gemini-s0-conv-r0",
+   1
+  ],
+  "E1": [
+   "abl-s0-ped_no_gate-r2",
+   2
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r4",
+   1
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r6",
+   1
+  ],
+  "E4": [
+   "abl-s0-conv_no_final_answer-r6",
+   1
+  ],
+  "P1": [
+   "abl-s0-ped_no_gate-r3",
+   1
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r1",
+   1
+  ],
+  "P3": [
+   "conf-gemini-s0-conv-r2",
+   0
+  ],
+  "P4": [
+   "abl-s0-ped_no_gate-r1",
+   1
+  ]
+ },
+ "C078": {
+  "real": [
+   "conf-gpt-s0-conv-r7",
+   3
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r3",
+   3
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r2",
+   3
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r1",
+   3
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r3",
+   2
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r1",
+   3
+  ],
+  "P2": [
+   "abl-s0-conv_no_final_answer-r5",
+   3
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r3",
+   3
+  ],
+  "P4": [
+   "conf-s0-ped-r6",
+   3
+  ]
+ },
+ "C091": {
+  "real": [
+   "conf-gemini-s0-conv-r0",
+   1
+  ],
+  "E1": [
+   "abl-s0-ped_no_gate-r2",
+   2
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r4",
+   1
+  ],
+  "E3": [
+   "abl-s0-conv_no_final_answer-r1",
+   2
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r6",
+   3
+  ],
+  "P1": [
+   "abl-s0-ped_no_gate-r1",
+   1
+  ],
+  "P2": [
+   "abl-s0-ped_no_tracker-r4",
+   2
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r1",
+   1
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r3",
+   1
+  ]
+ },
+ "C007": {
+  "real": [
+   "abl-s0-ped_no_cascade-r0",
+   1
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r8",
+   2
+  ],
+  "E2": [
+   "conf-gpt-s0-ped-r8",
+   1
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r1",
+   3
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r7",
+   1
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r3",
+   1
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r6",
+   2
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r0",
+   1
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r9",
+   1
+  ]
+ },
+ "C011": {
+  "real": [
+   "conf-gpt-s0-conv-r1",
+   0
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r3",
+   0
+  ],
+  "E2": [
+   "abl-s0-ped_no_gate-r4",
+   0
+  ],
+  "E3": [
+   "conf-s0-ped-r8",
+   0
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r8",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r1",
+   0
+  ],
+  "P2": [
+   "conf-s0-conv-r8",
+   0
+  ],
+  "P3": [
+   "conf-gemini-s0-ped-r1",
+   0
+  ],
+  "P4": [
+   "conf-s0-ped-r3",
+   0
+  ]
+ },
+ "C036": {
+  "real": [
+   "abl-s0-ped_no_cascade-r0",
+   3
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r8",
+   3
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r4",
+   3
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r2",
+   2
+  ],
+  "E4": [
+   "abl-s0-ped_no_cascade-r6",
+   3
+  ],
+  "P1": [
+   "conf-s0-ped-r9",
+   2
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r3",
+   1
+  ],
+  "P3": [
+   "abl-s0-ped_no_tracker-r3",
+   3
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r0",
+   2
+  ]
+ },
+ "C040": {
+  "real": [
+   "conf-gemini-s0-ped-r0",
+   3
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r8",
+   3
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r1",
+   2
+  ],
+  "E3": [
+   "abl-s0-ped_no_gate-r1",
+   1
+  ],
+  "E4": [
+   "abl-s0-conv_no_final_answer-r3",
+   2
+  ],
+  "P1": [
+   "conf-gemini-s0-conv-r2",
+   2
+  ],
+  "P2": [
+   "conf-gemini-s0-ped-r5",
+   3
+  ],
+  "P3": [
+   "conf-gemini-s0-ped-r7",
+   3
+  ],
+  "P4": [
+   "abl-s0-ped_no_tracker-r6",
+   3
+  ]
+ },
+ "C044": {
+  "real": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ],
+  "E1": [
+   "conf-s0-ped-r0",
+   0
+  ],
+  "E2": [
+   "abl-s0-ped_no_gate-r4",
+   0
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r0",
+   0
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r0",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r0",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r9",
+   1
+  ],
+  "P3": [
+   "conf-s0-ped-r3",
+   0
+  ],
+  "P4": [
+   "abl-s0-ped_no_tracker-r7",
+   0
+  ]
+ },
+ "C046": {
+  "real": [
+   "conf-gemini-s0-conv-r0",
+   1
+  ],
+  "E1": [
+   "abl-s0-ped_no_cascade-r6",
+   1
+  ],
+  "E2": [
+   "abl-s0-ped_no_tracker-r1",
+   2
+  ],
+  "E3": [
+   "abl-s0-ped_no_gate-r0",
+   1
+  ],
+  "E4": [
+   "abl-s0-ped_no_gate-r3",
+   1
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r3",
+   1
+  ],
+  "P2": [
+   "conf-s0-ped-r2",
+   1
+  ],
+  "P3": [
+   "abl-s0-ped_no_tracker-r1",
+   3
+  ],
+  "P4": [
+   "conf-s0-ped-r7",
+   1
+  ]
+ },
+ "C047": {
+  "real": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ],
+  "E1": [
+   "abl-s0-ped_no_cascade-r4",
+   0
+  ],
+  "E2": [
+   "abl-s0-conv_socratic-r6",
+   0
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r0",
+   0
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r0",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r7",
+   0
+  ],
+  "P2": [
+   "conf-s0-ped-r6",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r2",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r4",
+   0
+  ]
+ },
+ "C049": {
+  "real": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ],
+  "E1": [
+   "conf-s0-ped-r0",
+   0
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r0",
+   0
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r7",
+   0
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r0",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r0",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-conv-r7",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r3",
+   0
+  ],
+  "P4": [
+   "conf-s0-ped-r3",
+   0
+  ]
+ },
+ "C060": {
+  "real": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r0",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r7",
+   0
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r4",
+   0
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r8",
+   0
+  ],
+  "P1": [
+   "conf-s0-ped-r3",
+   0
+  ],
+  "P2": [
+   "conf-s0-ped-r0",
+   0
+  ],
+  "P3": [
+   "abl-s0-ped_no_tracker-r1",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r9",
+   0
+  ]
+ },
+ "C063": {
+  "real": [
+   "conf-gemini-s0-conv-r0",
+   3
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r8",
+   3
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r1",
+   2
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r2",
+   3
+  ],
+  "E4": [
+   "abl-s0-conv_no_final_answer-r3",
+   2
+  ],
+  "P1": [
+   "abl-s0-ped_no_gate-r2",
+   3
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r3",
+   3
+  ],
+  "P3": [
+   "abl-s0-ped_no_tracker-r1",
+   3
+  ],
+  "P4": [
+   "conf-gemini-s0-ped-r5",
+   3
+  ]
+ },
+ "C081": {
+  "real": [
+   "conf-gemini-s0-ped-r0",
+   2
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r1",
+   2
+  ],
+  "E2": [
+   "abl-s0-ped_no_gate-r0",
+   2
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r9",
+   3
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r1",
+   1
+  ],
+  "P1": [
+   "abl-s0-ped_no_tracker-r8",
+   2
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r9",
+   2
+  ],
+  "P3": [
+   "abl-s0-ped_no_tracker-r2",
+   2
+  ],
+  "P4": [
+   "conf-s0-ped-r4",
+   2
+  ]
+ },
+ "C085": {
+  "real": [
+   "conf-gemini-s0-conv-r0",
+   1
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r6",
+   2
+  ],
+  "E2": [
+   "abl-s0-conv_socratic-r3",
+   1
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r6",
+   2
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r8",
+   0
+  ],
+  "P1": [
+   "conf-s0-ped-r3",
+   1
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r2",
+   1
+  ],
+  "P3": [
+   "abl-s0-conv_no_final_answer-r1",
+   1
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r7",
+   0
+  ]
+ },
+ "C087": {
+  "real": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ],
+  "E1": [
+   "conf-s0-ped-r0",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r0",
+   0
+  ],
+  "E3": [
+   "conf-gpt-s0-ped-r2",
+   0
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r7",
+   0
+  ],
+  "P1": [
+   "conf-s0-ped-r3",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r4",
+   0
+  ],
+  "P3": [
+   "abl-s0-ped_no_gate-r1",
+   0
+  ],
+  "P4": [
+   "conf-gemini-s0-conv-r3",
+   0
+  ]
+ },
+ "C018": {
+  "real": [
+   "conf-gpt-s0-ped-r7",
+   1
+  ],
+  "E1": [
+   "abl-s0-conv_no_final_answer-r4",
+   1
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r4",
+   2
+  ],
+  "E3": [
+   "abl-s0-conv_no_final_answer-r7",
+   1
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r3",
+   3
+  ],
+  "P1": [
+   "conf-gemini-s0-ped-r1",
+   1
+  ],
+  "P2": [
+   "conf-s0-ped-r4",
+   1
+  ],
+  "P3": [
+   "abl-s0-ped_no_gate-r5",
+   1
+  ],
+  "P4": [
+   "abl-s0-ped_no_gate-r0",
+   3
+  ]
+ },
+ "C051": {
+  "real": [
+   "conf-gpt-s0-conv-r1",
+   0
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r7",
+   0
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r4",
+   0
+  ],
+  "E3": [
+   "abl-s0-ped_no_gate-r4",
+   0
+  ],
+  "E4": [
+   "abl-s0-ped_no_tracker-r2",
+   0
+  ],
+  "P1": [
+   "conf-s0-ped-r8",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-conv-r2",
+   0
+  ],
+  "P3": [
+   "conf-gemini-s0-ped-r5",
+   1
+  ],
+  "P4": [
+   "conf-s0-ped-r6",
+   0
+  ]
+ },
+ "C092": {
+  "real": [
+   "conf-gpt-s0-conv-r0",
+   0
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r9",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r5",
+   0
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r0",
+   0
+  ],
+  "E4": [
+   "abl-s0-ped_no_tracker-r8",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r9",
+   0
+  ],
+  "P2": [
+   "abl-s0-ped_no_gate-r2",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r9",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ]
+ },
+ "C082": {
+  "real": [
+   "abl-s0-conv_no_final_answer-r0",
+   2
+  ],
+  "E1": [
+   "abl-s0-ped_no_gate-r1",
+   1
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r8",
+   3
+  ],
+  "E3": [
+   "abl-s0-conv_no_final_answer-r1",
+   2
+  ],
+  "E4": [
+   "abl-s0-ped_no_cascade-r5",
+   2
+  ],
+  "P1": [
+   "abl-s0-ped_no_gate-r1",
+   2
+  ],
+  "P2": [
+   "abl-s0-ped_no_gate-r2",
+   3
+  ],
+  "P3": [
+   "conf-gemini-s0-conv-r1",
+   2
+  ],
+  "P4": [
+   "abl-s0-ped_no_tracker-r4",
+   2
+  ]
+ },
+ "C105": {
+  "real": [
+   "conf-gemini-s0-conv-r1",
+   1
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r3",
+   1
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r6",
+   2
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r5",
+   1
+  ],
+  "E4": [
+   "conf-s0-ped-r0",
+   1
+  ],
+  "P1": [
+   "abl-s0-conv_no_final_answer-r1",
+   1
+  ],
+  "P2": [
+   "conf-gemini-s0-conv-r0",
+   1
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r2",
+   1
+  ],
+  "P4": [
+   "conf-s0-ped-r3",
+   1
+  ]
+ },
+ "C122": {
+  "real": [
+   "abl-s0-conv_no_final_answer-r4",
+   0
+  ],
+  "E1": [
+   "abl-s0-ped_no_gate-r4",
+   0
+  ],
+  "E2": [
+   "conf-s0-ped-r8",
+   0
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r1",
+   0
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r3",
+   0
+  ],
+  "P1": [
+   "abl-s0-ped_no_gate-r3",
+   0
+  ],
+  "P2": [
+   "conf-s0-conv-r8",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r4",
+   0
+  ],
+  "P4": [
+   "abl-s0-ped_no_gate-r1",
+   0
+  ]
+ },
+ "C103": {
+  "real": [
+   "conf-gemini-s0-conv-r2",
+   2
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r3",
+   2
+  ],
+  "E2": [
+   "conf-s0-ped-r9",
+   0
+  ],
+  "E3": [
+   "abl-s0-conv_no_final_answer-r4",
+   2
+  ],
+  "E4": [
+   "conf-s0-ped-r2",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r7",
+   2
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r3",
+   2
+  ],
+  "P3": [
+   "conf-gemini-s0-conv-r8",
+   2
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r7",
+   1
+  ]
+ },
+ "C111": {
+  "real": [
+   "conf-gpt-s0-conv-r2",
+   0
+  ],
+  "E1": [
+   "conf-s0-ped-r8",
+   0
+  ],
+  "E2": [
+   "abl-s0-ped_no_gate-r4",
+   0
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r1",
+   0
+  ],
+  "E4": [
+   "abl-s0-conv_socratic-r3",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r5",
+   1
+  ],
+  "P2": [
+   "conf-s0-conv-r8",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r7",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r1",
+   0
+  ]
+ },
+ "C115": {
+  "real": [
+   "conf-gpt-s0-conv-r3",
+   0
+  ],
+  "E1": [
+   "conf-gpt-s0-ped-r8",
+   0
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r5",
+   0
+  ],
+  "E3": [
+   "conf-s0-ped-r8",
+   0
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r7",
+   0
+  ],
+  "P1": [
+   "conf-s0-conv-r8",
+   0
+  ],
+  "P2": [
+   "conf-gemini-s0-conv-r3",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r4",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r7",
+   0
+  ]
+ },
+ "C116": {
+  "real": [
+   "conf-gpt-s0-conv-r2",
+   0
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r8",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r5",
+   1
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r1",
+   0
+  ],
+  "E4": [
+   "abl-s0-conv_no_final_answer-r4",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r7",
+   0
+  ],
+  "P2": [
+   "conf-s0-conv-r8",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r3",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r5",
+   0
+  ]
+ },
+ "C118": {
+  "real": [
+   "conf-gpt-s0-conv-r3",
+   0
+  ],
+  "E1": [
+   "abl-s0-ped_no_cascade-r5",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r7",
+   0
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r3",
+   0
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r8",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r5",
+   0
+  ],
+  "P2": [
+   "conf-s0-conv-r8",
+   0
+  ],
+  "P3": [
+   "conf-s0-ped-r8",
+   0
+  ],
+  "P4": [
+   "conf-gemini-s0-ped-r4",
+   0
+  ]
+ },
+ "C119": {
+  "real": [
+   "conf-gpt-s0-conv-r2",
+   0
+  ],
+  "E1": [
+   "conf-gpt-s0-ped-r8",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r1",
+   0
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r9",
+   0
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r2",
+   0
+  ],
+  "P1": [
+   "conf-s0-conv-r8",
+   0
+  ],
+  "P2": [
+   "conf-gpt-s0-conv-r7",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r1",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r5",
+   1
+  ]
+ },
+ "C121": {
+  "real": [
+   "abl-s0-conv_no_final_answer-r4",
+   0
+  ],
+  "E1": [
+   "abl-s0-ped_no_cascade-r5",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r8",
+   0
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r2",
+   0
+  ],
+  "E4": [
+   "conf-gpt-s0-ped-r8",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-conv-r4",
+   0
+  ],
+  "P2": [
+   "conf-gemini-s0-ped-r4",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r5",
+   0
+  ],
+  "P4": [
+   "conf-s0-conv-r8",
+   0
+  ]
+ },
+ "C106": {
+  "real": [
+   "conf-gpt-s0-conv-r4",
+   3
+  ],
+  "E1": [
+   "conf-gemini-s0-ped-r5",
+   3
+  ],
+  "E2": [
+   "abl-s0-ped_no_cascade-r7",
+   3
+  ],
+  "E3": [
+   "abl-s0-ped_no_cascade-r5",
+   3
+  ],
+  "E4": [
+   "abl-s0-ped_no_gate-r2",
+   3
+  ],
+  "P1": [
+   "conf-s0-ped-r8",
+   3
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r3",
+   3
+  ],
+  "P3": [
+   "conf-s0-ped-r6",
+   3
+  ],
+  "P4": [
+   "abl-s0-ped_no_tracker-r4",
+   3
+  ]
+ },
+ "C110": {
+  "real": [
+   "conf-gpt-s0-conv-r2",
+   3
+  ],
+  "E1": [
+   "abl-s0-ped_no_tracker-r2",
+   3
+  ],
+  "E2": [
+   "abl-s0-conv_socratic-r7",
+   3
+  ],
+  "E3": [
+   "conf-gpt-s0-ped-r2",
+   1
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r9",
+   2
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r2",
+   3
+  ],
+  "P2": [
+   "abl-s0-ped_no_tracker-r1",
+   3
+  ],
+  "P3": [
+   "conf-s0-ped-r5",
+   2
+  ],
+  "P4": [
+   "conf-gpt-s0-conv-r7",
+   0
+  ]
+ },
+ "C126": {
+  "real": [
+   "conf-gemini-s0-conv-r0",
+   2
+  ],
+  "E1": [
+   "abl-s0-conv_no_final_answer-r4",
+   2
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r1",
+   2
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r5",
+   2
+  ],
+  "E4": [
+   "abl-s0-conv_no_final_answer-r5",
+   1
+  ],
+  "P1": [
+   "abl-s0-ped_no_tracker-r5",
+   2
+  ],
+  "P2": [
+   "conf-gemini-s0-ped-r6",
+   3
+  ],
+  "P3": [
+   "conf-gemini-s0-conv-r2",
+   1
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r1",
+   1
+  ]
+ },
+ "C109": {
+  "real": [
+   "conf-gemini-s0-conv-r2",
+   0
+  ],
+  "E1": [
+   "conf-s0-ped-r3",
+   0
+  ],
+  "E2": [
+   "abl-s0-conv_no_final_answer-r6",
+   0
+  ],
+  "E3": [
+   "abl-s0-conv_no_final_answer-r4",
+   0
+  ],
+  "E4": [
+   "abl-s0-ped_no_gate-r4",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ],
+  "P2": [
+   "abl-s0-ped_no_tracker-r5",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-conv-r6",
+   0
+  ],
+  "P4": [
+   "conf-s0-ped-r6",
+   0
+  ]
+ },
+ "C043": {
+  "real": [
+   "abl-s0-conv_socratic-r1",
+   2
+  ],
+  "E1": [
+   "conf-s0-ped-r8",
+   2
+  ],
+  "E2": [
+   "conf-s0-ped-r9",
+   0
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r9",
+   0
+  ],
+  "E4": [
+   "abl-s0-ped_no_gate-r9",
+   0
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r5",
+   1
+  ],
+  "P2": [
+   "conf-gemini-s0-ped-r5",
+   2
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r5",
+   2
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r2",
+   2
+  ]
+ },
+ "C088": {
+  "real": [
+   "abl-s0-ped_no_cascade-r2",
+   1
+  ],
+  "E1": [
+   "abl-s0-ped_no_gate-r3",
+   1
+  ],
+  "E2": [
+   "abl-s0-ped_no_tracker-r2",
+   1
+  ],
+  "E3": [
+   "conf-gemini-s0-ped-r2",
+   1
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r8",
+   1
+  ],
+  "P1": [
+   "conf-gpt-s0-ped-r3",
+   1
+  ],
+  "P2": [
+   "conf-gpt-s0-ped-r6",
+   1
+  ],
+  "P3": [
+   "conf-s0-ped-r3",
+   1
+  ],
+  "P4": [
+   "conf-gemini-s0-ped-r5",
+   1
+  ]
+ },
+ "C021": {
+  "real": [
+   "conf-gpt-s0-conv-r0",
+   0
+  ],
+  "E1": [
+   "abl-s0-conv_socratic-r9",
+   0
+  ],
+  "E2": [
+   "conf-gemini-s0-ped-r5",
+   0
+  ],
+  "E3": [
+   "abl-s0-conv_socratic-r0",
+   0
+  ],
+  "E4": [
+   "conf-gemini-s0-ped-r7",
+   0
+  ],
+  "P1": [
+   "conf-s0-conv-r5",
+   0
+  ],
+  "P2": [
+   "abl-s0-ped_no_gate-r2",
+   0
+  ],
+  "P3": [
+   "conf-gpt-s0-ped-r9",
+   0
+  ],
+  "P4": [
+   "conf-gpt-s0-ped-r0",
+   0
+  ]
+ }
+}

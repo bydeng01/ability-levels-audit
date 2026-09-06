@@ -1,0 +1,32 @@
+# FROZEN learner-profile texts — the manipulated factor of the study.
+#
+# Constraints (build prompt, Phase 4):
+#   - matched for length and specificity;
+#     NB (Amendment A5): the texts are NOT a minimal contrast on ability. Sentence (3)
+#     also states a help-seeking preference ("usually need step-by-step help" against
+#     "usually work through problems independently without help"), which is the
+#     construct the rubric's assistance_calibration dimension scores. Disclosed in
+#     PREREGISTRATION §2 and A5; deliberately not edited, because re-cutting the
+#     manipulation after an audit is what the freeze exists to prevent;
+#   - neither may hint at the dialogue (no mixture/percent/algebra-task specifics
+#     beyond naming the course subject, identical in both);
+#   - neither may instruct the judge how to weigh the profile.
+#
+# The two texts are sentence-by-sentence parallel: (1) course stage, (2) placement
+# percentile, (3) self-assessment, (4) previous teacher's description. Word counts
+# are matched exactly (novice 59 / advanced 59; verified by tests/test_instrument.py).
+# Frozen before any judge call; never tuned afterward.
+
+novice: >-
+  This student is in the first weeks of an introductory algebra course. On the
+  course placement test they scored in the 12th percentile. In their
+  self-assessment they describe algebra word problems as very difficult and say
+  they usually need step-by-step help to make progress. Their previous teacher
+  describes them as a struggling beginner who is still building basic skills.
+
+advanced: >-
+  This student is in the final weeks of an accelerated algebra course. On the
+  course placement test they scored in the 93rd percentile. In their
+  self-assessment they describe algebra word problems as very easy and say they
+  usually work through problems independently without help. Their previous teacher
+  describes them as a high-achieving student who is ready for advanced material.

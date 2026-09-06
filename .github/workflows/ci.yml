@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  offline:
+    name: offline reproduction (no API key)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install the frozen environment
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Test suite (incl. the 990-call mock end-to-end)
+        run: python -m pytest tests/ -q
+
+      - name: Stimulus reconstruction is byte-identical
+        run: python corpus/build_stimuli.py verify
+
+      - name: Pre-registered analysis
+        run: python analysis/analyze.py
+
+      - name: Post-hoc diagnostics and simulations
+        run: |
+          python analysis/diagnostics.py
+          python analysis/simulations.py
+
+      - name: Figures regenerate from their scripts
+        run: |
+          python analysis/figures/fig1.py
+          python analysis/figures/fig2.py
+          python analysis/figures/fig3.py
+
+      - name: Manifest and plan (zero provider calls)
+        run: python judging/run_study.py --manifest-only
+
+      # --manifest-only rederives these two from the committed frozen inputs;
+      # they must come back byte-identical. plan.json is excluded on purpose:
+      # contract_sha256 binds the interpreter and SDK build, which the runner
+      # does not reproduce to the patch level.
+      - name: Frozen inputs have not drifted
+        run: git diff --exit-code -- results/input_manifest.jsonl results/frozen_inputs.sha256
+
+      - name: Upload the regenerated outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: regenerated-outputs
+          path: |
+            analysis/out/
+            analysis/figures/*.pdf
+          if-no-files-found: error
+
+  container:
+    name: frozen container builds and passes
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # python:3.12.8-slim is the exact interpreter the protocol froze; the job
+      # above runs whatever 3.12.x the runner ships, so this is the only check
+      # that the frozen environment itself still reproduces.
+      - name: Build the image
+        run: docker build -t ability-levels-audit .
+
+      - name: Offline suite inside the image
+        run: docker run --rm ability-levels-audit
+
+      - name: Pre-registered analysis inside the image
+        run: docker run --rm ability-levels-audit python analysis/analyze.py

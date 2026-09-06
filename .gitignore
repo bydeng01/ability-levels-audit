@@ -1,0 +1,51 @@
+CLAUDE.md
+.env
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
+.pytest_cache/
+
+# runner scratch (regenerated; never part of a freeze)
+results/tmp.*
+# NB: exclude the cache dir's CONTENTS, not the dir itself — git cannot re-include a
+# file whose parent directory is excluded.
+results/cache/*
+
+# ...but the LIVE per-rep cache, the wire log and the spend ledger are the release's
+# provenance record, not scratch: README documents --offline-cache-only as replaying
+# "the released per-rep cache", and that path cannot work on a clone if the cache is
+# ignored (AUDIT-2026-08-08 N8). Mock rehearsal caches stay ignored.
+!results/cache/profile_pedagogy_cache.json
+
+# analysis output is regenerated from the promoted results; leaving it tracked makes
+# the worktree dirty after `analyze.py` and then trips require_git_freeze on any later
+# live command (AUDIT-2026-08-08-preflight-review-3 N10).
+analysis/out/
+
+# ---------------------------------------------------------------------------
+# Open-source release boundary (2026-09-05). The public artifact is the code,
+# the frozen data, the protocol and the audits. Everything below is either a
+# build output, author-identifying manuscript source, or unrelated material
+# that happens to sit in this tree.
+# ---------------------------------------------------------------------------
+
+# Manuscript sources. They carry the author byline and venue style files this
+# repository did not author; the paper is distributed by its venue, not here.
+NeurIPS_2026_newinml/
+AAAI_Student_Abstract_2027/
+paper/results.tex
+analysis/figures/*_caption.tex
+analysis/figures/fig3_float.tex
+
+# Rendered figures are build outputs of analysis/figures/fig{1,2,3}.py.
+analysis/figures/*.pdf
+analysis/figures/*.png
+analysis/figures/*.svg
+
+# Superseded figure scripts, kept locally for provenance only.
+analysis/figures/_superseded/
+
+# Local scratch and unrelated documents.
+Claude outputs/
+output/

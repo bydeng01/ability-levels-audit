@@ -1,0 +1,28 @@
+{
+  "design": "55 stimuli x 3 arms x 2 poles x 3 reps",
+  "n_stimuli": 55,
+  "n_units": 330,
+  "reps": 3,
+  "n_calls_planned": 990,
+  "judge_model": "claude-opus-4-8",
+  "est_cost_usd": 9.72,
+  "no_retry_reservation_usd": 53.22,
+  "retry_inclusive_request_ceiling_usd": 212.89,
+  "hard_live_cap_usd": 40.0,
+  "contract_sha256": "fe0a59d26232dc3a0edea271fc8362807f5db4c3c0de44052a36541c9f3d3704",
+  "frozen_inputs": {
+    "stimuli_sha256": "1d240ebca255c7e5cfa393292eb5dc6a050f2ddee904e21267ab1a178b8c5376",
+    "labels_sha256": "fda2bc3d6f25e60433e211a1c792d7a56b7d7d102338921d182d9059b22707d4",
+    "profiles_yaml_sha256": "06df144e32a6f1d7ce3774aab473e56608a777b02c63cab823eef0ad8f100bea",
+    "models_yaml_sha256": "3f3e3c8060f7ae1bdf3246b7ec29f8ef0ae189e994ea05e4fec13a13e0fcb296",
+    "judge_pedagogy_py_sha256": "a79766c86a44a7075f2c1579343f09802282ec99bbbff97b52c42edba5a0c9fe",
+    "profile_judge_py_sha256": "76a0c35850c5b4d907e4272419415a34c421e8b6f333403e8dd63b10d176fbf3",
+    "run_study_py_sha256": "90501bcaa63c0f4eec4ccb7f9f4f4939d863f4be15585a091d99d7440f441f98",
+    "rubric_md_sha256": "901f2fb274c7b93d5cc1a57c4629d8c78c327d861100a2ee8cac51de10fb7362",
+    "analyze_py_sha256": "458932b56babdb4cc2d021e52c6a22032227a8130d48beaf00d5f8b74f67ed06",
+    "prereg_md_sha256": "2e3a86979e892d31651f212ba5de1f361fb53d182e061f1ce4e515a13e2b34f8",
+    "requirements_txt_sha256": "d39a47ac09fcc374649a367970044c9d81b45d110d0e30317346cd59431db32e",
+    "topup_recipe_sha256": "9dff739abbd9f30ff61ddc58aa291403ded272e0490d4768db18cbfd985cf93c"
+  },
+  "note": "no cache_control breakpoint is ever sent, so no prompt-cache discount applies and none is assumed (the ~1000-token system prompt is at claude-opus-4-8's 1024-token cache minimum, not below it as earlier drafts said; nothing turns on it)"
+}

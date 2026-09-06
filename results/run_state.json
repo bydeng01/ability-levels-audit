@@ -1,0 +1,13 @@
+{
+  "state": "complete",
+  "timestamp_utc": "2026-08-10T13:52:17Z",
+  "complete": true,
+  "backend": "live",
+  "note": "scored run",
+  "result_sha256": {
+    "per_rep_scores.jsonl": "37f3f981836395ab3b3f2b5a4414b39dd64fa7571e98950253b5a2a21125696f",
+    "per_unit.jsonl": "15788f5318a93d30b5144734d26ba0925d34472481dc9089a3c4a28e2b99ae3e",
+    "completeness.json": "8427f7234a9f156c856f4bd30ac6e28350dce6555113367c6c3898c4e82f8406",
+    "run_meta.json": "1b2152c1c992926a79b04be5ff345fe4fac2d681708b44ad3c86ee12e6c413b6"
+  }
+}

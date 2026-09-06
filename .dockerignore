@@ -1,0 +1,23 @@
+.git
+.dockerignore
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+
+# regenerated inside the container
+analysis/out/
+analysis/figures/*.pdf
+analysis/figures/*.png
+analysis/figures/*.svg
+
+# outside the open-source release boundary (see the dated block in .gitignore)
+NeurIPS_2026_newinml/
+AAAI_Student_Abstract_2027/
+paper/results.tex
+analysis/figures/*_caption.tex
+analysis/figures/fig3_float.tex
+analysis/figures/_superseded/
+Claude outputs/
+output/

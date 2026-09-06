@@ -1,0 +1,64 @@
+{
+  "timestamp_utc": "2026-08-10T13:11:15Z",
+  "backend": "live",
+  "requested_model": "claude-opus-4-8",
+  "served_model_frozen": "claude-opus-4-8",
+  "temperature": "omitted from request (spec temperature: null)",
+  "max_tokens": 512,
+  "seed_supported": false,
+  "seed_note": "the Anthropic path sends no seed; the 3 reps are genuine stochastic samples (matches the source study)",
+  "anthropic_sdk_version": "0.96.0",
+  "parser_ok": true,
+  "finish_reasons": [
+    "end_turn"
+  ],
+  "usage_logged": true,
+  "contract_sha256": "fe0a59d26232dc3a0edea271fc8362807f5db4c3c0de44052a36541c9f3d3704",
+  "frozen_inputs": {
+    "stimuli_sha256": "1d240ebca255c7e5cfa393292eb5dc6a050f2ddee904e21267ab1a178b8c5376",
+    "labels_sha256": "fda2bc3d6f25e60433e211a1c792d7a56b7d7d102338921d182d9059b22707d4",
+    "profiles_yaml_sha256": "06df144e32a6f1d7ce3774aab473e56608a777b02c63cab823eef0ad8f100bea",
+    "models_yaml_sha256": "3f3e3c8060f7ae1bdf3246b7ec29f8ef0ae189e994ea05e4fec13a13e0fcb296",
+    "judge_pedagogy_py_sha256": "a79766c86a44a7075f2c1579343f09802282ec99bbbff97b52c42edba5a0c9fe",
+    "profile_judge_py_sha256": "76a0c35850c5b4d907e4272419415a34c421e8b6f333403e8dd63b10d176fbf3",
+    "run_study_py_sha256": "90501bcaa63c0f4eec4ccb7f9f4f4939d863f4be15585a091d99d7440f441f98",
+    "rubric_md_sha256": "901f2fb274c7b93d5cc1a57c4629d8c78c327d861100a2ee8cac51de10fb7362",
+    "analyze_py_sha256": "458932b56babdb4cc2d021e52c6a22032227a8130d48beaf00d5f8b74f67ed06",
+    "prereg_md_sha256": "2e3a86979e892d31651f212ba5de1f361fb53d182e061f1ce4e515a13e2b34f8",
+    "requirements_txt_sha256": "d39a47ac09fcc374649a367970044c9d81b45d110d0e30317346cd59431db32e",
+    "topup_recipe_sha256": "9dff739abbd9f30ff61ddc58aa291403ded272e0490d4768db18cbfd985cf93c"
+  },
+  "spend": {
+    "cap_usd": 40.0,
+    "backend": "live",
+    "prior_settled_usd": 0.0,
+    "this_run_settled_usd": 0.0166,
+    "lifetime_settled_usd": 0.0166,
+    "outstanding_committed_usd": 0.0,
+    "requests_this_run": 2
+  },
+  "calls": [
+    {
+      "arm": "D",
+      "parsed_ok": true,
+      "degraded": null,
+      "served_model": "claude-opus-4-8",
+      "stop_reason": "end_turn",
+      "in_tokens": 1334,
+      "out_tokens": 52
+    },
+    {
+      "arm": "P_nov",
+      "parsed_ok": true,
+      "degraded": null,
+      "served_model": "claude-opus-4-8",
+      "stop_reason": "end_turn",
+      "in_tokens": 1456,
+      "out_tokens": 52
+    }
+  ],
+  "git_commit": "85ecde87d8279094503fe65c2711a6ea44a8d6ce",
+  "git_freeze_tags": [
+    "prereg-final-2026-08-10c"
+  ]
+}
