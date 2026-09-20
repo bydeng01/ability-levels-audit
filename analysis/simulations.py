@@ -1,29 +1,17 @@
 #!/usr/bin/env python3
-"""Post-hoc simulations for the appendix. Not registered, and not a frozen input; every
-value is a deterministic function of the promoted scores and of SEED.
+"""Post-hoc simulations for BCa coverage, seed sensitivity, and signed-rank size.
 
-This file exists because three numbers the manuscript reports had no producer in the
-repository, which contradicts the provenance claim that every reported value re-derives
-offline from the released artifacts. It commits them:
+Uses the promoted scores and fixed seeds to estimate:
+1. BCa coverage at n = 18 for the primary and pure low-pole endpoints.
+2. Sensitivity of the near-zero BCa lower limit to the bootstrap seed.
+3. Signed-rank rejection rates under sign-flip and mean-centred distributions.
 
-  1. BCa interval coverage at n = 18, for the primary endpoint and for the pure low-pole
-     endpoint (Appendix "Power and coverage simulations").
-  2. Stability of the one near-zero BCa lower limit across bootstrap seeds (Appendix
-     "Release, specification status, and multiplicity").
-  3. The size of the registered exact signed-rank test under a null it actually
-     satisfies.
+Sign flips satisfy the test's symmetry null. The mean-centred empirical
+distribution used by the figure power curve remains asymmetric; its rejection
+rate at zero shift is not a null-size estimate. These simulations are exploratory
+and are outside the frozen inputs.
 
-(3) is the substantive one. analysis/figures/fig3.py resamples the cluster distribution
-centred on its MEAN. That distribution has mean zero but is asymmetric, so the
-signed-rank null (symmetry about zero) is false under it by construction, and the
-rejection rate it returns at shift zero is not the test's size. Under a DGP that does
-satisfy the null (random sign flips of the observed magnitudes) the same exact test is
-correctly sized. Reading fig3's shift-zero rate as "a mildly anti-conservative test" is
-therefore a misdiagnosis: what it measures is the gap between the mean and the
-pseudomedian. The power curve itself is unaffected; it remains a valid power curve
-against a shift in the mean.
-
-Run:  python analysis/simulations.py
+Run from the repository root: python3 analysis/simulations.py
 """
 from __future__ import annotations
 

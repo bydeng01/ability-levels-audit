@@ -1,4 +1,4 @@
-# label-vs-evidence: profile anchoring in pedagogy-aware LLM judges
+# Difference-in-Differences on a Censored Rating Scale Can Manufacture an Effect
 
 [![Python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -6,136 +6,172 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2608.27309-b31b1b.svg)](https://arxiv.org/abs/2608.27309)
 [![Docker](https://img.shields.io/badge/Docker-supported-2496ED.svg?logo=docker&logoColor=white)](Dockerfile)
 
-**Title:** *Do Pedagogy-Aware LLM Judges Generalize Across Student Ability
-Levels?*
+Code and released data for *Difference-in-Differences on a Censored Rating Scale
+Can Manufacture an Effect: Evidence from a Pre-Registered LLM-Judge Audit*
+([paper](https://arxiv.org/abs/2608.27309)).
 
-This study asks what a pedagogy-aware LLM judge does when a learner's *stated*
-profile conflicts with the competence the learner *demonstrates* in the dialogue:
-ground the rating in the behavioural evidence, or anchor on the label. The
-manipulation is applied to the judge and not to the tutor. Dialogues and candidate
-tutor responses are held fixed, and only the learner profile shown to the judge is
-randomised. The study reuses the
-frozen corpus and the frozen pedagogy-judge instrument of the companion
-`conv-vs-ped-tutor` study (vendored read-only at commit
-`ab5ea2a99d67cc2b23808c52e841301c5e56d887`); it generates no new tutoring sessions
-and makes zero student or tutor model calls.
+The study varies the learner profile shown to a pedagogy-aware LLM judge while
+holding each dialogue and candidate tutor response fixed. The pre-registered
+primary weak-stratum Profile Anchoring Gap was +0.085 (95% BCa interval [−0.167, +0.353]; exact
+signed-rank p = 0.684). This does not establish equivalence across profiles.
+An exploratory censoring construction reproduces much of the largest sub-score
+gap, illustrating how a bounded rating scale can turn a common score shift into
+an apparent change in scaffolding preference.
 
-Full design + analysis plan: [protocol/PREREGISTRATION.md](protocol/PREREGISTRATION.md).
-Every decision and deviation: [protocol/decisions-log.md](protocol/decisions-log.md).
+The release includes the frozen study materials, 990 accepted judge ratings,
+request records, registered analysis, exploratory diagnostics, and figure scripts.
+The [protocol index](protocol/README.md) separates the pre-registration and dated
+audit records from the current reproduction instructions below.
 
-## Design
+## Reproduce the released analysis
 
-55 dialogue contexts (each ending with a student turn) are drawn from the source
-corpus's 2,219 judged tutor turns, stratified **30 weak / 25 strong** by independently
-blind-labelled demonstrated competence (with an ordinal evidence-strength covariate;
-the tutor's own state-tracker is a sampling prior only). The strong stratum is short of
-30 because the corrected eligibility rule left only 26 eligible strong candidates in
-the whole pool and a pre-data audit excluded one whose current error made its two
-response poles an invalid scaffolding contrast; the remaining 25 are taken entire
-(Amendments A2 and A4). Each context carries a high-scaffolding `R_H` and a
-low-scaffolding `R_L` candidate response (real corpus
-turns where possible, authored otherwise; provenance recorded). The frozen Opus-4.8
-pedagogy judge rates each (context, response) under three arms — no profile `D`,
-novice profile `P_nov`, advanced profile `P_adv` — whose prompts are byte-identical
-except for the profile block. 55 × 3 × 2 × 3 reps = **990 paid calls (~$9.72)**.
-Primary endpoint: the weak stratum's Profile Anchoring Gap
-`PAG = Δ(P_nov) − Δ(P_adv)` where `Δ = S(R_H) − S(R_L)`.
-
-## Layout
-
-```
-vendor/            read-only verbatim copies from $SRC (PROVENANCE.md has hashes)
-corpus/            build_stimuli.py; frozen stimuli.jsonl (+.sha256); corpus/logs/
-labeling/          blind labelling (RUBRIC.md, label_competence.py, labels.jsonl)
-profiles/          frozen novice/advanced profile texts
-judging/           profile_judge.py (instrument) + run_study.py (paid runner)
-analysis/          analyze.py (pre-registered §6); diagnostics.py and
-                   simulations.py (post-hoc, not frozen); figures/
-results/           runner namespace: manifest, preflight, cache, wire, finals
-protocol/          PREREGISTRATION.md + decisions-log.md + AUDIT-2026-08-08.md
-tests/             prompt purity, arm equivalence, reconstruction, parser,
-                   ledger/breaker, mock end-to-end + offline replay
-paper/             abstract draft (placeholders until the paid run)
-```
-
-## Reproduce (offline, no key)
+Use Python 3.12.8 and the pinned dependencies. From the repository root:
 
 ```bash
-python3 -m pytest tests/ -q                  # incl. the 990-call mock end-to-end
-SRC_LOGS=/path/to/conv-vs-ped-tutor/logs \
-  python3 corpus/build_stimuli.py census     # corpus census (needs the source logs)
-python3 corpus/build_stimuli.py verify       # byte-identical stimulus reconstruction
-python3 judging/run_study.py --manifest-only # plan + hashes, zero provider calls
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install -r requirements.txt
+
+python3 analysis/analyze.py
+python3 analysis/diagnostics.py
+python3 analysis/simulations.py
+python3 analysis/figures/fig1.py
+python3 analysis/figures/fig2.py
+python3 analysis/figures/fig3.py
 ```
 
-Or in the frozen container (Python 3.12.8 and the exact pins), which runs that suite
-by default:
+After dependency installation, these commands run offline without an API key.
+Analysis outputs go to `analysis/out/`; figures go to `analysis/figures/`.
+`analyze.py` implements the frozen registered analysis. `diagnostics.py` adds
+registered diagnostics and separately labelled post-hoc analyses; `simulations.py`
+and Figures 2–3 are exploratory.
+
+The instrument test-retest comparison in `diagnostics.py` also needs the companion
+study's per-turn results. Set `SRC_RESULTS=/path/to/conv-vs-ped-tutor/results` to
+supply them. That comparison is skipped when those files are unavailable.
+Figure PDF checks use Poppler's `pdfinfo`, `pdffonts`, and `pdftotext`; missing
+tools are reported by the scripts. See [figure maintenance](analysis/figures/FIGURE_SPEC.md).
+
+Verify the released materials and run the offline tests:
+
+```bash
+python3 corpus/build_stimuli.py verify
+python3 -m pytest tests/ -q
+```
+
+The reconstruction check uses the source logs included in `corpus/logs/`.
+The tests include a 990-call mock run and cache replay checks.
+
+Alternatively, build the frozen Python 3.12.8 container:
 
 ```bash
 docker build -t ability-levels-audit .
 docker run --rm ability-levels-audit
+docker run --rm ability-levels-audit python analysis/analyze.py
 ```
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the whole offline path on
-every push: the test suite, the reconstruction check, `analysis/analyze.py`,
-`diagnostics.py`, `simulations.py`, the three figure scripts, and `--manifest-only`,
-then asserts that `results/input_manifest.jsonl` and `results/frozen_inputs.sha256`
-come back byte-identical. No key, no provider calls.
+[CI](.github/workflows/ci.yml) runs the offline tests, reconstruction, analysis,
+diagnostics, simulations, figure generation, and manifest checks. It also builds
+the container and runs the tests and registered analysis inside it.
 
-## The paid run (operator sequence)
+## Design and data
 
-Requires `ANTHROPIC_API_KEY` exported (Anthropic; judge = `claude-opus-4-8` per the
-vendored `configs/models.yaml`). Lifetime spend is capped by a per-attempt persisted
-ledger (default `--cap 40`, which cannot be raised on resume); the cache makes every
-step resumable; nothing is promoted unless every unit has 3 valid reps. Live
-preflight also requires a clean worktree and a `prereg-final-*` tag at `HEAD`.
+The study selected 55 contexts from 2,219 judged tutor turns in the companion
+`conv-vs-ped-tutor` corpus: 30 weak and 25 strong by blind-labelled demonstrated
+competence. Three independent annotation passes in fresh Claude agent contexts
+supplied the competence labels; the tutor's state tracker was used only as a
+sampling prior. The eligibility corrections and pre-run exclusion that reduced
+the strong stratum are recorded in pre-registration Amendments A2 and A4.
+
+Each context has a high-scaffolding response `R_H` and a low-scaffolding response
+`R_L`, drawn from the corpus or authored with provenance recorded. The frozen
+Opus-4.8 pedagogy judge rated both responses under three arms: no profile `D`,
+novice profile `P_nov`, and advanced profile `P_adv`. Prompts differ only in the
+profile block. Three repetitions per unit gave 55 × 3 × 2 × 3 = 990 accepted ratings.
+
+The primary endpoint is the weak stratum's Profile Anchoring Gap:
+`PAG = Δ(P_nov) − Δ(P_adv)`, where `Δ = S(R_H) − S(R_L)`.
+Stimulus contrasts are averaged within source run before inference: 18 runs
+contribute to the weak stratum and 10 to the strong stratum, with 23 distinct
+runs overall. Demonstrated competence is observational; the randomised factor
+is the profile shown to the judge. The corpus and judge instrument are reused
+from the companion study at commit `ab5ea2a99d67cc2b23808c52e841301c5e56d887`.
+
+## Repository layout
+
+```text
+vendor/       companion-study code, configuration, rubric, and provenance hashes
+corpus/       frozen stimuli, construction records, and source logs
+labeling/     rubric, blind batches, per-rep labels, and the v1 archive
+profiles/     frozen novice and advanced profile texts
+judging/      judge instrument and paid-run controller
+analysis/     registered estimator, diagnostics, simulations, and figures
+results/      released ratings, request records, cache, manifests, and run metadata
+protocol/     pre-registration, decisions log, and historical audit index
+paper/        archived pre-run abstract draft
+tests/        offline tests
+```
+
+## Frozen records
+
+The study inputs and analysis are bound by
+[`results/frozen_inputs.sha256`](results/frozen_inputs.sha256) and the run contract.
+`analysis/analyze.py` verifies the analysis and protocol hashes, result hashes,
+cache and wire records, and the complete 55 × 3 × 2 result grid before analysis.
+The [vendored provenance record](vendor/PROVENANCE.md) identifies the source copies.
+
+The [pre-registration](protocol/PREREGISTRATION.md), frozen code, original labels,
+and audit reports retain their historical wording. Later decisions and corrections
+are in the [decisions log](protocol/decisions-log.md); the
+[protocol index](protocol/README.md) explains the dated reports. The
+[pre-run abstract](paper/abstract.md) contains unfilled result templates and is
+retained as a historical draft, not the current paper.
+
+<details>
+<summary>Original paid-run workflow and corpus-building commands</summary>
+
+The following records the original operator workflow. Reproducing the released
+analysis uses the offline commands above. A new paid run needs its own reviewed
+study checkout and frozen inputs; the released results directory already contains
+the completed study.
+
+Live calls require `ANTHROPIC_API_KEY`, a clean worktree, and a `prereg-final-*`
+tag at `HEAD`. The judge is configured in `vendor/configs/models.yaml`. The
+persisted spend ledger defaults to a $40 lifetime cap, which cannot be raised on
+resume. The cache supports resumption; result promotion requires three valid
+repetitions for every unit.
+
+After committing and tagging the study inputs, the original sequence was:
 
 ```bash
-# After reviewing and committing every frozen artifact:
-git tag prereg-final-2026-08-08
-python3 judging/run_study.py --preflight     # 2 synthetic calls; freezes the contract
-python3 judging/run_study.py --pilot 12      # small paid pilot; no promotion
-python3 judging/run_study.py                 # full run; transactional promotion
-python3 analysis/analyze.py                  # pre-registered analysis -> summary.json
-python3 analysis/figures/fig1.py             # registered figure
-python3 analysis/figures/fig2.py             # exploratory
-python3 analysis/figures/fig3.py             # exploratory
+python3 judging/run_study.py --preflight  # two synthetic provider calls
+python3 judging/run_study.py --pilot 12  # paid pilot; cached for the full run
+python3 judging/run_study.py             # complete and promote the run
 ```
 
-`--offline-cache-only` re-derives the promoted numbers from the released per-rep
-cache and aborts on any miss; `--judge-backend mock` exercises the full pipeline with
-synthetic scores (never reportable).
+Every live command after preflight requires `HEAD` to match the preflight commit.
+Do not commit between preflight and completion. The same check limits live
+`--offline-cache-only` replay to the original run checkout; it does not work at a
+later release commit. `--judge-backend mock` exercises the pipeline with synthetic,
+unreportable scores. `--manifest-only` makes no provider calls but rewrites the
+plan and manifests in `results/`, so use a separate checkout for that check.
 
-**Do not create any commit between `--preflight` and the end of the run.** Every live
-command after preflight requires `HEAD` to equal the commit preflight froze, so a commit
-in between blocks the paid run. The same check means live `--offline-cache-only` replays
-in the operator's own tree, not in a clone whose history includes the commit that
-published the cache (AUDIT-2026-08-10 N5).
+Rebuilding the full corpus census requires the companion study's source logs:
 
-## Freeze discipline
+```bash
+SRC_LOGS=/path/to/conv-vs-ped-tutor/logs \
+  python3 corpus/build_stimuli.py census
+```
 
-Stimuli, labels, profile texts, judge prompt, executed request code, exact dependency
-versions, analysis code, and the analysis plan are hash-bound
-(`results/frozen_inputs.sha256`, `contract_sha256`) and committed under the required
-git tag **before the first paid judge call**. Preflight and every later live command
-abort on drift. Accepted live cache entries must match an fsynced wire record carrying
-the provider response id, full response, parsed scores, and record hash. Promotion
-hashes all four final result files; `analysis/analyze.py` verifies those hashes and the
-cache/wire hashes plus the complete unique 55 × 3 × 2 result grid before computing
-anything. Inference is over
-the 23 independent source runs, with stimulus-level contrasts averaged within source
-run first. A null result is a reportable outcome, and nothing is tuned toward an
-effect.
+The public `verify` command instead uses the included source-log subset to
+reconstruct the released stimuli.
 
-An independent pre-flight audit of all of this is at
-[protocol/AUDIT-2026-08-08.md](protocol/AUDIT-2026-08-08.md); the fixes it required
-(including the re-freeze to 55 stimuli and the integrity gates) are recorded as
-Amendments A2–A4.
+</details>
 
 ## Citation
 
-If you use this repository or its released results, cite the paper. GitHub reads
-[CITATION.cff](CITATION.cff); the BibTeX arXiv serves is
+If you use the code or released results, cite the paper. Citation metadata is also
+available in [CITATION.cff](CITATION.cff).
 
 ```bibtex
 @misc{fan2026differenceindifferencescensoredratingscale,
@@ -152,5 +188,3 @@ If you use this repository or its released results, cite the paper. GitHub reads
 ## License
 
 MIT — see [LICENSE](LICENSE).
-
-

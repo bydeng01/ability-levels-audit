@@ -1,48 +1,22 @@
 #!/usr/bin/env python3
-"""Registered diagnostics that the frozen estimator does not emit, plus the
-post-hoc disclosures the post-run audit requires.
+"""Registered diagnostics and exploratory analyses of the released scores.
 
-Why this is a separate file from analyze.py
--------------------------------------------
-`analysis/analyze.py` is a frozen input: its sha256 is bound into `contract_sha256`,
-recorded in `results/plan.json` under the freeze tag, and rechecked at analysis time.
-Editing it after a judge score exists trips the run's own gates and invalidates the
-provenance chain. But Amendment A6.4 registers two outputs it never computes:
+Registered outputs are the ceiling/floor tables and instrument test-retest
+comparison (Amendment A6.4), plus BCa half-widths (section 6.5). Post-hoc outputs
+are labelled separately and should be reported as exploratory.
 
-  (a) "Per arm and pole, the fraction of units at `overall == 5.000` and at `== 1.000`,
-      and the same for the four sub-scores."
-  (b) The 165 D-arm real-pole calls are byte-identical repeats of published
-      companion-study calls, so "their agreement with the released 3-rep means is
-      reported as a test-retest check on the frozen instrument".
-
-and PREREGISTRATION §6.5 registers the realised BCa half-width, which `summary.json`
-has no key for. This script emits those without touching the frozen estimator.
-
-It is deliberately not a frozen input and not part of `contract_sha256`: it computes no
-registered estimand, and every number it prints is a deterministic function of the
-already-promoted results. Re-running it can never change a reported estimate.
-
-Integrity: it calls `analyze.load()`, so it inherits that function's gates unchanged:
-promoted-set completeness, the exact 55x3x2 grid, the stimuli-unchanged check, the
-analysis-code/prereg digest check, and the committed-`plan.json` anchor. Diagnostics
-therefore cannot be produced from a tampered, incomplete or mock run (without
-`--allow-mock`), and they provably describe the same promoted set `analyze.py` read.
-
-Sections are labelled by provenance. "REGISTERED" outputs are named in the
-pre-registration (A6.4, §6.5). "POST-HOC" outputs are disclosures required by
-`protocol/AUDIT-2026-08-10-post-run-interpretation.md`; they are descriptive functions
-of the frozen promoted scores, they are not registered, and they must be labelled as
-exploratory wherever they appear in the paper.
+This script is outside the frozen estimator. It reads results through
+analyze.load(), which validates the result grid, hashes, and frozen analysis
+inputs. Mock results require --allow-mock.
 
 Usage:
-    python3 analysis/diagnostics.py                    # after a promoted live run
-    python3 analysis/diagnostics.py --allow-mock       # pipeline rehearsal only
+    python3 analysis/diagnostics.py
+    python3 analysis/diagnostics.py --allow-mock
     python3 analysis/diagnostics.py --out results/diagnostics.json
     SRC_RESULTS=/path/to/conv-vs-ped-tutor/results python3 analysis/diagnostics.py
 
-The test-retest section needs the companion study's released per-turn scores. It is
-skipped (not failed) when they are not reachable, so the registered ceiling/floor table
-is still produced on a clone without the source repository.
+The test-retest comparison requires the companion study's per-turn scores and
+is skipped when they are unavailable. The other diagnostics still run.
 """
 from __future__ import annotations
 
@@ -407,9 +381,7 @@ def censoring_null_model(units, stimuli, reps_path: Path, field="productive_stru
 
 
 def rubric_collinearity(reps_path: Path) -> dict:
-    """POST-HOC. How separable are the five rubric fields as the judge actually emits
-    them? If the sub-scores are near-collinear, 'anchoring on field X but not on
-    overall' is not a coherent claim about the instrument."""
+    """Post-hoc correlations and redundancy among the five emitted rubric fields."""
     if not reps_path.is_file():
         return {"skipped": True, "reason": f"missing {reps_path}"}
     scores = [json.loads(l)["scores"] for l in open(reps_path) if l.strip()]

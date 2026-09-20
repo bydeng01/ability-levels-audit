@@ -1,28 +1,16 @@
 #!/usr/bin/env python3
-"""Check Figure 3's caption against the artifact it sits beside.
+"""Author tool for checking Figure 3 against a specific manuscript caption.
 
-    cd analysis/figures
-    python3 check_fig3.py ../../NeurIPS_2026_newinml/neurips_2026.tex
+Requires the local manuscript source (not included in the public release), a
+rendered fig3.pdf, qpdf, and the inputs read by _data. From analysis/figures:
+    python3 check_fig3.py /path/to/neurips_2026.tex
 
-Three independent comparisons, in order of strength:
+Checks caption numbers against data, positional claims against PDF geometry,
+and whether the caption or ticks identify each mark. Wording checks target
+the 2026-08-22 caption and must be updated for a revised manuscript.
 
-  A. CAPTION -> DATA.  Every numeral in the caption is re-derived from
-     ``_data`` and matched.  Any numeral the caption prints that is not in the
-     derived set is reported; that is how a stale number survives an edit.
-  B. CAPTION -> DRAWING.  The figures' geometry is read back out of
-     ``fig3.pdf``'s content stream (the ``q``/``Q``/``cm`` CTM stack is
-     interpreted and every mark back-projected through the axes transform), and
-     the caption's positional claims are checked against where the ink actually
-     is.  This is the check that catches a caption describing a previous build.
-  C. MARKS -> CAPTION.  Every mark the figure draws must be keyed by the
-     caption, since FIGURE_SPEC.md requires the figure be decodable from figure
-     plus caption alone.  Also asserts the retired wordings are gone: after the
-     2026-08-22 pass "hollow" must not appear in panel (a)'s half of the caption
-     (the dropped zeros are crosses) and the shading no longer "runs to the
-     interval's upper limit".
-
-Exits non-zero on the first category with a failure.  Needs ``qpdf`` (content
-stream) and the repo's ``_data``; run it from inside ``analysis/figures``.
+Exits nonzero when a check fails. This is separate from the public offline
+reproduction workflow, which generates the figures without manuscript sources.
 """
 from __future__ import annotations
 
@@ -209,10 +197,7 @@ def main() -> None:
               "before trusting anything below")
     check(abs(cs[0]) < 1e-6, "shading starts at shift 0, not at the axis limit",
           f"left edge {cs[0]:+.6f}")
-    # Each of these asserts both that the caption makes the claim and that the
-    # ink agrees with it.  Testing only the geometry would let the label read
-    # 'caption "solid to 0.40" matches the fill' about a caption that never says
-    # it, which would make the checker itself overclaim.
+    # Check both the caption wording and the corresponding geometry.
     check("solid to $0.40$" in cap and abs(cs[1] - blo) < 1e-6,
           'caption says "solid to 0.40" AND the fill ends there',
           f"fill solid to {cs[1]:.6f}")
@@ -236,13 +221,8 @@ def main() -> None:
           f"{g['n_dots']} dots + {g['n_cross']} crosses")
 
     print("\nC.  MARK INVENTORY -> CAPTION   (built from the DRAWING, not from the caption)")
-    # Enumerated from fig3.py's painting calls rather than from phrases in the
-    # caption, because a phrase-driven check can only confirm what the caption
-    # already says and can never discover an element the caption forgot.  Each
-    # element declares how it is keyed.  Two are keyed by landing exactly on a
-    # labelled tick rather than by a caption clause; that is a deliberate,
-    # stated judgement, and the tick coincidence is verified from the PDF
-    # below.
+    # Inventory the drawing elements independently of the caption.
+    # Two reference marks are keyed by labelled ticks; verify their positions below.
     PAINTING_CALLS = 10          # bump ONLY when a new element is declared here
     INVENTORY = [
         ("(a) zero reference rule",  "tick",    None),

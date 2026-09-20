@@ -8,30 +8,16 @@ __pycache__/
 
 # runner scratch (regenerated; never part of a freeze)
 results/tmp.*
-# NB: exclude the cache dir's CONTENTS, not the dir itself — git cannot re-include a
-# file whose parent directory is excluded.
+# Keep the parent directory visible so the released cache can be included below.
 results/cache/*
 
-# ...but the LIVE per-rep cache, the wire log and the spend ledger are the release's
-# provenance record, not scratch: README documents --offline-cache-only as replaying
-# "the released per-rep cache", and that path cannot work on a clone if the cache is
-# ignored (AUDIT-2026-08-08 N8). Mock rehearsal caches stay ignored.
+# Track the live per-rep cache as provenance; mock caches stay ignored.
 !results/cache/profile_pedagogy_cache.json
 
-# analysis output is regenerated from the promoted results; leaving it tracked makes
-# the worktree dirty after `analyze.py` and then trips require_git_freeze on any later
-# live command (AUDIT-2026-08-08-preflight-review-3 N10).
+# Regenerated analysis output; keep it outside the live runner's clean-tree check.
 analysis/out/
 
-# ---------------------------------------------------------------------------
-# Open-source release boundary (2026-09-05). The public artifact is the code,
-# the frozen data, the protocol and the audits. Everything below is either a
-# build output, author-identifying manuscript source, or unrelated material
-# that happens to sit in this tree.
-# ---------------------------------------------------------------------------
-
-# Manuscript sources. They carry the author byline and venue style files this
-# repository did not author; the paper is distributed by its venue, not here.
+# Local manuscript sources and generated LaTeX fragments.
 NeurIPS_2026_newinml/
 AAAI_Student_Abstract_2027/
 paper/results.tex

@@ -12,7 +12,7 @@ analysis/figures/*.pdf
 analysis/figures/*.png
 analysis/figures/*.svg
 
-# outside the open-source release boundary (see the dated block in .gitignore)
+# local manuscript sources and scratch material
 NeurIPS_2026_newinml/
 AAAI_Student_Abstract_2027/
 paper/results.tex

@@ -1,29 +1,12 @@
 #!/usr/bin/env python3
-"""Shared figure style for the paper's figures.
+"""Shared canvas dimensions, typography, colours, and PDF checks.
 
-Three things this module exists to prevent, each of which was live in the
-figures before it existed:
+Figures use a 5.5-inch manuscript text width. figsize_for() sets the canvas to
+its intended inclusion width so font and stroke sizes remain in print points.
+The font stack prefers Times-compatible serifs; PDFs embed TrueType fonts.
+Arm and response-pole identities use separate colour pairs.
 
-1. Scale drift.  A figure authored at one width and pulled into LaTeX at
-   another is silently rescaled, and every font size and stroke width in it is
-   multiplied by that factor. fig1 was authored at 3.35in and included at
-   ``width=\\linewidth`` (5.5in), a 1.64x upscale, so its nominal 7-8pt text
-   rendered at 11.5-13.1pt next to 10pt body copy; fig3 was authored at 5.5in
-   and included at ``0.78\\linewidth``, a 0.78x downscale, so its nominal
-   6.2-7.5pt text rendered at 4.8-5.9pt.  Effective type size therefore spanned
-   2.7x across one paper.  ``figsize_for()`` below makes the LaTeX inclusion
-   fraction an explicit argument, so the canvas is authored at exactly the width
-   it is displayed and the scale factor is always 1.0.
-
-2. Type 3 fonts.  matplotlib's default ``pdf.fonttype`` is 3.  ICML's style
-   guide disallows Type 3; arXiv flags it.  ``pdf.fonttype = 42`` embeds
-   TrueType instead, which also keeps text selectable and editable.
-
-3. Font mismatch.  ``neurips_2026.sty`` sets ``\\renewcommand{\\rmdefault}{ptm}``,
-   i.e. Times.  matplotlib's default is DejaVu Sans.  The stack below prefers
-   Times and its metric-compatible clones, so figure text matches the page.
-
-Import ``apply()`` at the top of every figure script, before any pyplot call.
+Call apply() before creating a figure.
 """
 from __future__ import annotations
 
@@ -44,10 +27,7 @@ TEXTWIDTH_IN = 5.5
 TEXTHEIGHT_IN = 9.0
 BODY_PT = 10.0
 
-# Figure text sits one to three points below body copy: large enough to read at
-# print size, small enough that the figure does not shout over the paragraph
-# next to it.  These are *rendered* sizes, valid only because figsize_for()
-# guarantees a 1.0 scale factor.
+# Print-point sizes assume the canvas is included at its declared width.
 PT = {
     "base": 8.0,
     "tick": 7.0,
@@ -57,18 +37,8 @@ PT = {
     "small": 6.5,
 }
 
-# Okabe-Ito, a validated colour-vision-deficiency-safe set.  Hue carries exactly
-# one meaning per axis of comparison, and that meaning is constant across the
-# three figures:
-#
-#     arm   ->  P_nov blue / P_adv vermillion / D grey
-#     pole  ->  R_H bluish green / R_L reddish purple
-#
-# Keeping arm and pole on *different* pairs is not decoration.  Before
-# 2026-08-18 fig2 reused the arm blue and vermillion to mean pole, so a reader
-# who learned the mapping from fig1 carried it into fig2 and read the panels
-# backwards.  All four hues remain mutually distinguishable under deuteranopia,
-# protanopia and tritanopia.
+# Okabe-Ito palette: blue/vermillion for profile arms, green/purple for poles.
+# Grey identifies the no-profile arm; other greys style reference marks.
 COLOR = {
     # -- arm identity --------------------------------------------------------
     "P_nov": "#0072B2",       # blue

@@ -1,20 +1,9 @@
 #!/usr/bin/env python3
-"""Shared read path for the figures.
+"""Shared data loading and calculations for the figures.
 
-Every quantity a figure draws is loaded here and nowhere else, so a figure
-cannot silently disagree with the estimator or with another figure.  Two of
-these were live before this module existed: fig2 carried its own inline copy of
-the censoring null model while ``diagnostics.py`` carried another, and fig1's
-POWER_LIMIT was justified in a docstring quoting 0.702/0.922 against the
-0.711/0.930 the simulation in fig3 actually produces.
-
-Nothing here issues a model call or touches a frozen input.  Every value is a
-deterministic function of the released per-unit and per-rep scores, which is
-what makes the figures reproducible offline.
-
-``selftest()`` re-derives each figure's headline numbers against
-``analysis/out/summary.json`` and ``diagnostics.json`` and raises on the first
-mismatch.  Run it whenever a figure script changes.
+Loads released per-unit and per-rep scores, summary.json, and diagnostics.json.
+selftest() checks key figure quantities against the analysis output. Figure
+calculations run offline; simulation seeds are fixed below.
 """
 from __future__ import annotations
 
@@ -35,8 +24,7 @@ POLES = ("high", "low")
 FIELDS = ("overall", "scaffolding", "productive_struggle",
           "assistance_calibration", "elicitation")
 
-# Printed names.  The JSON keys are configuration field names and must not reach
-# the page; the shipped fig2 carried a backticked `overall` on its x-axis.
+# Display labels for the configuration fields.
 SHORT = {"overall": "composite", "scaffolding": "scaffolding",
          "productive_struggle": "productive\nstruggle",
          "assistance_calibration": "assistance\ncalibration",

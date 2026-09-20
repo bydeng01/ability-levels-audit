@@ -15,20 +15,20 @@ blind labelling pass.
     student turns.
 
 Subcommands (run in order; later ones consume earlier outputs):
-  census      verify the corpus shape against the build prompt's measured numbers
-              (2,219 judged turns; tracker join 991 with 844/100/39/8) and write
+  census      verify the source census
+              (2,219 judged turns; tracker join 990 with 844/100/39/7) and write
               corpus/census.json + corpus/response_pools.jsonl (all judged turns,
               classified for R_H/R_L pairing).
-  candidates  sample the ~90-context candidate pool -> corpus/candidates.jsonl (+ sha256).
+  candidates  sample the initial candidate pool -> corpus/candidates.jsonl (+ sha256).
   select      apply the pre-specified deterministic rule to the Phase 3 labels ->
-              the 60 selected candidate ids (corpus/selection.json).
+              the selected candidate ids (55 in the released corpus/selection.json).
   pair        attach R_H / R_L to the selected stimuli from the response pools, with
               authored counterparts taken from the blind review packets
               (corpus/reviews/packet_*.jsonl) -> corpus/pairing_draft.jsonl.
   freeze      assemble corpus/stimuli.jsonl (+ sha256) and copy every referenced run
               dir's calls.jsonl into corpus/logs/<run>/.
   verify      rebuild every stimulus context from corpus/logs and assert byte-identical
-              reconstruction (the Phase 7 reconstruction guarantee).
+              reconstruction.
 """
 from __future__ import annotations
 
@@ -52,11 +52,8 @@ from protocol.leakage import turn_leaks  # noqa: E402  vendored, frozen
 
 SEED = 20260808
 CORPUS = ROOT / "corpus"
-# Source-corpus logs ($SRC/logs). Only `census`, `candidates`, `topup` and `freeze`
-# need them; `verify` reads the vendored copies under corpus/logs/ and is the one
-# reproduction path that works on any clone. Overridable via $SRC_LOGS or --src-logs
-# so the default absolute path is not a hard dependency on one machine
-# (AUDIT-2026-08-08 N9).
+# Source logs are required by census, candidates, topup, and freeze.
+# Override the default with SRC_LOGS or --src-logs. verify uses corpus/logs/.
 DEFAULT_SRC_LOGS = Path(
     os.environ.get("SRC_LOGS")
     or "../conv-vs-ped-tutor/logs")

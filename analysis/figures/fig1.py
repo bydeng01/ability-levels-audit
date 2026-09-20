@@ -1,81 +1,12 @@
 #!/usr/bin/env python3
-"""Registered figure (PREREGISTRATION.md S7), rebuilt 2026-08-18, revised 2026-08-22.
+"""Registered scaffolding-preference figure (PREREGISTRATION section 7).
 
-(a) The registered read, unchanged in form: preference for high scaffolding,
-    Delta = S(R_H) - S(R_L), against blind-labeled demonstrated competence, one
-    line per arm.  Parallel, closely-spaced lines indicate a behaviour-driven
-    judge; wide separation would indicate profile anchoring.
-(b) The registered estimand, which panel (a) does not show: PAG against zero,
-    with its BCa interval and the range the test cannot resolve.
+Panel (a) shows arm means and BCa intervals. Panel (b) shows the registered
+PAG estimand and its interval directly. The power band applies to the weak
+stratum only; its solid and fringed edges bracket the simulated 80% crossing.
 
-Panel (b) is there because PAG is a difference between two of the lines in (a),
-and the eye cannot read a difference off two overlapping error bars.  What it
-reads instead is "the intervals overlap, so nothing is precise", which is the
-wrong test.  The estimand's own interval is narrower than any arm's (half-width
-0.260 against 0.314-0.428), because clustering the difference within source run
-removes the between-run level variation that dominates the arm means.  The
-shipped build printed that interval in the title and drew only per-arm bars, so
-its strongest encoding (the weak->strong slope) carried the one contrast S5.1
-explicitly declines to test, while the registered endpoint was a 0.085 gap
-invisible inside 0.66-0.86-wide bars.  Panel (b) draws the endpoint.
-
-Two further corrections against the shipped build:
-
-* The detection band is centred on zero.  It is a statement about |PAG|, so it
-  belongs on the PAG axis; anchoring it to the novice line in (a) put a claim
-  about a difference onto a level axis.
-* The band edge brackets the 80% crossing instead of locating it.  Power is
-  0.711 at a 0.40 shift and 0.930 at 0.42; the endpoint lives on a sparse
-  rational lattice and the curve is a step function.  The shipped caption called
-  +-0.42 "the range where power is below 80%", which is false at its own edge.
-  The band is now solid to 0.40 and fringed to 0.42, and both numbers are
-  re-derived from fig3's simulation through ``_data`` instead of being
-  hand-copied into a docstring constant that had already drifted to
-  0.702/0.922.
-
-2026-08-22 revision, against FIGURE_SPEC.md.  Encoding-only: every drawn value
-is unchanged and ``_data.selftest`` is untouched by it.
-
-* Text-load reduction.  Three runs cut, each a second copy of something the
-  caption states verbatim within an inch of the mark:
-    - panel (b)'s "shaded: under 80% power (solid 0.40, fringe 0.42)" -- the
-      caption already reads "solid to 0.40, fringed to 0.42", and said it more
-      precisely, since the shading reaches 0.42, where power is 0.930;
-    - panel (b)'s "+0.085 [-0.167, +0.353]" -- now led with in the caption, and
-      three decimals were precision the drawing could not support anyway;
-    - panel (a)'s "18 runs, 30 stimuli" / "10 runs, 25 stimuli" -- the caption
-      gives both, and in the body's word ("clusters"), which the figure did not
-      use.
-  Those two annotations were also the only users of COLOR["muted"], which is
-  byte-identical to COLOR["D"], so the figure was setting prose in the hue that
-  means "no-profile arm" three inches to the left.
-* Limits retightened after the cut, and the axes grown into the strip the
-  cut x-axis annotation vacated (bottom 0.225 -> 0.155, top 0.865 -> 0.900,
-  panel (b) y (-0.80, 0.94) -> (-0.52, 0.64) and x (-0.62, 1.62) -> (-0.52,
-  1.52)).  The canvas is unchanged at 5.5 x 2.552in, so nothing moves in the
-  .tex.
-* The power band is drawn under the weak column only.  ``power_curve()``
-  bootstraps ``primary_clusters()``, i.e. the 18 weak clusters; the shipped band
-  spanned the full panel and so ran under the strong point, about which it says
-  nothing.  Re-simulating on the 10 strong clusters puts that bracket near
-  0.50-0.55, which is not drawn here because it is not a registered quantity.
-* Arm labels sit within a measured line-height of their own mean, with leaders.
-  The shipped build offset by (rank-1)x8pt on top of the true spacing, drawing a
-  24.2pt spread for arms 9.2pt apart, a 2.6x exaggeration of the one separation
-  panel (a) exists to show is small.  ``_repel`` now pushes only as far as the
-  measured string height requires and recentres, and a leader line carries each
-  label back to its own marker.
-* Panel (a)'s title used a word the body does not have.  "registered read"
-  occurs 0 times in neurips_2026.tex and "read" as a noun occurs 0 times.  The
-  body's own name for this quantity is "baseline scaffolding preference"
-  (materials table), which is also the better hedge, since the panel's most
-  salient encoding is the weak->strong slope and that is not the registered
-  test.  The y-label then carried the same words as the title, so it is now the
-  body's own formula instead: Table 1's $\\Delta = S(R_H) - S(R_L)$.
-* "blind-labelled" becomes "blind-labeled".  The body spells it with one l, 4/4.
-
-Reads analysis/out/summary.json and the released per-unit scores.  No paid call;
-no frozen input touched.
+Reads the released scores and analysis/out/summary.json through _data.
+Run from the repository root: python3 analysis/figures/fig1.py
 """
 from __future__ import annotations
 
@@ -198,19 +129,12 @@ def main() -> None:
         ax_w_pt - LABEL_GAP_PT - w_pt - EDGE_PAD_PT)
     ax.set_xlim(XLO_A, x_hi)
 
-    # The three arms are 0.106 of a scale point apart at the strong end (9.2pt
-    # against a measured line height of 7.2pt), so the labels do not fit at
-    # their own y.  Push by the minimum the type demands, then let a leader line
-    # carry each label back to its marker, so the reader can see how far each
-    # label was moved.  The shipped build's exaggeration was undisclosed.
+    # Separate overlapping labels by the measured text height and connect each
+    # label to its original mean.
     per_unit = ax_h_pt / (YLIM_A[1] - YLIM_A[0])
     placed = _repel([y * per_unit for _, y, _ in ends], h_pt + 0.9)
     text_x = label_x + LABEL_GAP_PT * (x_hi - XLO_A) / ax_w_pt
-    # The leader runs from the arm's own marker, so the true mean is where the
-    # line starts and the displacement is on show.  It is drawn at 0.45pt and
-    # 0.6 alpha, lighter than the 0.7pt error bars and the 1.1pt series, so it
-    # reads as annotation and not as a fourth line.  Alpha does that work
-    # instead of a fourth grey, since grey already means the no-profile arm.
+    # Use thin, translucent leaders in the corresponding arm colour.
     for (mx, my, arm), y_pt in zip(ends, placed):
         ax.annotate(LABEL[arm], xy=(mx, my), xytext=(text_x, y_pt / per_unit),
                     xycoords="data", textcoords="data", ha="left", va="center",
@@ -231,10 +155,8 @@ def main() -> None:
 
     # ------------------------------------------------------------- (b) estimand
     ax = fig.add_subplot(gs[1])
-    # The band is the power of the registered test on the 18 WEAK clusters
-    # (``power_curve`` bootstraps ``primary_clusters``).  It is drawn under the
-    # weak column and nowhere else: run under the strong point it would assert a
-    # resolution the simulation never computed for that stratum.
+    # The power simulation uses the 18 weak-stratum source runs, so the band
+    # applies only to the weak column.
     span = (X["weak"] - BAND_HALF_W, X["weak"] + BAND_HALF_W)
     ax.fill_between(span, -band_hi, band_hi,
                     color=_style.COLOR["band_fringe"], lw=0, zorder=0)
@@ -247,10 +169,7 @@ def main() -> None:
                 lw=0.5, ls=(0, (2.0, 1.6)), zorder=1)
     ax.axhline(0, color=_style.COLOR["ink"], lw=0.7, zorder=2)
 
-    # Primary and secondary differ by marker fill instead of hue, since grey
-    # already means "no profile arm" in panel (a) and one hue must not carry two
-    # meanings inside one figure.  The x ticks name the strata and the caption
-    # keys the fill.
+    # Marker fill distinguishes the primary and secondary strata.
     for stratum, fill in (("weak", _style.COLOR["ink"]), ("strong", "white")):
         p = pag[stratum]
         lo, hi = p["ci95_bca"]
