@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Exploratory diagnostics of rating-scale censoring (outside registered S6/S7).
 
-Panels show (a) composite ratings and boundary counts, (b) the two pole terms
+Panels show (a) overall ratings and boundary counts, (b) the two pole terms
 whose difference is PAG, and (c) the productive-struggle censoring construction.
 Panel (c) includes clipped and rounded variants, BCa intervals, and nonzero
 cluster counts. A residual test with an attainable p-value floor above 0.05
@@ -24,7 +24,7 @@ ASPECT = 0.4455          # 5.50 x 2.45in, the shipped height
 # Panel (b) has the longest title and receives the widest slot.
 FIELDS = _data.FIELDS
 ARMS = _data.ARMS
-TICK = {"overall": "composite", "scaffolding": "scaffolding",
+TICK = {"overall": "overall", "scaffolding": "scaffolding",
         "productive_struggle": "prod. struggle",
         "assistance_calibration": "assist. calib.",
         "elicitation": "elicitation"}
@@ -73,7 +73,7 @@ def main() -> None:
     ax.set_xlim(0.60, 5.86)
     ax.set_ylim(0.4, 6.6)
     ax.set_xticks([1, 2, 3, 4, 5])
-    ax.set_xlabel("per-unit composite rating", labelpad=2)
+    ax.set_xlabel("per-unit overall rating", labelpad=2)
     ax.set_title("a   the ceiling binds hardest", fontsize=PT["annot"],
                  loc="left", pad=4)
     _style.tidy(ax)
