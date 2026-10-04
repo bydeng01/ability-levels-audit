@@ -3,15 +3,10 @@
 The paid study is complete. For the current paper and offline reproduction commands,
 start with the [repository README](../README.md).
 
-[PREREGISTRATION.md](PREREGISTRATION.md) is the plan frozen before judge scoring.
-Its original title, pre-run status, and two-page format remain as recorded because
-the file is hash-bound to the run. The [decisions log](decisions-log.md) records
-amendments and the later manuscript-format change.
-
-The reports below describe the versions reviewed on their dates. Their verdicts,
-line references, open issues, and operator instructions are historical. The original
-files remain at their cited paths. Follow-up decisions are recorded in the
-decisions log and subsequent reports.
+[PREREGISTRATION.md](PREREGISTRATION.md) was frozen before judge scoring and is
+hash-bound to the run. The reports below reflect the versions reviewed on their
+dates. Amendments and subsequent corrections are recorded in the
+[decisions log](decisions-log.md).
 
 | Record | Scope |
 |---|---|
