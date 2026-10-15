@@ -74,8 +74,7 @@ profiles/     frozen novice and advanced profile texts
 judging/      judge instrument and paid-run controller
 analysis/     registered estimator, diagnostics, simulations, and figures
 results/      released ratings, request records, cache, manifests, and run metadata
-protocol/     pre-registration, decisions log, and historical audit index
-paper/        archived pre-run abstract draft
+protocol/     frozen pre-registration, amendments, and historical review evidence
 tests/        offline tests
 ```
 
@@ -87,9 +86,11 @@ The study inputs and analysis are bound by
 cache and wire records, and the complete 55 × 3 × 2 result grid before analysis.
 The [vendored provenance record](vendor/PROVENANCE.md) identifies the source copies.
 
-The [protocol index](protocol/README.md) links the pre-registration, historical
-reviews, and archived pre-run abstract. Amendments and corrections are recorded
-in the [decisions log](protocol/decisions-log.md).
+The [protocol index](protocol/README.md) distinguishes the unchanged frozen
+pre-registration from edited public excerpts of historical reviews. Amendments
+and corrections are recorded in the [decisions log](protocol/decisions-log.md).
+Candidate pools, blind review packets and earlier labels remain available as
+construction evidence; the offline tests replay the released selection and pairing.
 
 See the [original run workflow](judging/README.md) for paid-run requirements and
 corpus-building commands.

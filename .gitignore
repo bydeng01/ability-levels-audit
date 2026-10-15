@@ -20,7 +20,7 @@ analysis/out/
 # Local manuscript sources and generated LaTeX fragments.
 NeurIPS_2026_newinml/
 AAAI_Student_Abstract_2027/
-paper/results.tex
+paper/
 analysis/figures/*_caption.tex
 analysis/figures/fig3_float.tex
 
@@ -35,3 +35,6 @@ analysis/figures/_superseded/
 # Local scratch and unrelated documents.
 Claude outputs/
 output/
+
+# Local recoverable copies of internal development records.
+/.local-archive/

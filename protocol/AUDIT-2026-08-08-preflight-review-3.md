@@ -1,63 +1,14 @@
-# VERDICT: GO-WITH-FIXES
+# Third pre-flight review — August 8, 2026
 
-**Independent pre-flight audit, third pass, 2026-08-08. Provider calls made: zero. Money spent: $0.00.**
+Public excerpt of the August 8, 2026 review. Findings, verification claims and coverage
+limits refer to that historical review, not the current checkout. Finding IDs
+and citations retain their original scope; cited line numbers may have shifted.
+See the [record conventions](README.md#record-conventions).
 
-The engineering here is unusually good and almost every quantitative claim in the
-repository is exactly true. I recomputed the frozen-set composition, the entire
-labelling reliability chain, the v1→v2 confusion table, the cost arithmetic, the
-signed-rank implementation, the vendored provenance, and the full construction chain
-from the source repository's raw logs, and all of them reproduce to the byte or to the
-digit. The spend controls resisted every attack I could construct. Three things stop the
-run today. (1) The tree still has no `prereg-final-*` tag and three
-untracked paths, so `--preflight` will abort before it constructs a client; that part is
-mechanical, and the runner enforces it. (2) The frozen judge system prompt contains the
-sentence *"Base your rating only on the dialogue shown"*, while the manipulated factor is
-placed outside the dialogue, so the pre-registered reading of a null primary endpoint
-(§6.2: "the judge grounds its preference in behavioural evidence") is not licensed by
-this design, and nothing in the frozen materials acknowledges it. (3) The two
-profile texts differ not only in stated ability but in a stated need for step-by-step
-help, which is precisely what the rubric's `assistance_calibration` dimension asks the
-judge to score, so a positive PAG is equally consistent with correct assistance
-calibration as with label anchoring. (2) and (3) make the registered interpretation of
-the primary endpoint indefensible in both directions. Both are fixable in an hour by
-a pre-data amendment (an "A5") that costs nothing now and is impossible to make
-credibly once scores exist, which is exactly what a freeze is for. Fix those three,
-then run: the $9.72 buys a real measurement, and the rest of the apparatus is sound.
-
----
-
-## Filename note
-
-The brief asked for `protocol/AUDIT-<today>.md`. That path, `protocol/AUDIT-2026-08-08.md`,
-already exists: it is the first audit, referenced by `README.md:100` and
-`protocol/PREREGISTRATION.md:8`. Writing there would have destroyed it and broken both
-references. `protocol/AUDIT-2026-08-08-independent-review.md` is also taken (an earlier,
-explicitly incomplete second review). This report is therefore at a third, non-colliding
-path. Rename if you prefer; do not overwrite either predecessor.
-
-**During the audit itself, no file in this repository was created or modified except
-this one** (the remediation in the appendix came afterwards, on a separate instruction).
-All experiments ran on `cp -a` copies under a scratch directory. Confirmed at the end of
-the audit phase:
-`git status --porcelain --untracked-files=all` still lists exactly the three pre-existing
-untracked paths plus this file, and `corpus/stimuli.jsonl` / `labeling/labels.jsonl`
-still hash to `1d240ebc…8c5376` / `fda2bc3d…2707d4`. I treated
-`~/Documents/GitHub/conv-vs-ped-tutor` as read-only (only `git show` and reads of
-`logs/`); its worktree is clean.
-
-I treated the two predecessor audits as unverified claims, not as evidence. Where I
-checked their assertions they largely hold; the exceptions are B1 and N1–N2 below.
-
-> **Post-audit note (same day).** The repository owner subsequently asked for the fixes
-> to be applied, and they were; see **Appendix: remediation applied** at the end. Every
-> `file:line` citation in this report refers to the tree as audited, at
-> `HEAD 9c879b63` before any fix; several have shifted. The VERDICT above is not
-> revised. It was a judgment about the tree that was audited, and the remediation is a
-> self-report by the same agent that wrote the findings, exactly the pattern this
-> report criticises in the first audit's §6 addendum. It needs independent
-> re-verification, and B1 remains open regardless.
-
----
+The review at `9c879b63` identified three blockers: an incomplete Git freeze,
+a system-prompt restriction on profile use, and a confound between stated ability
+and support need. The remediation appendix was written by the same agent after
+applying fixes; its claims require separate verification.
 
 ## 1. BLOCKING FINDINGS
 
@@ -552,7 +503,7 @@ problem (0 of 55 on both). `tests/test_stimuli.py:126-129` does pass `solution_f
 
 ---
 
-### N10. Housekeeping that will bite the operator
+### N10. Release contents and operational limitations
 
 - **Two untracked `corpus/logs/` directories** (`abl-s0-ped_no_gate-r0`,
   `conf-gpt-s0-ped-r7`) will block `require_git_freeze` until resolved. Verified they are
@@ -738,8 +689,6 @@ client, so nothing I ran could have spent money even by accident.
 
 ## 4. NOT COVERED
 
-Stated plainly; a missing finding below is not a clean bill of health.
-
 - **The blind pairing reviews.** I did not read `corpus/reviews/packet_*.jsonl` against
   `corpus/packets/packet_*.json` to check that each reviewer's decision is consistent with
   the brief they were given, that reviewers saw no labels/policies, or that the six
@@ -787,8 +736,8 @@ Stated plainly; a missing finding below is not a clean bill of health.
 
 ## Appendix: remediation applied
 
-Applied by the same agent that wrote the findings above, at the owner's request, on
-2026-08-08. This is a self-report and needs independent re-verification. Zero
+Applied on 2026-08-08 by the same agent that wrote the findings above. This is a
+self-report, not an independent re-verification. Zero
 provider calls; `corpus/stimuli.jsonl` and `labeling/labels.jsonl` are byte-identical to
 the audited tree (`1d240ebc…8c5376`, `fda2bc3d…2707d4`), the design is unchanged (330
 units / 990 calls / $9.72), `build_stimuli.py verify` still passes, and the suite is
@@ -808,10 +757,9 @@ units / 990 calls / $9.72), `build_stimuli.py verify` still passes, and the suit
 
 ### Deliberately not applied
 
-- **B1 (git tag + the untracked paths).** Operator action; not mine to commit or tag.
+- **B1 (git tag + the untracked paths).** The final Git freeze remained pending.
 - **B3's design option:** deleting the help-seeking sentence from both profiles. That
-  changes the manipulation. A5 discloses it instead; the choice between disclosure and
-  redesign belongs to the author.
+  changes the manipulation. A5 records the confound; the profile texts were retained.
 - **N6 (windowed circuit breaker).** Changing an abort threshold could abort a paid run
   mid-flight, which is a worse failure than the one it fixes, and the $40 cap is the
   real backstop. Still open.

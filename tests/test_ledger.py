@@ -1,4 +1,4 @@
-"""Spend ledger + circuit breaker guarantees (Phase 7)."""
+"""Spend ledger + circuit breaker guarantees."""
 import json
 import pytest
 

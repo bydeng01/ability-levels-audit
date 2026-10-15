@@ -1,4 +1,4 @@
-"""The frozen pedagogy parser round-trips well-formed and malformed replies (Phase 7)."""
+"""The frozen pedagogy parser round-trips well-formed and malformed replies."""
 import json
 
 from analysis import judge_pedagogy as JP

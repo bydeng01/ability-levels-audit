@@ -7,8 +7,8 @@ analysis.judge, imported and never re-implemented), splits each judged tutor tur
 a `context` (ends with the last student turn) and the actual tutor `response`, and
 samples a stratified candidate pool.
 
-Sampling priors, never analysis labels: the analysis stratum comes from the Phase 3
-blind labelling pass.
+Sampling priors, never analysis labels: the analysis stratum comes from the blind
+labelling pass.
   - PedTutor-family runs: the logged state_tracker record (tags.node == "state_tracker"),
     joined on (problem_id, turn_index).
   - ConvTutor-family runs (no tracker): a lexical struggle score over the context's
@@ -20,7 +20,7 @@ Subcommands (run in order; later ones consume earlier outputs):
               corpus/census.json + corpus/response_pools.jsonl (all judged turns,
               classified for R_H/R_L pairing).
   candidates  sample the initial candidate pool -> corpus/candidates.jsonl (+ sha256).
-  select      apply the pre-specified deterministic rule to the Phase 3 labels ->
+  select      apply the pre-specified deterministic rule to the blind labels ->
               the selected candidate ids (55 in the released corpus/selection.json).
   pair        attach R_H / R_L to the selected stimuli from the response pools, with
               authored counterparts taken from the blind review packets

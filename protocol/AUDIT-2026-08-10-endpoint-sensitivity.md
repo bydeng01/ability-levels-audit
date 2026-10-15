@@ -1,34 +1,15 @@
-# VERDICT: GO-WITH-FIXES
+# Endpoint sensitivity and integrity review — August 10, 2026
 
-The materials are in genuinely good shape. Every hash in `results/frozen_inputs.sha256`
-recomputes; all 20 vendored files are byte-identical to source commit `ab5ea2a9`; every
-composition number in Amendments A4 and A5 reproduces exactly from `corpus/stimuli.jsonl`;
-the committed manifest regenerates byte-for-byte from a clean `git archive HEAD`; 79 tests
-pass with zero skips and a clean worktree; no paid artifact of any kind exists. I found no
-error in the frozen materials and no way to make the runner spend money it should not.
+Public excerpt of the August 10, 2026 review. Findings, verification claims and coverage
+limits refer to that historical review, not the current checkout. Finding IDs
+and citations retain their original scope; cited line numbers may have shifted.
+See the [record conventions](README.md#record-conventions).
 
-What I found instead is a sensitivity problem in the primary endpoint that is measurable
-today, for free, and is disclosed nowhere. The companion study already rated 82 of the
-110 frozen pole texts with this exact instrument and model, and its published scores show
-the two poles sitting at opposite ends of the response scale: corpus `R_H` averages 4.55/5
-with 47% pinned at exactly 5.0, corpus `R_L` averages 1.78/5 with 59% pinned at exactly
-1.0. In the weak stratum the endpoint therefore has ~6.2 scale points of room to move in
-the pre-registered "anchoring" direction and ~1.8 in the opposite direction, a 3.5:1
-asymmetry that §6.2's conditional null reading (the safeguard A5 added) does not account
-for. That is a limitation, not an error, and stating it costs one paragraph. It is also
-pre-run-or-never: after the first judge score, adding it reads as post-hoc excuse-making,
-which is exactly what the freeze exists to prevent.
-
-Two code defects share that property. `mode_preflight` still carries the unguarded cost
-computation that Amendment A5.7 claims was fixed (a self-reported remediation that only
-landed on one of its two call sites), and `analyze.py`'s integrity chain terminates in an
-untracked file while the committed anchor that would close it sits unread in
-`results/plan.json`. Both are on frozen inputs (`run_study.py`, `analyze.py`), so both are
-also pre-run-or-never: editing either after a judge score exists trips the run's own
-gates. Fix these three, regenerate the manifest, re-tag, then go. The run is otherwise
-sound and the $40 cap is real.
-
----
+The review identified asymmetric censoring of the primary endpoint, missing usage
+accounting on the preflight path, and an analysis-integrity check without a
+committed anchor. These findings led to Amendment A6. The post-run
+[interpretation review](AUDIT-2026-08-10-post-run-interpretation.md) later corrected
+the pre-run claim that censoring cannot manufacture a difference in differences.
 
 ## 1. BLOCKING FINDINGS
 

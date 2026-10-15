@@ -1,22 +1,17 @@
-# Post-run interpretation audit — what the 990 paid calls will and will not support
+# Post-run interpretation review — August 10, 2026
 
-**Status: POST-RUN. Not a pre-flight document and not a revision of any pre-flight report.**
-The paid run is complete, promoted and `reportable: true`; nothing here is a defect in the run,
-the freeze, or the instrument. The pre-flight verdict in
-`protocol/AUDIT-2026-08-10-post-a6-reverification.md` (GO) stands unamended. This document is
-solely about which claims the resulting numbers license, and it exists because the first
-interpretation written after the run (including a proposed headline) was wrong in two places.
+Public excerpt of the August 10, 2026 review. Findings, verification claims and coverage
+limits refer to that historical review, not the current checkout. Finding IDs
+and citations retain their original scope; cited line numbers may have shifted.
+See the [record conventions](README.md#record-conventions).
 
-Method: five independent adversarial lenses (statistical inference; censoring and measurement;
-confounding and construct validity; pre-registration compliance; rival explanations) were each
-tasked with refuting seven interpretive claims, every objection was then re-tested by a separate
-verifier empowered to refute it, and 25 objections survived. Every load-bearing survivor below was
-then re-verified a third time by the auditor directly against `results/per_unit.jsonl`,
-`results/per_rep_scores.jsonl` and `results/wire/calls.jsonl`. Figures marked **[V]** were
-personally recomputed; figures marked **[W]** are adopted from the adversarial pass and are
-flagged as not independently re-derived.
-
----
+**[V]** identifies values directly recomputed by the reporting reviewer from
+`results/per_unit.jsonl`, `results/per_rep_scores.jsonl` and `results/wire/calls.jsonl`.
+**[W]** identifies values adopted from contributing review passes and not
+independently re-derived by that reviewer. These distinctions are retained.
+Later recomputations, including the seed-dependent interval count, are recorded
+in the [decisions log](decisions-log.md) and the
+[August 18 checks](AUDIT-2026-08-18-manuscript-correctness.md).
 
 ## 1. The result, as it stands
 
@@ -44,9 +39,9 @@ Spend $10.01; 990/990 calls parsed, non-degraded, served `claude-opus-4-8`.
 
 ---
 
-## 3. The three errors, with the evidence that kills them
+## 3. Interpretation errors and supporting evidence
 
-### 3.1 C3 — the `productive_struggle` finding is manufactured by floor censoring (most important)
+### 3.1 C3 — floor censoring can reproduce the `productive_struggle` gap
 
 **[V]** `PAG_ps` (weak) = **+0.3781** (p = 0.0020) decomposes as `a_L` − `a_H` with
 **`a_H` = −0.3951** (p = 0.0010) and **`a_L` = −0.0170** (p = 0.2500): 96% of the statistic is
@@ -77,8 +72,9 @@ the divergence is a property of the rubric's aggregation rather than a result.
 cluster means (10+ / 1−) gives p = **0.01172**, which fails Bonferroni ×8. No correction was
 pre-registered in any case (§6.5: secondaries are descriptive with CIs).
 
-**Consequence:** delete the `productive_struggle` clause from the headline; report the field with
-`a_H` and `a_L` printed beside it, the floored/free split, and the null-model reproduction.
+**Interpretation:** the gap alone does not identify anchoring. Its per-pole terms,
+floored/free split and zero-differential-preference construction are needed to
+interpret it.
 
 ### 3.2 C2 — censoring is not conservative; the correction runs the other way
 
@@ -102,13 +98,13 @@ D arm pins `R_H` at 5.0 versus +0.352 where it does not.
 
 A6.3's uninformative branch is still inapplicable, but not because a fall is uncensored. It is
 inapplicable by its own text: A6.3 conditions on a joint null of `PAG_weak` and the §6.3 pure
-profile effect, and **[V]** the pure effect is non-null (`a_L` p = 0.0078). Strike "decisively
-excluded" and "contradicted by data". **[W]** On the 14 weak stimuli where a rise is expressible,
+profile effect, and **[V]** the pure effect is non-null (`a_L` p = 0.0078).
+**[W]** On the 14 weak stimuli where a rise is expressible,
 8 fell and 2 rose (sign p = 0.109), which is suggestive but not decisive.
 
 ---
 
-## 4. A falsified registered statement (the most publishable finding here)
+## 4. Correction to the registered censoring interpretation
 
 Amendment **A6.3** asserts: *"Censoring cannot manufacture an effect, so a non-null `PAG_weak`
 remains interpretable as profile influence."* That is false as written for a
@@ -119,11 +115,11 @@ asymmetric censoring biases the statistic away from zero in the registered ancho
 The primary endpoint is null, so nothing in the headline result is corrupted. But the registered
 protection is narrower than it claims: only the weaker reading ("the profile influenced the
 rating") is protected, and the per-field secondaries are not protected at all. Correcting this in
-print is a genuine methodological contribution and should be stated plainly.
+print is necessary to distinguish profile influence from differential preference.
 
 ---
 
-## 5. Required disclosures
+## 5. Interpretation limits
 
 1. **Report the interval, never a bound.** BCa 95% = [−0.16667, **+0.35340**], half-width 0.2600.
    "|PAG| < 0.35" is **[V]** false against the study's own upper limit. No equivalence margin,
@@ -173,12 +169,12 @@ print is a genuine methodological contribution and should be stated plainly.
     a stated help-seeking preference (§2, A5.2), so the endpoint is profile *influence*.
 13. **Provenance split.** Distinguish numbers emitted by the digest-bound estimator
     (`analyze_py_sha256` 458932b5…, `prereg_md_sha256` 2e3a8697…, both **[V]** matching) from
-    post-hoc diagnostics. Commit a separate script emitting the A6.4 table and the test-retest, and
-    publish its output beside `summary.json`.
+    post-hoc diagnostics. The A6.4 table and test-retest were absent from the frozen
+    estimator and required a separate implementation.
 
 ---
 
-## 6. Two positive robustness facts that survived every attack
+## 6. Prompt length and instrument test–retest
 
 - **[V] Not a prompt-length artifact.** Input tokens are constant across the 3 reps of all 330
   units, and differ by exactly one token between P_adv and P_nov across all 110
@@ -190,18 +186,12 @@ print is a genuine methodological contribution and should be stated plainly.
 
 ---
 
-## 7. Defensible headline
+## 7. Inference limits
 
-> On weak-evidence stimuli, a frozen pedagogy LLM judge's holistic preference for high-scaffolding
-> responses (Δ = +2.58 with no profile) is not detectably shifted by a stated learner profile
-> (`PAG_weak` = +0.085, 95% BCa [−0.167, +0.353], half-width 0.260, exact signed-rank p = 0.68). It
-> is a failure to detect anchoring at a resolution that cannot exclude a +0.35 gap (≈13% of the
-> measured Δ), not a demonstration of its absence. The advanced profile does lower absolute severity
-> relative to the novice profile on the low pole (−0.153, p = 0.0078, the exact-test floor at 8 of
-> 18 clusters) and, non-significantly, on the high pole (−0.238, p = 0.0625). The largest per-field
-> gap (`productive_struggle`, +0.378) is reproduced by a zero-anchoring floor-censoring model and is
-> not identified as anchoring. The pre-registered authoring-interaction check was underpowered
-> (4 nonzero clusters, p = 0.75) and is reported as uninformative.
+The primary result is a failure to detect anchoring, not evidence of its absence.
+The interval cannot exclude a +0.35 gap, approximately 13% of the no-profile
+preference. The registered authoring-interaction check has four nonzero source-run
+clusters and p = 0.75; the review treated it as uninformative.
 
 ---
 
@@ -219,7 +209,3 @@ print is a genuine methodological contribution and should be stated plainly.
   support are directional and would need independent recomputation before print.
 - **No new labelling, stimulus or instrument review** was performed; §5 of the pre-flight report
   stands.
-- **Operational note:** this file is untracked, so `run_study.py`'s clean-tree gate will refuse
-  `--offline-cache-only` until it is committed, and committing moves `HEAD`, which breaks that
-  path's `git_commit` equality check anyway (the known N5 limitation). Run any cache replay before
-  committing this, or accept that replay is only possible from the run's own commit.

@@ -1,4 +1,4 @@
-"""Prompt purity + arm equivalence + profile matching (Phase 7)."""
+"""Prompt purity + arm equivalence + profile matching."""
 import json
 import re
 from types import SimpleNamespace

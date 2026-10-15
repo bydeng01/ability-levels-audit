@@ -1,83 +1,18 @@
-# VERDICT: GO
+# Post-A6 verification — August 10, 2026
 
-The materials verify end-to-end and the run should proceed from the current tree. I
-independently recomputed every quantitative claim in the self-applied Amendment **A6** from
-the companion study's own released scores (all reproduce to the digit), and I empirically
-re-verified the two self-applied code fixes **B2** (preflight usage guard) and **B3**
-(analysis integrity anchored to the committed `plan.json`) by executing the exact attacks
-they claim to block; both hold. The freeze is intact (all 12 frozen-input hashes, the three
-sidecars, the manifest, and `contract_sha256` all recompute; the deterministic selection
-regenerates the frozen 55 byte-for-byte; the frozen competence labels are exactly the
-majority vote of the three per-rep files, 0/126 mismatches); the spend ceiling is a genuine
-hard cap on billed dollars; the instrument's D-arm payloads are byte-identical to real
-companion-study calls; 81 tests pass with zero skips and a clean tree; and no paid artifact
-of any kind exists. I found no blocking defect in the frozen materials, no spend hole,
-and no rival explanation for the primary endpoint that the pre-registration does not already
-disclose. The single pre-run action is a process reconciliation rather than a change to any
-frozen file: the operator's asserted state is stale (see NB1). HEAD is `c297d22`
-(`prereg-final-2026-08-10`), not the claimed `c5fdf97` (`prereg-final-2026-08-08b`), and
-`c297d22` is unpushed. Run on `c297d22`; do not revert to `c5fdf97`, which is the
-pre-A6 tree.
+Public excerpt of the August 10, 2026 review. Findings, verification claims and coverage
+limits refer to that historical review, not the current checkout. Finding IDs
+and citations retain their original scope; cited line numbers may have shifted.
+See the [record conventions](README.md#record-conventions).
 
----
-
-## 0. State the operator asserted vs. what is actually here (read this first)
-
-The operator asserted "HEAD is `c5fdf97`, tagged `prereg-final-2026-08-08b`, worktree clean,
-pushed to origin." That is stale. Actual state, confirmed directly:
-
-| | operator asserted | actual |
-|---|---|---|
-| HEAD | `c5fdf97` | **`c297d22`** ("Apply 2026-08-10 pre-flight audit fixes: Amendment A6, …") |
-| tag at HEAD | `prereg-final-2026-08-08b` | **`prereg-final-2026-08-10`** |
-| origin/master | = HEAD (pushed) | `c5fdf97` — HEAD is **1 commit ahead, unpushed** |
-| worktree | clean | clean (confirmed) |
-
-`c297d22` is the A6/B2/B3-remediated commit and is a valid preflight target: the real
-(non-monkeypatched) `require_git_freeze()` returns clean + `['prereg-final-2026-08-10']` at
-HEAD, so preflight passes here today. The whole of this audit was performed against
-`c297d22`. The danger is only if the operator acts on the stale belief and checks out
-`c5fdf97`/`prereg-final-2026-08-08b`: that tree predates A6 (no censoring disclosure), the
-B2 preflight guard, and the B3 analysis anchor, and running it would publish superseded
-materials. See NB1.
-
----
-
-## 1. BLOCKING FINDINGS
-
-**None.** No issue rises to the level of stopping the paid run. Everything the prior
-(fourth) pass fixed was re-verified independently and holds; the areas the prior passes
-declared "not covered" were probed and produced only test-quality and disclosure items
-(Section 2), not defects in what will actually run.
-
----
+The reviewed freeze was `c297d22` (`prereg-final-2026-08-10`), which includes
+Amendment A6 and the preflight-usage and analysis-anchor fixes. The earlier
+`c5fdf97` freeze predates those changes. The review reported no blocking findings.
+The findings and limits below record what was checked before judge scoring.
+The later [post-run review](AUDIT-2026-08-10-post-run-interpretation.md) corrects
+the censoring interpretation in this report.
 
 ## 2. NON-BLOCKING FINDINGS
-
-### NB1. The operator's stated freeze commit is wrong and the real freeze commit is unpushed — DOCUMENTARY, confidence **high**
-
-**What is wrong.** The operator asserts HEAD = `c5fdf97` / `prereg-final-2026-08-08b`,
-pushed. In fact HEAD = `c297d22` / `prereg-final-2026-08-10`, one commit ahead of
-`origin/master` (`c5fdf97`) and not pushed. `git diff c5fdf97 c297d22` is exactly the A6
-remediation (PREREGISTRATION +100 lines / Amendment A6, `run_study.py` preflight guard,
-`analyze.py` plan-anchor, abstract "If null" fix, the AUDIT-2026-08-10 report,
-regenerated `results/plan.json` + `frozen_inputs.sha256`).
-
-**How I verified it.** `git rev-parse HEAD`, `git tag --points-at HEAD`,
-`git rev-parse origin/master`, `git diff --stat c5fdf97 c297d22`, and the real
-`_git_freeze_snapshot()` executed against the live tree (returns commit `c297d22`, tag
-`prereg-final-2026-08-10`, empty `unexpected_git_status`).
-
-**The concrete failure it could cause.** If the operator "restores" the state they believe
-they are in (`git checkout prereg-final-2026-08-08b`) and runs preflight there, the paid run
-executes against pre-A6 materials: the primary endpoint's asymmetric-censoring limitation
-is undisclosed, `mode_preflight` carries the unguarded cost computation (the B2 defect), and
-`analyze.py`'s integrity chain terminates in an untracked file (the B3 defect). Running in
-place (the default) uses `c297d22` and is correct.
-
-**Required action (no frozen-file change).** Confirm HEAD is `c297d22`/`prereg-final-2026-08-10`
-before preflight; push it to origin so the "pushed" precondition is true and the released
-tree carries A6; do not check out `c5fdf97`. **DOCUMENTARY**: nothing in the freeze changes.
 
 ### NB2. The cache/wire fraud-resistance checks and the B2 guard are almost entirely undefended by tests — DOCUMENTARY, confidence **high**
 
@@ -163,14 +98,11 @@ initiated the step" framing would be honest but is not required.
 
 ### NB6. Minor documentary imprecisions — DOCUMENTARY, confidence **high**
 
-- The operator's "stimuli.jsonl and labels.jsonl have not changed across any remediation" is
+- The claim that stimuli and labels were unchanged across all remediation is
   precise for labels (blob `f802c2e1`, unchanged since the initial freeze `1e4c868`) but
   loose for stimuli: the blob changed once (`e20580c2`→`84afc1ed`) at the A4 56→55
   refreeze (`9c879b6`) and has been byte-stable across all three `prereg-final-*` tags. The
   change is fully disclosed (A2/A4); the current `sha256 1d240ebc…` is the A5/A6 value.
-- `README.md:73` still shows `git tag prereg-final-2026-08-08` in the operator sequence; that
-  tag already exists on an old commit and HEAD already carries `prereg-final-2026-08-10`
-  (which the runner accepts), so the example is stale but harmless.
 - `results/plan.json`'s `est_cost_usd 9.72` and `run_study.py:623`'s `est_in = 1640 + 95*2/3`
   still use the pre-A6 95-token profile-block figure; the directly-measured value with the
   corrected 124-token block is ~$9.81 (A6.7 rounds it to "~$10.0"). Immaterial against the

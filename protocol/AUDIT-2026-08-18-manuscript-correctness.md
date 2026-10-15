@@ -1,21 +1,20 @@
-# Manuscript correctness audit — `ability-levels-audit`
+# Released-artifact checks — August 18, 2026
 
-Adversarial re-derivation of `NeurIPS_2026_newinml/neurips_2026.tex` against the released artifacts.
-Every number below was recomputed from `results/`, `corpus/`, `labeling/` and `profiles/` with an
-independent implementation of the registered estimators, not read from `summary.json`,
-`diagnostics.json`, the README, the pre-registration or any prior audit.
+Public excerpt of the August 18, 2026 review. Findings, verification claims and coverage
+limits refer to that historical review, not the current checkout. Finding IDs
+and citations retain their original scope; cited line numbers may have shifted.
+See the [record conventions](README.md#record-conventions).
 
-**Integrity gates.** All 12 entries of `results/frozen_inputs.sha256` were re-hashed at the start and
-again at the end of this audit: unchanged, and in agreement with `results/run_meta.json`,
-`results/preflight/resolved_config.json` and the sidecar. `contract_sha256` agrees across both
-records (`fe0a59d2…`). The promoted-result manifest, the wire hash and the cache hash all verify.
-Nothing was modified. No paid call was made.
-
----
+These checks refer to the manuscript version reviewed on that date. The reviewer
+reported recomputing the numerical claims from released artifacts with separate
+implementations of the estimators. The retained sections record numerical and
+methodological evidence, including discrepancies and unavailable companion data.
+Manuscript revision instructions and literature-positioning notes are omitted.
+The findings are historical; they do not establish the status of the current paper.
 
 ## Findings
 
-### 1. Three reported values do not re-derive from the released artifacts — Blocker
+### 1. Three reported values do not re-derive from the released artifacts
 
 **Claim.** §7 asserts that every reported value re-derives offline from the release, and Appendix D
 that the release is self-contained; the drift check's published comparison values are not in the
@@ -40,96 +39,9 @@ all. They return a mean of 3.891 against the published 3.879, Pearson r = 0.979,
 - So `3.879`, `r = 0.979` and `40 of the 55` require a second, separately-released artifact. They are
   the only reported values that do. Everything else I re-derived offline from this release alone.
 
-**Severity.** Blocker: "every value reported here re-derives offline" and "the release is
-self-contained" are false as stated, in the paragraph whose subject is checkable provenance.
-
-**Fix.** Two edits, length-neutral together.
-
-At `:395`, replace `The release is self-contained.` with:
-
-`The release is self-contained but for the corpus's own published scores, which only the drift check reads.`
-
-At `:210`, replace `On the arm it covers, this removes judge drift as a competing account of the null, and it is the only direct drift check the design affords.` with (this also fixes finding 6, and the clause I cut to pay for the sentence above is `and it is the only direct drift check the design affords`, which Appendix A already states at `:347`):
-
-`On the one arm and pole it covers, 165 of the 990 calls, this removes judge drift as a competing account of the null.`
-
 ---
 
-### 2. The premise that the field uses this design is uncited, and no cited audit instantiates it — Serious
-
-**Claim.** The paper's relevance rests on a within-item double difference being current practice and
-the field's strongest design; that sentence carries no citation and none of the cited audits uses it.
-
-**Location.** `neurips_2026.tex:69`, echoed at `:222`.
-
-**Evidence.** At `:69`, *"The strongest audits difference twice: a within-item contrast between two
-candidate responses is differenced again across the manipulated attribute…"* carries no `\citep`. The
-citation on the preceding clause is `\citep{wang2024large,howell2025prestige}`. Checked against the
-cited works: `wang2024large` swaps candidate order (a within-item contrast, not a double
-difference); `howell2025prestige` randomises author identity across manuscripts in a between-item
-regression whose headline is a rejection decision; `panickssery2024llm` contrasts self- versus
-other-generated text; `chen2024humans` perturbs items; and the manuscript's only named exemplar,
-`maltbie2026intersectional` (`:71`), is a between-conversation persona factorial
-(race × age × gender × confidence) rather than a within-item two-pole difference in differences. The design
-the paper analyses and warns the field about is not documented as being in use.
-
-**Severity.** Serious: an unsupported empirical claim about the field, load-bearing for the paper's
-scope.
-
-**Fix.** At `:69`, replace `The strongest audits difference twice:` with:
-
-`A stronger design differences twice:`
-
-At `:222`, replace `and the within-item difference in differences is their strongest form;` with:
-
-`and a within-item difference in differences is the natural way to strengthen them;`
-
----
-
-### 3. The "worse as the stimuli improve" claim is stated in a work cited only for a weaker point, and the closest prior work is uncited — Serious
-
-**Claim.** The escalation observation the abstract sells as distinctive appears almost verbatim in
-Rohrer & Arslan (2021), which the paper cites only for "a scale can manufacture an interaction is
-known"; and a 2025/26 paper covering exactly this statistical object is uncited.
-
-**Location.** `neurips_2026.tex:92` (the citation), `:141` (the claim), `:63` and `:71` (the abstract
-and introduction versions), `:77` (contribution 1).
-
-**Evidence.**
-
-- Rohrer & Arslan (2021), *AMPPS* 4(2), Box 1, verbatim: *"The stronger the main effect of the
-  moderator on the outcome is, the more exacerbated the problems caused by ceiling or floor effects
-  are because this will push individuals with certain moderator values closer to the boundaries of
-  the scale."* Box 1 also gives the spurious interaction itself (*"a regular regression analysis
-  would indicate an interaction between the predictor and group membership"*) and both remedies the
-  manuscript names at `:217`. The manuscript's `:141`, *"the difficulty deepens as the stimuli
-  improve: a common shift is censored unequally precisely because the two poles sit near opposite
-  bounds"*, is the same point.
-- Wang & Li, *"Tobit modeling for dependent-sample t-tests and moderated regression with ceiling or
-  floor data"*, **Behavior Research Methods** (doi `10.3758/s13428-025-02904-y`), uncited: a
-  dependent-sample design, a moderation (interaction) estimand, a ceiling/floor-censored
-  outcome. Abstract: conventional analysis yields *"biased estimates, inflated Type I error rates,
-  and poor confidence interval coverage, even with as little as 10% ceiling data"*; the paper reports
-  moderated-regression Type I error of 69.8–80.3% and relative bias in the interaction coefficient of
-  92.7–101.2%. That is the manufactured interaction, quantified, in the manuscript's own setting.
-
-**Severity.** Serious: contribution 1 as worded ("an identifiability analysis of within-item
-difference-in-differences endpoints on bounded rating scales") does not survive Wang & Li; the
-judge-audit instantiation, the live counterexample and the three-number check do.
-
-**Fix.** At `:92`, replace `that a scale can manufacture an interaction is known \citep{rohrer2021precise}.` with:
-
-`that a bound can manufacture an interaction, and that it worsens as the moderator's main effect grows, is known \citep{rohrer2021precise}, and censored-outcome corrections exist for the dependent-sample moderation case \citep{wangli2026tobit}.`
-
-Buy the length by cutting, from the same paragraph, `Recent work on judge scale design tunes granularity for human agreement \citep{li2026grading} but does not treat the bounds as an identification problem.`
-
-At `:77`, replace `an identifiability analysis of within-item difference-in-differences endpoints on bounded rating scales, carrying known limited-dependent-variable results \citep{puhani2012treatment} into the judge-audit setting` with:
-
-`we carry known censored-outcome results \citep{puhani2012treatment,rohrer2021precise} into the judge-audit setting`
-
----
-
-### 4. The introduction reports only the larger of the two construction shares — Serious
+### 4. The introduction reports only the larger of the two construction shares
 
 **Claim.** The abstract and §4.3 both give the reproduced share as a range; the introduction gives
 only the upper end, which is the one the producing code says not to quote alone.
@@ -144,16 +56,9 @@ says "79 to 85\%" and §4.3 (`:192`) gives both. `:75` says only "85\% of the ma
 `analysis/diagnostics.py` (the producer) states: *"The judge emits integers, so `round_then_clip` is
 at least as defensible and gives a smaller share. Quote the range, not the larger endpoint."*
 
-**Severity.** Serious: a missing hedge on the paper's headline counterexample, inconsistent with its
-own abstract two paragraphs earlier.
-
-**Fix.** Replace `reproduces $+0.321$, 85\% of the magnitude,` with:
-
-`reproduces 79 to 85\% of the magnitude,`
-
 ---
 
-### 5. Table 3 claims to cover every reported quantity; the per-pole split that carries §4.3 has no row and no status label — Serious
+### 5. Table 3 claims to cover every reported quantity; the per-pole split that carries §4.3 has no row and no status label
 
 **Claim.** The per-pole decomposition of each per-field gap is post-hoc, is not emitted by the frozen
 estimator, and appears in no row of the specification-status table, while the sentence that
@@ -175,20 +80,9 @@ the contrasts against the no-profile arm, a different quantity); *Identifiabilit
 (Location §5; the three-number check, of which the per-pole split is not one). Figure 2's caption
 does open "**Exploratory.**"; the prose numbers at `:188` carry no such label.
 
-**Severity.** Serious: an unlabelled post-hoc quantity carrying the central §4.3 argument, in the
-one table a reader consults for specification status.
-
-**Fix.** Insert after `:427`:
-
-`Per-pole split of each gap & Shows the gaps are high-pole movement & \S\ref{sec:manufactured}, Fig.~\ref{fig:two} \\`
-
-Buy the row by deleting, from the Table 3 caption at `:402`, `Registered quantities were fixed before any score existed;` which the group headings already say. And at `:188` replace `The registered per-field decomposition reports one nominally significant gap:` with:
-
-`The registered per-field gaps include one nominally significant one; their per-pole split below is exploratory:`
-
 ---
 
-### 6. The drift check's stated coverage limit omits that it covers one pole per stimulus — Serious
+### 6. The drift check's stated coverage limit omits that it covers one pole per stimulus
 
 **Claim.** The check is hedged to "the arm it covers"; it also covers only the real-turn pole, so it
 speaks to 165 of 990 calls and to 55 of the 110 no-profile units.
@@ -201,14 +95,9 @@ so exactly one of each stimulus's two poles is covered. The no-profile arm holds
 calls; the check re-issues 165. Mean absolute difference is 0.133 with a maximum of 1.0, and exact
 agreement is 40 of 55; the check bounds mean drift on that one cell, not agreement everywhere.
 
-**Severity.** Serious: a check said to remove a competing account without its own coverage limits
-fully stated.
-
-**Fix.** Given in finding 1.
-
 ---
 
-### 7. "105–164%" excludes its own minimum — Minor
+### 7. "105–164%" excludes its own minimum
 
 **Claim.** The lower endpoint of the stated range is 104%, not 105%.
 
@@ -220,13 +109,9 @@ assistance calibration $0.464506/0.308642 = 150.50\%$; elicitation $0.172840/0.1
 Minimum 104.49% → 104%. (The companion range is right: pole-movement shares are 71.9, 95.9, 74.9,
 81.8% → "72–96%".)
 
-**Severity.** Minor: rounding, in the direction that overstates the smallest share.
-
-**Fix.** Replace `$105$--$164\%$` with `$104$--$164\%$`.
-
 ---
 
-### 8. §5 attributes both bounds on the attenuation share to non-expansiveness — Minor
+### 8. §5 attributes both bounds on the attenuation share to non-expansiveness
 
 **Claim.** Non-expansiveness gives $\kappa_j \ge 0$; the upper bound $\kappa_j \le 1$ needs the clip's
 monotonicity, which is not invoked.
@@ -243,15 +128,9 @@ $\PAG = \PAG^{*} + \kappa_H\delta_H - \kappa_L\delta_L$ with $\PAG^{*} = \delta_
 headroom identity (positive headroom $d+4$, negative $4-d$, difference $2d$ with $d$ the pole
 separation).
 
-**Severity.** Minor.
-
-**Fix.** Replace `Because $c$ is non-expansive,` with `Because $c$ is monotone and non-expansive,`,
-and pay for it by deleting `whatsoever` from `expresses no differential preference whatsoever`
-earlier in the same paragraph.
-
 ---
 
-### 9. Table 3 calls the floor-censoring construction a "null simulation" — Minor
+### 9. Table 3 calls the floor-censoring construction a "null simulation"
 
 **Claim.** The object is deterministic and is named a construction everywhere else; the table's name
 also collides with the genuine Monte-Carlo row four lines below.
@@ -265,13 +144,9 @@ says "Floor-censoring null simulation" (`:425`), and `:429` uses "simulations" f
 / 600-replicate Monte Carlo. The producing code states the object *"is NOT a data-generating
 process"*.
 
-**Severity.** Minor.
-
-**Fix.** Replace `Floor-censoring null simulation` with `Floor-censoring construction`.
-
 ---
 
-### 10. Table 2's tutor-type row counts stimuli, not source runs — Minor
+### 10. Table 2's tutor-type row counts stimuli, not source runs
 
 **Location.** `neurips_2026.tex:368`.
 
@@ -280,14 +155,9 @@ From `corpus/stimuli.jsonl`, 31 + 24 = 55 stimuli; by source run the split is 13
 the row two above states 23 runs. The dependent row at `:370` (`ped. 29/31, conv. 14/24`) also uses
 stimulus denominators, and the prose at `:217` says "23 of 30 weak *contexts*".
 
-**Severity.** Minor.
-
-**Fix.** Replace `Source-run tutor type (pedagogy-tuned / conversational)` with
-`Stimuli by source-run tutor type (ped.-tuned / conversational)`.
-
 ---
 
-### 11. "cluster" carries every exact-test floor argument but is never bound to "source run" — Minor
+### 11. "cluster" carries every exact-test floor argument but is never bound to "source run"
 
 **Location.** first undefined use at `neurips_2026.tex:183`; definition paragraph at `:126`.
 
@@ -296,15 +166,9 @@ stimulus denominators, and the prose at `:217` says "23 of 30 weak *contexts*".
 `:217`, `:386`, `:388`, `:439`, `:447`, `:454`) carrying every "n nonzero clusters" floor statement,
 without ever being identified with the source run.
 
-**Severity.** Minor.
-
-**Fix.** At `:126` replace `and all tests and intervals use those source-run means;` with
-`and all tests and intervals use those source-run means, the study's clusters;`, paying for it by
-deleting `in full` from `its $p$-value enumerated in full`.
-
 ---
 
-### 12. Figure 1's caption defines the shaded band as the sub-80%-power range; power at ±0.42 is 0.93 — Minor
+### 12. Figure 1's caption defines the shaded band as the sub-80%-power range; power at ±0.42 is 0.93
 
 **Location.** `neurips_2026.tex:447`, against `:157`.
 
@@ -314,26 +178,7 @@ distribution, 6,000 replicates, the figure's own seed): power is 0.0800 at shift
 "first exceeds $0.80$ between $+0.40$ and $+0.42$", so ±0.42 is the upper bracket of the crossing,
 not the range where power is below 80%.
 
-**Severity.** Minor.
-
-**Fix.** Replace `within $\pm 0.42$ of the stated-novice line: the $|\PAG|$ range where the registered test's power is below $80\%$` with:
-
-`within $\pm 0.42$ of the stated-novice line, the bracket inside which the registered test's power first reaches $80\%$`
-
----
-
-### 13. Bibliographic details — Minor
-
-**Location.** `references.bib`.
-
-- `gelman2016statistical` is a mangled record (`journal={The best writing on mathematics (Pitici M, ed)}, volume={102}, pages={305--318}, year={2016}`). The primary publication is Gelman & Loken, *American Scientist* **102**(6), 460–465, **2014**. The content attributed at `:95` is correct.
-- `tack2022ai` is cited as an arXiv preprint; it was published at **EDM 2022** (15th Int. Conf. on Educational Data Mining, short papers).
-- `maltbie2026intersectional` gives the author as "Benjamin Maltbie"; arXiv:2604.11609 lists **Ben Maltbie**. Everything the manuscript attributes to it at `:71` (1–10 rubric, factorial interactions, most ratings within two points of the floor) checks out.
-- `vanlehn2011relative` is in the bib and never cited.
-
----
-
-## Known items
+## Client-library provenance
 
 **Item 1: the client-library version is not single-sourced. CONFIRMED.**
 `judging/run_study.py:756` records `anthropic.__version__` into `resolved_config.json`
@@ -342,17 +187,6 @@ not the range where power is below 80%.
 disagree (editable install, shadowed module, vendored copy). Appendix A at `:347`, *"the provider's
 client library version, 0.96.0, is hashed into the contract digest"*, attributes the recorded
 string to the digest, which is not where the digest's copy came from.
-Suggested fix at `:347`: replace `and the provider's client library version, 0.96.0, is hashed into the contract digest with the request values and the code that assembles them` with
-`and the client library version the digest records, 0.96.0, is hashed with the request values and the code that assembles them, though the run record reads it by a second path`.
-
-**Item 2: the judge is named one way in the main text and another in Appendix A. REFUTED.**
-`grep -in "opus|claude" neurips_2026.tex` returns exactly two mentions: `:110` *"an instance of
-Claude Opus 4.8"* and `:347` *"The provider returned one identifier, Claude Opus 4.8, on all 990
-calls"*. Identical prose form. The artifacts use the API identifier `claude-opus-4-8`
-(`run_meta.json:judge_model`; `served_model` on all 990 wire rows; `vendor/configs/models.yaml`
-judge role), which is the same object in its API spelling. No inconsistency remains in this file.
-
----
 
 ## Verification record
 
@@ -493,20 +327,7 @@ flagged as reversed on an earlier pass and repaired before the freeze": the rele
 report describes the final pass only (55/55, 0 reversed). (iv) Whether the six acid-mixture problems
 are all in fact acid-mixture (I confirmed six distinct problem identifiers, not their content).
 
-**Most likely to be wrong.** Finding 2. It rests on a reading of five cited audits' designs rather
-than on this repository, and an author who has a specific within-item double-difference audit in mind
-can refute it with one citation, which is also the cheapest fix. Finding 5 is next: the boundary
-between "the registered per-field gap" and "its post-hoc per-pole split" is one a reader could argue
-Table 3's caption already covers by saying status is per quantity, though the table then owes the
-split a row. Finding 3's novelty exposure is a judgement about how much of contribution 1 survives
-Wang & Li, not a factual error in the manuscript.
-
-**Deliberately not reported.** The abstract's bare "is null" (the interval follows immediately, and
-§1, §4.1 and §8 all state the failure-to-detect reading); Type 3 fonts in two figures and four
-unreferenced labels (formatting, out of scope); the §5 pole means being stimulus-level rather than
-clustered (the sentence says so); "still draw the low pole from a single tutor model" at `:104`
-(24 of 27, given three lines below in Table 2). I also checked and cleared two claims that look
-wrong and are not: "six reported here return the smallest $p$-value their nonzero-cluster count
+Two further checks supported the reported statements: "six reported here return the smallest $p$-value their nonzero-cluster count
 admits" (six is right once figure-reported tests are counted, which is the same convention that makes
 the companion "four" right), and "survives no correction at a family larger than four" (the sign test
 on 10 positive of 11 nonzero clusters gives $p = 0.01172$; $0.05/4 = 0.0125$ passes and

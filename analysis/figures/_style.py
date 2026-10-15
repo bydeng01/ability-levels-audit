@@ -194,13 +194,8 @@ def scan_text(path: Path, gap_pt: float = 0.6) -> list[str]:
     """Find text that will not survive printing: runs off the canvas, or runs
     into another run.
 
-    Both failure modes shipped in this paper and neither is visible in a casual
-    look at the PNG.  fig2's panel (c) title was cut off mid-word at the right
-    canvas edge ("censoring reproduc"), and fig3's panel (a) statistics line was
-    overprinted by panel (b)'s rotated y-label, with the tail of the string drawn
-    *inside* panel (b) over the power curve.  A word box that leaves the canvas,
-    or two boxes that intersect by more than ``gap_pt`` in both axes, is the
-    signature of each.
+    Checks word boxes for canvas overflow and pairwise overlap greater than
+    ``gap_pt`` in both axes.
 
     Needs poppler's ``pdftotext``; returns a "skipped" note if it is absent.
     """

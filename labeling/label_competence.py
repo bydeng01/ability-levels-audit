@@ -12,10 +12,9 @@ response, never the tracker record, never the policy/base/prior-stratum metadata
 
 Primary labelling path (decisions-log 2026-08-08): three independent blind passes
 by fresh Claude (Fable 5) agent contexts driven by the build harness — per-rep
-records are written to labeling/reps/rep{1,2,3}.jsonl and are auditable. The
-`--backend api` path implements the build prompt's paid alternative (~2x96 short
-calls through the vendored model client) and can be run as a robustness check;
-it is not the primary source of labels.jsonl.
+records are written to labeling/reps/rep{1,2,3}.jsonl and are auditable.
+The `api` subcommand runs an alternative labelling pass through the vendored
+model client. It was not the source of the released labels.jsonl.
 
 Subcommands:
   prepare    write labeling/batches/rep{r}_batch{b}.json (blind inputs, 3 reps x 3 batches)

@@ -1,10 +1,9 @@
-"""Mock end-to-end + offline-cache-only replay guarantees (Phase 7).
+"""Mock end-to-end + offline-cache-only replay guarantees.
 
 Runs the entire pipeline (preflight -> derived full scoring -> completeness ->
 transactional promotion -> offline reconstruction) with the deterministic mock
-backend inside a temp results dir, so the repo's real results/ namespace stays
-clean for the paid run. The same reconstruction path serves the released live
-cache after the paid run.
+backend inside a temporary results directory. The released result files remain
+unchanged. The same reconstruction path also serves the released live cache.
 """
 import json
 import hashlib

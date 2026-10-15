@@ -1,21 +1,23 @@
-# Decisions log — label-vs-evidence
+# Protocol decisions and amendments
 
-Chronological record of every design decision and deviation. Newest entries at the bottom.
+Public record of design changes and deviations, in chronological order. Earlier
+counts and interpretations describe intermediate versions and are superseded by
+later entries. Credential status and operator handoffs are omitted; this document
+is not a frozen input. See the [record conventions](README.md#record-conventions).
 Companion source repo (`$SRC`): `conv-vs-ped-tutor` @ `ab5ea2a99d67cc2b23808c52e841301c5e56d887` (clean tree).
 
 ---
 
 ## 2026-08-08 — Build start, environment, vendoring
 
-- **Environment**: built from the frozen build prompt. Python 3.12.8 (miniforge base env;
-  all `requirements.txt` deps already installed, no venv created, and `requirements.txt`
-  records the floor versions for reproduction).
-- **Vendored transitive dependencies beyond the build prompt's table.** `analysis/metrics.py`
+- **Environment at build start**: Python 3.12.8 in the miniforge base environment.
+  Dependencies were subsequently pinned in `requirements.txt` before the final freeze.
+- **Vendored dependencies.** `analysis/metrics.py`
   hard-imports `protocol.leakage`, `protocol.session`, `agents.extraction`,
   `domain.algebra.checker`; `protocol/session.py` imports `agents.cold_baseline` (constants
   only, no further deps). All copied verbatim, read-only, recorded in `vendor/PROVENANCE.md`.
-  `configs/models.yaml` also vendored (not in the table, but it defines the `judge` role the
-  build prompt names). `agents/base.py`, `ped_tutor.py`, `conv_tutor.py`, `full_session.py`,
+  `configs/models.yaml` was also vendored because it defines the `judge` role.
+  `agents/base.py`, `ped_tutor.py`, `conv_tutor.py`, `full_session.py`,
   and langgraph are not vendored, since nothing we run needs the tutor graph.
 - **Vendor layout mirrors the source package layout under `vendor/`**, so
   `agents.config.REPO_ROOT` (parent of `agents/`) resolves to `vendor/` and the vendored
@@ -28,10 +30,7 @@ Companion source repo (`$SRC`): `conv-vs-ped-tutor` @ `ab5ea2a99d67cc2b23808c52e
   ped_no_gate, ped_no_tracker (sonnet base). Calibration/smoke/judge/preflight run dirs in
   `$SRC/logs` are not part of the corpus.
 - **Cost basis re-verified from `$SRC/logs/pedjudge-20260704-210950-761`**: 3,120 calls,
-  mean 1,639.6 input / 52.0 output tokens, matching the build prompt.
-- **Git**: repo initialized. Per the build prompt ("Do not commit or push without being
-  asked" + the build order's explicit "freeze …, tag it"), commits are made only at the
-  named freeze milestones, each with a tag; no pushes.
+  mean 1,639.6 input / 52.0 output tokens.
 
 ## 2026-08-08 — Freeze-order refinement (candidate pool → labels → stimulus freeze)
 
@@ -93,17 +92,6 @@ exist; the binding freeze ("freeze before scoring") is untouched. The v1→v2
 confusion table will be reported. Whatever v2 yields is final: if a stratum still
 has <30 members, take all of it and report the imbalance; there is no further
 instrument iteration and no post-label re-sampling.
-
-## 2026-08-08 — Paid-run credential situation
-
-No `ANTHROPIC_API_KEY` exists in this environment (not in the shell env, no `.env`
-anywhere, no dotfile reference, no `ant` CLI profile). The source study's keys were
-evidently exported per terminal session and never persisted. The build therefore
-completes everything up to and including the offline gates (mock end-to-end, manifest,
-frozen artifacts, tags), and the live sequence (`--preflight` → `--pilot 12` → paid
-run) is left as a documented one-command-each sequence for the operator to run with
-the key exported. The runner fails fast and clearly without the key (LiveCaller
-raises before any state is touched).
 
 ## 2026-08-08 — v2 labels complete; v1→v2 relationship is strictly monotone
 
@@ -468,9 +456,8 @@ corpus / 2 authored; R_L 29 corpus / 26 authored; and 27 all-corpus pairs (12 we
 15 strong). The stimulus sha256 is
 `1d240ebca255c7e5cfa393292eb5dc6a050f2ddee904e21267ab1a178b8c5376`.
 
-This entry does not claim that the final git freeze already exists. The material is a
-freeze candidate until the operator reviews and commits every artifact and creates
-the required tag. The live runner enforces that remaining boundary.
+At this stage the material was a freeze candidate; the final commit and tag had
+not yet been created. The live runner enforced the freeze requirement.
 
 **Offline verification after the fixes.** Python 3.12.8 with the exact pinned
 dependencies reports **70 passed, 0 skipped**. This includes the 990-call mock run,
@@ -587,21 +574,20 @@ arm stays cut, and the paper says so explicitly: the cut now rests on (b) and (c
 The arm is not added: it would require new paid calls and a new freeze, and adding an
 arm after seeing the results is the behaviour the freeze exists to prevent.
 
-**Reason (c) is uncited.** §4.1(c) attributes the "profiles alone move learner-conditioned
-scores" result to *EduPanel*. A literature search across arXiv, ACL Anthology, OpenReview and
-general web search could not verify that any such paper, benchmark or system exists; the only
-matches are unrelated commercial products. The manuscript therefore supports (c) with
-confirmed persona/sociodemographic-prompting work (Beck et al. 2024; Hu & Collier 2024;
-Howell et al. 2025) and carries a visible `[CITE]` marker where the pre-registration's own
-reference would go. **Action for the author: either supply the correct citation or drop the
-name.** The pre-registration is not edited either way.
+**Unverified citation in reason (c).** The pre-registration attributes the
+profile-only effect to *EduPanel*, but the August 10 review could not verify that
+reference. The manuscript then cited persona/sociodemographic-prompting work
+(Beck et al. 2024; Hu & Collier 2024; Howell et al. 2025). Those references do not
+verify the pre-registration's named source. The frozen protocol retains its
+original text.
 
 **Extra figures.** `PREREGISTRATION.md:10` requires anything beyond §6 to be labelled
 exploratory. Figure 1 is the registered §7 figure. Figures 2 and 3 are new and are labelled
 **Exploratory** in their captions and in the running text, as are §5.3, §5.4, the §6
 diagnostic and every contrast absent from `summary.json`.
 
-**New post-hoc scripts (not part of the freeze).** `analysis/paper_checks.py`,
+**New post-hoc scripts (not part of the freeze).** `analysis/paper_checks.py`
+(now `analysis/diagnostics.py` and `analysis/simulations.py`),
 `analysis/figures/fig2.py`, `analysis/figures/fig3.py`. These recompute independently every
 `[W]`-marked figure in `AUDIT-2026-08-10-post-run-interpretation.md`, i.e. the ones that
 audit flags as not re-derived by the auditor. All reproduce except one: the seed-dependence

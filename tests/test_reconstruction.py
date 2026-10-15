@@ -1,4 +1,4 @@
-"""Byte-identical reconstruction of every stimulus from corpus/logs (Phase 7)."""
+"""Byte-identical reconstruction of every stimulus from corpus/logs."""
 import subprocess
 import sys
 import shutil

@@ -1,63 +1,15 @@
-# Independent pre-flight review — label-vs-evidence paid run
+# Second pre-flight review — August 8, 2026
 
-**Status: INCOMPLETE (stopped on request partway through).** This is a record of where
-the review stopped rather than a finished audit. Sections 1–4 report only what I
-established and personally re-verified; §5 lists, honestly and in detail, what was never
-examined. Do not read a missing finding as a clean bill of health.
+Public excerpt of the August 8, 2026 review. Findings, verification claims and coverage
+limits refer to that historical review, not the current checkout. Finding IDs
+and citations retain their original scope; cited line numbers may have shifted.
+See the [record conventions](README.md#record-conventions).
 
-**Reviewer:** second independent pre-flight review, 2026-08-08.
-**Provider calls made: zero. Money spent: $0.00.**
-Everything was offline: the test suite, the mock backend, ad-hoc Python over the frozen
-artifacts, and scratch copies of the repo outside it. No file in this repository was
-created or modified except this one, as confirmed by `git status --porcelain` (41
-entries, unchanged from session start) and by `corpus/stimuli.jsonl` /
-`labeling/labels.jsonl` still hashing to `2613e05f…16adf8` / `fda2bc3d…2707d4` at the
-end.
-
-### Filename note
-
-The brief asked for `protocol/AUDIT-<today>.md`. That path, `protocol/AUDIT-2026-08-08.md`,
-already exists: it is the first audit, and it is referenced by `README.md:94` and
-`protocol/PREREGISTRATION.md:9`. Writing there would have destroyed it and broken both
-references, so this review is at a non-colliding path. Rename if you prefer, but do not
-overwrite the first audit.
-
-### Relationship to the first audit
-
-`protocol/AUDIT-2026-08-08.md` returned NO-GO on four blocking findings; its §6
-"Post-fix addendum" then records that the same agent applied the fixes and revised the
-verdict to GO, and says so plainly. That addendum is therefore a self-report. I treated
-every claim in it as unverified. Where I checked its claims they very largely hold (§4);
-the exceptions are in §3.
-
----
-
-## 1. PROVISIONAL VERDICT
-
-**GO-WITH-FIXES**, provisional and conditional on the audit being finished.
-
-The engineering is genuinely good and most of the repository's own claims are exactly
-true: I recomputed the entire frozen-set composition, the whole labelling reliability
-chain, the cost arithmetic, the contract hash, the manipulation check and the selection
-rule, and they reproduce to the digit (§4). The four fixes the first audit forced are
-real: I re-demonstrated the B2 tamper case end-to-end and it is now caught on every path.
-
-But one blocking item stands (§2.1): the frozen materials do not exist in version
-control. The `prereg-frozen` tag and `HEAD` both still hold the superseded 60-stimulus
-set; the entire 56-stimulus re-freeze (stimuli, labels wiring, corrected code, corrected
-protocol, regenerated manifest) is uncommitted working-tree state, and seven required
-paths are untracked outright. A study whose central claim is a pre-registration freeze
-currently has no immutable anchor for the thing it froze. The fix costs $0 and one commit,
-and it must happen before the first paid call, because afterwards it is unprovable.
-
-Everything else I found is non-blocking (§3): a set of statements in the pre-registration,
-the decisions-log and the abstract that are wrong or overstated and must be corrected
-before the run, since a pre-registration cannot honestly be amended once data exist. Two
-of them are substantive enough to change how the headline may be written (§3.1, §3.2).
-
-The provisional part matters: seven of my nine investigation lines never reported.
-
----
+This review was incomplete and its GO-WITH-FIXES verdict was provisional. It
+examined the 56-stimulus version. Sections 2–4 contain the reporting reviewer's
+checks; section 5 records the coverage gaps. The first review's remediation
+addendum was a self-report by the same agent that applied the fixes. The second
+review rechecked only the claims identified below.
 
 ## 2. BLOCKING FINDINGS
 
@@ -462,18 +414,7 @@ messages)` takes no `seed`; temperature is sent only `if temp is not None` and
 The circuit breaker trips after 12 responses in a 100 %-failure run, ≤ $0.39 at
 worst-case pricing.
 
-**V14. `$SRC` exists and is intact.** `$SRC (the companion study's working tree)`
-is present with 221 log dirs. I did not write to it.
-
----
-
 ## 5. NOT COVERED: where this review stops
-
-This is the important section. The review was stopped partway; seven of nine parallel
-investigation lines never reported, and I had not begun to reconcile the two that did.
-
-**Lines that never reported at all** (started, killed mid-flight; their transcripts are
-under `…/subagents/workflows/wf_1eb8870f-9f3/`):
 
 - **Test quality.** The systematic "what would have to break for this test to fail"
   pass, including mutation-testing every load-bearing test and checking `test_freeze.py`
@@ -502,11 +443,10 @@ under `…/subagents/workflows/wf_1eb8870f-9f3/`):
   but the systematic claim-by-claim table across README / PREREGISTRATION / decisions-log /
   abstract was not completed.
 
-**Two lines did report and I have only partially reconciled them.** I personally re-verified
-four of their claims (the untracked-logs consequence, the SciPy tie behaviour, the top-up
-irreproducibility, the label join key) and they held. Their remaining ~13 findings are
-unverified leads rather than findings, and are deliberately not carried into §2/§3 above.
-The adversarial refutation phase I had queued behind them never ran for either line.
+Four claims from two contributing reviews were re-verified by the reporting reviewer:
+the untracked-log failure, SciPy tie behaviour, top-up irreproducibility and label
+join key. Approximately 13 other leads remained unverified and were not included
+as findings. Coverage was incomplete.
 
 **Structural gaps that no amount of further offline work would close:**
 
@@ -528,16 +468,3 @@ The adversarial refutation phase I had queued behind them never ran for either l
 - **This is a methods and engineering review, not a statistical review.** I checked that
   the code computes what §6 describes and re-derived §6.5's precision claim; I did not
   assess whether the estimators are the right ones for the question.
-
----
-
-## 6. WHERE TO RESUME
-
-1. Finish the seven unreported lines above, starting with the instrument/commensurability
-   check, since it is the study's central validity claim and is entirely unverified on
-   the current 56.
-2. Reconcile and adversarially verify the ~13 outstanding leads from the two lines that did
-   report.
-3. Then, before `--preflight`: commit and re-tag (§2.1), and make the §3 corrections to
-   `PREREGISTRATION.md`, `decisions-log.md` and `paper/abstract.md`, all of which are
-   legitimate now and illegitimate once a judge score exists.
