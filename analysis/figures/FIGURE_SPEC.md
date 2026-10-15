@@ -35,12 +35,3 @@ greyscale view. The figure scripts use Poppler (`pdfinfo`, `pdffonts`, `pdftotex
 to check canvas size, embedded fonts, clipping, and text overlaps. Missing tools
 are reported by the scripts. If a caption or canvas changes, also compile the
 manuscript and inspect its layout.
-
-`check_fig3.py` is an author tool for the 2026-08-22 manuscript caption. It requires
-the local TeX source, a rendered `fig3.pdf`, and `qpdf`; it is separate from public
-reproduction. Its wording and layout checks need updating when the manuscript
-changes. From this directory:
-
-```bash
-python3 check_fig3.py /path/to/neurips_2026.tex
-```

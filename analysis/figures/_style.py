@@ -20,12 +20,9 @@ import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib import font_manager as fm  # noqa: E402
 
 # --------------------------------------------------------------------------
-# Page geometry.  From neurips_2026.sty: textwidth=5.5in, textheight=9in,
-# \normalsize = 10pt on 11pt leading.
+# Manuscript text width from neurips_2026.sty.
 # --------------------------------------------------------------------------
 TEXTWIDTH_IN = 5.5
-TEXTHEIGHT_IN = 9.0
-BODY_PT = 10.0
 
 # Print-point sizes assume the canvas is included at its declared width.
 PT = {
@@ -57,16 +54,9 @@ COLOR = {
     "faint": "#9A9A9A",
 }
 
-# Times first, then its metric-compatible free clones.  Times New Roman resolves
-# on macOS; Nimbus Roman / TeX Gyre Termes on TeX Live; Liberation Serif on most
-# Linux boxes.  All are metrically Times, so the figure renders identically
-# wherever it is rebuilt.
-#
-# Ordered TrueType-first: pdf.fonttype=42 asks for TrueType embedding, and
-# handing it an OpenType/CFF face (Nimbus Roman and TeX Gyre Termes are both
-# .otf on most TeX installs) produces a valid but odd PDF that poppler reports
-# as "Mismatch between font type and embedded font file".  Harmless, but it is
-# noise in exactly the check a submission portal runs.
+# Prefer Times-compatible TrueType fonts for PDF embedding. Rendering can vary
+# with the installed fonts. OpenType/CFF faces can trigger Poppler's
+# "Mismatch between font type and embedded font file" warning with fonttype=42.
 SERIF_STACK = [
     "Times New Roman",   # macOS, Windows           (TrueType)
     "Tinos",             # metric clone of the above (TrueType)
@@ -80,9 +70,7 @@ SERIF_STACK = [
 
 
 def resolve_serif() -> str:
-    """Return the first font in SERIF_STACK actually installed, and warn if the
-    match is not a Times clone.  A silent fallback to DejaVu Serif is the kind
-    of drift this module exists to catch."""
+    """Return the first installed serif and warn on fallback to DejaVu Serif."""
     for name in SERIF_STACK:
         try:
             fm.findfont(fm.FontProperties(family=name), fallback_to_default=False)

@@ -22,7 +22,11 @@ python3 judging/run_study.py             # complete and promote the run
 Every live command after preflight requires `HEAD` to match the preflight commit.
 Do not commit between preflight and completion. The same check limits live
 `--offline-cache-only` replay to the original run checkout; it does not work at a
-later release commit. `--judge-backend mock` exercises the pipeline with synthetic,
+later release commit. The release includes `results/preflight/resolved_config.json`;
+the frozen runner's comment that this record is untracked describes the earlier
+checkout. Publishing the record does not remove the commit-match requirement.
+
+`--judge-backend mock` exercises the pipeline with synthetic,
 unreportable scores. `--manifest-only` makes no provider calls but rewrites the
 plan and manifests in `results/`, so use a separate checkout for that check.
 

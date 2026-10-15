@@ -70,11 +70,10 @@ PRE_DATA_EXCLUSIONS = {
     "C018": "unrepaired current error and response-pair contingency confound",
 }
 
-# Expected corpus shape. Judged-turn total and the three sampling-relevant tracker
-# cells match the build prompt exactly. The build prompt reported 991 joinable with
-# (False,False)=8; the join reproducible from the frozen pipeline (strict JSON parse,
-# training+answer-phase-window turns) gives 990 with (False,False)=7; the one-record
-# delta sits entirely in the never-sampled ambiguous cell (decisions-log 2026-08-08).
+# Expected counts from the frozen pipeline's strict JSON parsing and training
+# answer-phase window. The initial specification counted 991 tracker joins with
+# (False,False)=8; reconstruction gives 990 with (False,False)=7. The difference
+# affects only the unsampled ambiguous cell (decisions-log 2026-08-08).
 EXPECTED_JUDGED_TURNS = 2219
 EXPECTED_TRACKER_JOIN = {"n": 990, (False, True): 844, (True, True): 100,
                          (True, False): 39, (False, False): 7}
@@ -567,22 +566,15 @@ def cmd_select(args):
 
 
 # ---------------------------------------------------------------- pairing
-# Pairing v2 (decisions-log 2026-08-08). v1 mined a counterpart response with a
-# lexical heuristic (has_question / leaks) plus same-problem_id + length matching.
-# Manual review showed that is not sufficient: same problem_id does not imply the
-# donor tutor was discussing the same thing (one graft imported a "working
-# together" rate discussion into a mixture context), and question-vs-no-question
-# separates phrasing rather than scaffolding level.
-#
-# v2 keeps the build prompt's order of preference (a real corpus turn wherever one
-# genuinely fits, an authored counterpart otherwise) but resolves it by review
-# rather than by regex: for each stimulus we emit a packet (context, the
-# real next turn, and ranked same-problem candidates from each pole's pool), a
-# blind reviewer picks a fitting corpus candidate or authors the counterpart, and
-# every decision is validated and spot-checked before freeze.
+# Pairing v2 (decisions-log 2026-08-08). Each blind review packet contains the
+# context, real next turn, and ranked same-problem candidates. Reviewers prefer
+# a fitting corpus response and author a counterpart when none fits. Shared
+# problem IDs, similar lengths, and question marks alone do not establish fit
+# or scaffolding level. Decisions are validated and spot-checked before freeze.
 
-# Policy pools follow the build prompt: ped* and conv_socratic are the natural
-# high-scaffolding sources; plain conv is the low-scaffolding source.
+# Policy pools define donor eligibility; response-level filters select candidates
+# that ask a question without leaking the answer (high pole), or disclose the
+# answer or ask no question (low pole), before blind review.
 ELICIT_POLICIES = {"ped", "ped_no_gate", "ped_no_cascade", "ped_no_tracker",
                    "conv_socratic", "conv_no_final_answer"}
 PERFORM_POLICIES = {"conv", "conv_no_final_answer", "ped", "ped_no_gate",

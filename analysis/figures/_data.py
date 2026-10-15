@@ -24,12 +24,6 @@ POLES = ("high", "low")
 FIELDS = ("overall", "scaffolding", "productive_struggle",
           "assistance_calibration", "elicitation")
 
-# Display labels for the configuration fields.
-SHORT = {"overall": "composite", "scaffolding": "scaffolding",
-         "productive_struggle": "productive\nstruggle",
-         "assistance_calibration": "assistance\ncalibration",
-         "elicitation": "elicitation"}
-
 SCALE_MIN, SCALE_MAX = 1.0, 5.0
 EPS = 1e-9
 
@@ -112,16 +106,15 @@ def n_pinned_all_arms(pole: str, field: str = "overall", sids=None) -> int:
 
 
 # --------------------------------------------------------------------------
-# inference, with the honesty flags the figures need
+# inference and attainable p-value bounds
 # --------------------------------------------------------------------------
 def report(v: np.ndarray) -> dict:
-    """``analyze.wilcoxon_report`` plus what the p-value is *able* to say.
+    """Signed-rank results with the nonzero count and attainable p-value floor.
 
     A two-sided exact signed-rank test on k nonzero clusters cannot return a
-    p below 2/2**k.  Where that floor exceeds alpha the test could not have
-    rejected under any data, so its p-value carries no evidence and the figures
-    must not print it as though it did: fig2's residual (k=5, floor 0.0625) was
-    shipped with "p=0.625" set beside two significant p-values.
+    p below 2/2**k. If that floor exceeds alpha, no assignment of signs can
+    produce a rejection at that level. Figures report this limit alongside
+    the test result.
     """
     w = dict(A.wilcoxon_report(v))
     k = int(np.sum(np.abs(np.asarray(v, dtype=float)) > A.ZERO_TOL))

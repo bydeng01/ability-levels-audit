@@ -8,6 +8,12 @@ hash-bound to the run. The reports below reflect the versions reviewed on their
 dates. Amendments and subsequent corrections are recorded in the
 [decisions log](decisions-log.md).
 
+The original reports retain agent handoffs, review coverage notes, and the
+credential and checkout state at the time. These are historical records, not
+current run instructions. Use the [run workflow](../judging/README.md) for the
+execution requirements. Original paths and text are preserved so citations in
+the frozen protocol remain valid.
+
 | Record | Scope |
 |---|---|
 | [First pre-flight audit, August 8](AUDIT-2026-08-08.md) | Initial findings, remediation evidence, and the remaining freeze step. |
