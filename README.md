@@ -27,6 +27,7 @@ python3 -m pip install -r requirements.txt
 python3 analysis/analyze.py
 python3 analysis/diagnostics.py
 python3 analysis/simulations.py
+python3 analysis/robustness_checks.py
 python3 analysis/figures/fig1.py
 python3 analysis/figures/fig2.py
 python3 analysis/figures/fig3.py
@@ -35,12 +36,13 @@ python3 analysis/figures/fig3.py
 After dependency installation, these commands run offline without an API key.
 Analysis outputs go to `analysis/out/`; figures go to `analysis/figures/`.
 `analyze.py` implements the frozen registered analysis. `diagnostics.py` adds
-registered diagnostics and separately labelled post-hoc analyses; `simulations.py`
-and Figures 2–3 are exploratory.
+registered diagnostics and separately labelled post-hoc analyses; `simulations.py`,
+`robustness_checks.py` and Figures 2–3 are exploratory.
 
-The instrument test-retest comparison in `diagnostics.py` also needs the companion
-study's per-turn results. Set `SRC_RESULTS=/path/to/conv-vs-ped-tutor/results` to
-supply them. That comparison is skipped when those files are unavailable.
+The instrument test-retest comparison in `diagnostics.py` and the second-judge check
+in `robustness_checks.py` also need the companion study's per-turn results. Set
+`SRC_RESULTS=/path/to/conv-vs-ped-tutor/results` to supply them. Those comparisons
+are skipped when those files are unavailable.
 Figure PDF checks use Poppler's `pdfinfo`, `pdffonts`, and `pdftotext`; missing
 tools are reported by the scripts. See [figure maintenance](analysis/figures/FIGURE_SPEC.md).
 
