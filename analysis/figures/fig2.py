@@ -121,12 +121,13 @@ def main() -> None:
     ceiling = cn["full_clip_ceiling"]
     ax.plot((-0.55, 2.55), (ceiling, ceiling), color=C["faint"], lw=0.6,
             ls=(0, (2.0, 1.6)), zorder=1)
-    ax.annotate("full-clip ceiling", (2.50, ceiling), xytext=(0, 2),
+    # Two lines keep the label clear of the construction's interval at x = 1.
+    ax.annotate("all low poles\nfloored", (2.50, ceiling), xytext=(0, 2),
                 textcoords="offset points", ha="right", va="bottom",
                 fontsize=PT["small"], color=C["muted"])
 
     marks = (("observed", cn["observed"], C["P_adv"]),
-             ("censoring\nnull", cn["clip"], C["muted"]),
+             ("construction", cn["clip"], C["muted"]),
              ("residual", cn["residual"], C["pole_H"]))
     for i, (_lab, w, col) in enumerate(marks):
         lo, hi = w["ci95_bca"]
